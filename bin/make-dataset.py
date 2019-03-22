@@ -8,9 +8,6 @@ import collections
 import json
 import logging
 import random
-from typing import (
-    Dict,
-    List)
 
 import click
 import tqdm
@@ -24,24 +21,9 @@ from socialnorms.filters import (
     COMMENT_FILTERS,
     POST_FILTERS,
     LABEL_SCORES_FILTERS)
-from socialnorms.labels import Label
 
 
 logger = logging.getLogger(__name__)
-
-
-# constants and helper functions
-
-def _extract_label_scores_from_comments(
-        comments: List[Comment]
-) -> Dict[Label, float]:
-    label_to_score = {label: 0. for label in Label}
-    for comment in comments:
-        label = Label.extract_from_text(comment.body)
-        if label:
-            label_to_score[label] += comment.score
-
-    return label_to_score
 
 
 # main function
@@ -100,26 +82,25 @@ def make_dataset(
                 posts.append(post)
 
     # Step 3: Extract labels with scores from the comments for each
-    # post, filter out posts with bad labels, then write the dataset
+    # post, filter out posts with bad labels, try and retrieve the
+    # original post text from the comments, and then write the dataset
     # instances to disk.
     with click.open_file(output_path, 'w') as out_file:
         for post in tqdm.tqdm(
                 random.sample(posts, len(posts)),
                 **settings.TQDM_KWARGS
         ):
-            label_scores = _extract_label_scores_from_comments(post.comments)
-
-            if all(check(label_scores) for check in LABEL_SCORES_FILTERS):
+            if all(check(post.label_scores) for check in LABEL_SCORES_FILTERS):
                 instance = {
                     'id': post.id,
                     'title': post.title,
-                    'text': post.selftext,
+                    'text': post.original_text or post.selftext,
                     'label_scores': {
                         label.name: score
-                        for label, score in label_scores.items()
+                        for label, score in post.label_scores.items()
                     },
                     'label': max(
-                        label_scores.items(),
+                        post.label_scores.items(),
                         key=lambda t: t[1])[0].name
                 }
 

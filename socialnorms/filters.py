@@ -32,16 +32,6 @@ COMMENT_FILTERS = [
 
 # filters for posts
 
-def post_not_deleted(
-        post: Post
-) -> bool:
-    """Return ``True`` if the post not been deleted."""
-    return not (
-        post.selftext == '[deleted]'
-        or post.selftext == '[removed]'
-    )
-
-
 def post_is_self(
         post: Post
 ) -> bool:
@@ -56,15 +46,39 @@ def post_selftext_is_not_empty(
     return post.selftext != ""
 
 
+def post_not_deleted(
+        post: Post
+) -> bool:
+    """Return ``True`` if the post not been deleted."""
+    return not (
+        post.selftext == '[deleted]'
+        or post.selftext == '[removed]'
+    )
+
+
+def post_has_original_text(
+        post: Post
+) -> bool:
+    """Return ``True`` if the post has original text.
+
+    The original text of the post (before any subsequent edits by the
+    author) is saved in the comments section by the AutoModerator
+    bot. Return ``True`` if the original text can be found and extracted
+    from the comments, and ``False`` otherwise.
+    """
+    return post.original_text is not None
+
+
 def post_has_enough_content(
         post: Post
 ) -> bool:
     """Return ``True`` if the post has enough content tokens.
 
     Return ``True`` if the post has more content tokens (tokens in the
-    title plus in the selftext) than a certain threshold.
+    title plus in the original text or selftext if it's not available)
+    than a certain threshold.
     """
-    content = post.title + ' ' + post.selftext
+    content = post.title + ' ' + (post.original_text or post.selftext)
 
     return count_words(content) >= 16
 
@@ -75,6 +89,7 @@ POST_FILTERS = [
     post_is_self,
     post_selftext_is_not_empty,
     post_not_deleted,
+    post_has_original_text,
     post_has_enough_content
 ]
 """The list of post filters used for creating the dataset."""

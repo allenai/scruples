@@ -3,9 +3,13 @@
 from typing import (
     Any,
     Dict,
-    List)
+    List,
+    Optional)
 
 import attr
+import regex
+
+from socialnorms.labels import Label
 
 
 # utility functions
@@ -36,7 +40,7 @@ def instantiate_attrs_with_extra_kwargs(
 
 # data models
 
-@attr.s(frozen=True, slots=True, kw_only=True)
+@attr.s(frozen=True, kw_only=True)
 class Comment:
     """A class representing a comment.
 
@@ -121,13 +125,28 @@ class Comment:
         converter=int)
 
 
-@attr.s(frozen=True, slots=True, kw_only=True)
+@attr.s(frozen=True, kw_only=True)
 class Post:
     """A class representing a post.
 
     Attributes
     ----------
-    See `Parameters`_.
+    label_scores : Dict[Label, int]
+        A dictionary mapping each label to a score for that
+        label. Scores are computed by summing the score of each comment
+        expressing a particular label. ``label_scores`` is computed
+        lazily and cached (since ``Post`` objects are immutable), so
+        accessing the attribute the first time will be slower.
+    original_text : Optional[str]
+        The original text of the post or ``None``. The post in it's
+        original form is usually captured by the AutoModerator for the
+        subreddit. If the original text can be found in the comments,
+        then it will captured in this attribute; otherwise, the
+        attribute is ``None``. ``original_text`` is computed lazily and
+        cached (since ``Post`` objects are immutable), so accessing the
+        attribute the first time will be slower.
+
+    See `Parameters`_ for additional attributes.
 
     Parameters
     ----------
@@ -179,6 +198,20 @@ class Post:
         Whether or not the post has been stickied to the top of the
         subreddit.
     """
+    # hidden class attributes
+    _AUTO_MODERATOR_NAME = 'AutoModerator'
+    _ORIGINAL_COMMENT_PREFIX_AND_SUFFIX = (
+        # prefix for the comment archiving the original post
+        '^^^^AUTOMOD  ***This is a copy of the above post. It is a'
+        ' record of the post as originally written, in case the post is'
+        ' deleted or edited.***\n\n',
+        # (optional) suffix for the comment archiving the original post
+        '\n\n*I am a bot, and this action was performed'
+        ' automatically. Please [contact the moderators of this'
+        ' subreddit](/message/compose/?to=/r/AmItheAsshole) if you have'
+        ' any questions or concerns.*'
+    )
+
     # identifying information
     id: str = attr.ib(
         validator=attr.validators.instance_of(str),
@@ -254,3 +287,47 @@ class Post:
     stickied: bool = attr.ib(
         validator=attr.validators.instance_of(bool),
         converter=bool)
+
+    @property
+    def label_scores(self) -> Dict[Label, int]:
+        # Previously computed values can safely be cached since the
+        # object is intended to be immutable. We want to store this
+        # cached value on the object so that it can be garbage collected
+        # when the object is.
+        if not hasattr(self, '_label_scores'):
+            label_scores = {label: 0. for label in Label}
+            for comment in self.comments:
+                label = Label.extract_from_text(comment.body)
+                if label:
+                    label_scores[label] += comment.score
+
+            # To get around the immutability of the instance, we have to
+            # use __setattr__ from object.
+            object.__setattr__(self, '_label_scores', label_scores)
+
+        return self._label_scores
+
+    @property
+    def original_text(self) -> Optional[str]:
+        # Previously computed values can safely be cached since the
+        # object is intended to be immutable. We want to store this
+        # cached value on the object so that it can be garbage collected
+        # when the object is.
+        if not hasattr(self, '_original_text'):
+            prefix, suffix = self._ORIGINAL_COMMENT_PREFIX_AND_SUFFIX
+            original_text = None
+            for comment in self.comments:
+                if (
+                        comment.author == self._AUTO_MODERATOR_NAME
+                        and comment.body.startswith(prefix)
+                ):
+                    if comment.body.endswith(suffix):
+                        original_text = comment.body[len(prefix):-len(suffix)]
+                    else:
+                        original_text = comment.body[len(prefix):]
+
+            # To get around the immutability of the instance, we have to
+            # use __setattr__ from object.
+            object.__setattr__(self, '_original_text', original_text)
+
+        return self._original_text
