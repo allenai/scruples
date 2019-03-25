@@ -55,6 +55,7 @@ def analyze_performance(
         *zip(*[
             (id_to_dataset_label[id_], id_to_pred[id_])
             for id_ in id_to_pred.keys()
+            if id_ in id_to_dataset_label
         ]),
     )
 
