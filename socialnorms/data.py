@@ -299,7 +299,7 @@ class Post:
             for comment in self.comments:
                 label = Label.extract_from_text(comment.body)
                 if label:
-                    label_scores[label] += comment.score
+                    label_scores[label] += 1
 
             # To get around the immutability of the instance, we have to
             # use __setattr__ from object.
