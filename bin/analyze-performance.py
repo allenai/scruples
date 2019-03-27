@@ -6,10 +6,40 @@ import logging
 import click
 from sklearn import metrics
 
+from socialnorms import utils
 from socialnorms.labels import Label
 
 
 logger = logging.getLogger(__name__)
+
+
+# constants
+
+REPORT_TEMPLATE =\
+"""Social Norms Classification Performance Report
+==============================================
+Analysis of classification performance on socialnorms.
+
+
+Main Metrics
+------------
+Accuracy          : {accuracy:.4f}
+Balanced Accuracy : {balanced_accuracy:.4f}
+F1 (micro)        : {f1_micro:.4f}
+F1 (macro)        : {f1_macro:.4f}
+F1 (weighted)     : {f1_weighted:.4f}
+
+
+Classification Report
+---------------------
+{classification_report}
+
+
+Confusion Matrix
+----------------
+{confusion_matrix}
+
+"""
 
 
 # main function
@@ -61,14 +91,7 @@ def analyze_performance(
 
     # Step 4: Write the report.
     with click.open_file(output_path, 'w') as output_file:
-        # write the header
-        output_file.write(
-            f'Social Norms Performance Report\n'
-            f'===============================\n'
-            f'Analysis of classification performance on socialnorms.\n')
-        output_file.write('\n\n')
-
-        # write the main metrics
+        # compute main metrics
         accuracy = metrics.accuracy_score(
             y_true=dataset_labels,
             y_pred=predicted_labels)
@@ -88,48 +111,26 @@ def analyze_performance(
             y_pred=predicted_labels,
             average='weighted')
 
-        output_file.write(
-            f'Main Metrics\n'
-            f'------------\n'
-            f'Accuracy          : {accuracy:.4f}\n'
-            f'Balanced Accuracy : {balanced_accuracy:.4f}\n'
-            f'F1 (micro)        : {f1_micro:.4f}\n'
-            f'F1 (macro)        : {f1_macro:.4f}\n'
-            f'F1 (weighted)     : {f1_weighted:.4f}\n')
-        output_file.write('\n\n')
+        # create the classification report
+        classification_report = metrics.classification_report(
+            y_true=dataset_labels,
+            y_pred=predicted_labels)
 
-        # write a full classification report
-        output_file.write(
-            'Classification Report\n'
-            '---------------------\n')
-        output_file.write(
-            metrics.classification_report(
-                y_true=dataset_labels,
-                y_pred=predicted_labels))
-        output_file.write('\n\n')
-
-        # write a confusion matrix
-        label_names = [label.name for label in Label]
-        confusion_matrix = metrics.confusion_matrix(
+        # create the confusion matrix
+        confusion_matrix = utils.make_confusion_matrix_str(
             y_true=dataset_labels,
             y_pred=predicted_labels,
-            labels=label_names)
-        confusion_matrix_header = '|'.join(
-            f' {label_name: <4} '
-            for label_name in label_names)
-        confusion_matrix_body = '|\n|'.join(
-            f' {label_name: <4} |' + '|'.join(f' {x: >4} ' for x in row)
-            for label_name, row in zip(label_names, confusion_matrix))
+            labels=[label.name for label in Label])
+
         output_file.write(
-            f'Confusion Matrix\n'
-            f'----------------\n'
-            f'+======+======+======+======+======+======+\n'
-            f'|      |{confusion_matrix_header}| predicted\n'
-            f'+======+======+======+======+======+======+\n'
-            f'|{confusion_matrix_body}|\n'
-            f'+------+------+------+------+------+------+\n'
-            f' true\n')
-        output_file.write('\n\n')
+            REPORT_TEMPLATE.format(
+                accuracy=accuracy,
+                balanced_accuracy=balanced_accuracy,
+                f1_micro=f1_micro,
+                f1_macro=f1_macro,
+                f1_weighted=f1_weighted,
+                classification_report=classification_report,
+                confusion_matrix=confusion_matrix))
 
 
 if __name__ == '__main__':

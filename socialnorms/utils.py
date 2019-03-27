@@ -1,12 +1,18 @@
 """Utilities."""
 
+from typing import (
+    List,
+    Optional)
+
+import numpy as np
 import regex
+from sklearn import metrics
 
 
 _character_filter_regex = regex.compile(r'[^\w\s]')
 _whitespace_regex = regex.compile(r'\s+')
 
-def count_words(text):
+def count_words(text: str):
     """Return the number of words in ``text``.
 
     Return the number of words in ``text`` where a word is defined as a
@@ -50,3 +56,80 @@ def count_words(text):
     text = _whitespace_regex.sub(' ', text)
 
     return len(text.strip().split(' '))
+
+
+def make_confusion_matrix_str(
+        y_true: List[str],
+        y_pred: List[str],
+        labels: Optional[List[str]] = None
+) -> str:
+    """Return the confusion matrix as a pretty printed string.
+
+    Parameters
+    ----------
+    y_true : List[str], required
+        The true labels.
+    y_pred : List[str], required
+        The predicted labels.
+    labels : Optional[List[str]], optional (default = None)
+        The list of label names. If ``None`` then the list of possible
+        labels is computed from ``y_true`` and ``y_pred``.
+
+    Returns
+    -------
+    str
+        A pretty printed string for the confusion matrix.
+    """
+    labels = labels or [
+        str(label)
+        for label in sorted(list(set(y_true) + set(y_pred)))
+    ]
+    confusion_matrix = metrics.confusion_matrix(
+        y_true=y_true,
+        y_pred=y_pred,
+        labels=labels)
+
+    # The cell length should be the longest of:
+    #
+    #   1. 6 characters
+    #   2. The length of the longest label string
+    #   3. The maximum number of digits of any number in the confusion
+    #      matrix
+    #
+    cell_length = max(
+        6,
+        max(len(label) for label in labels),
+        np.ceil(
+            np.log(np.max(np.abs(confusion_matrix)))
+            / np.log(10)))
+
+    header_separator = (
+        '+'
+        + '+'.join('=' * (cell_length + 2) for _ in range(len(labels) + 1))
+        + '+')
+
+    body_separator = (
+        '+'
+        + '+'.join('-' * (cell_length + 2) for _ in range(len(labels) + 1))
+        + '+')
+
+    header = (
+        f'| {"": <{cell_length}} |'
+        + '|'.join(f' {label: <{cell_length}} ' for label in labels)
+        + '|')
+
+    body = (
+        '|'
+        + '|\n|'.join(
+            f' {label: <{cell_length}} |' + '|'.join(
+                f' {x: >{cell_length}} ' for x in row)
+            for label, row in zip(labels, confusion_matrix))
+        + '|')
+
+    return (
+        f'{header_separator}\n'
+        f'{header}\n'
+        f'{header_separator}\n'
+        f'{body}\n'
+        f'{body_separator}'
+    )
