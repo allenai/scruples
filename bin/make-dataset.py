@@ -17,10 +17,6 @@ from socialnorms.data import (
     Comment,
     Post,
     instantiate_attrs_with_extra_kwargs)
-from socialnorms.filters import (
-    COMMENT_FILTERS,
-    POST_FILTERS,
-    LABEL_SCORES_FILTERS)
 
 
 logger = logging.getLogger(__name__)
@@ -49,26 +45,22 @@ def make_dataset(
     COMMENTS_PATH, create the social norms dataset, and write it to
     OUTPUT_PATH.
     """
-    # Step 1: Read in the comments, filter out bad ones, and index the
-    # rest by their link ids.
+    # Step 1: Read in the comments and index them by their link ids.
     link_id_to_comments = collections.defaultdict(list)
     with click.open_file(comments_path, 'r') as comments_file:
         for ln in tqdm.tqdm(comments_file.readlines(), **settings.TQDM_KWARGS):
-            kwargs = json.loads(ln)
             comment = instantiate_attrs_with_extra_kwargs(
                 Comment,
-                **kwargs)
+                **json.loads(ln))
 
-            if all(check(comment) for check in COMMENT_FILTERS):
-                # IDs are usually prefixed with something like "t1_",
-                # "t2_", etc. to denote what type of object it is. Slice
-                # off the first 3 characters to remove this prefix from
-                # the link id because it will not be on the posts' IDs
-                # when we join the comments to them.
-                link_id_to_comments[comment.link_id[3:]].append(comment)
+            # IDs are usually prefixed with something like "t1_",
+            # "t2_", etc. to denote what type of object it is. Slice
+            # off the first 3 characters to remove this prefix from
+            # the link id because it will not be on the posts' IDs
+            # when we join the comments to them.
+            link_id_to_comments[comment.link_id[3:]].append(comment)
 
-    # Step 2: Read in the posts, filter out the bad ones, and join them
-    # with their comments.
+    # Step 2: Read in the posts and join them with their comments.
     posts = []
     with click.open_file(posts_path, 'r') as posts_file:
         for ln in tqdm.tqdm(posts_file.readlines(), **settings.TQDM_KWARGS):
@@ -78,33 +70,35 @@ def make_dataset(
                 comments=link_id_to_comments[kwargs['id']],
                 **kwargs)
 
-            if all(check(post) for check in POST_FILTERS):
-                posts.append(post)
+            posts.append(post)
 
     # Step 3: Extract labels with scores from the comments for each
-    # post, filter out posts with bad labels, try and retrieve the
-    # original post text from the comments, and then write the dataset
-    # instances to disk.
-    with click.open_file(output_path, 'w') as out_file:
+    # post, filter out bad posts, try and retrieve the original post
+    # text from the comments, and then write the dataset instances to
+    # disk.
+    with click.open_file(output_path, 'w') as output_file:
         for post in tqdm.tqdm(
+                # shuffle the posts
                 random.sample(posts, len(posts)),
                 **settings.TQDM_KWARGS
         ):
-            if all(check(post.label_scores) for check in LABEL_SCORES_FILTERS):
-                instance = {
-                    'id': post.id,
-                    'title': post.title,
-                    'text': post.original_text or post.selftext,
-                    'label_scores': {
-                        label.name: score
-                        for label, score in post.label_scores.items()
-                    },
-                    'label': max(
-                        post.label_scores.items(),
-                        key=lambda t: t[1])[0].name
-                }
+            if not post.is_good:
+                continue
 
-                out_file.write(json.dumps(instance) + '\n')
+            instance = {
+                'id': post.id,
+                'post_type': post.post_type,
+                'title': post.title,
+                'text': post.original_text or post.selftext,
+                'label_scores': {
+                    label.name: score
+                    for label, score
+                    in post.label_scores.label_to_score.items()
+                },
+                'label': post.label_scores.best_label.name
+            }
+
+            output_file.write(json.dumps(instance) + '\n')
 
 
 if __name__ == '__main__':

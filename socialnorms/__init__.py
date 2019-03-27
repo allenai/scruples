@@ -2,7 +2,6 @@
 
 from . import (
     data,
-    filters,
     labels,
     settings,
     utils)

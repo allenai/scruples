@@ -9,6 +9,9 @@ from typing import (
 import attr
 import regex
 
+from socialnorms import (
+    settings,
+    utils)
 from socialnorms.labels import Label
 
 
@@ -41,12 +44,81 @@ def instantiate_attrs_with_extra_kwargs(
 # data models
 
 @attr.s(frozen=True, kw_only=True)
+class LabelScores:
+    """A class representing scores for all the labels.
+
+    Attributes
+    ----------
+    best_label : Label
+        The overall highest scoring label. Ties are broken arbitrarily.
+    is_all_zero : bool
+        ``True`` if all the scores are zero.
+    has_unique_highest_scoring_label : bool
+        ``True`` if one of the labels scored higher than all others.
+    is_good : bool
+        ``True`` if the label scores are considered good for inclusion
+        in the final dataset.
+
+    See `Parameters`_ for additional attributes.
+
+    Parameters
+    ----------
+    label_to_score : Dict[Label, int]
+        A dictionary mapping each label to its corresponding score.
+    """
+    label_to_score: Dict[Label, int] = attr.ib(
+        validator=attr.validators.deep_mapping(
+            key_validator=attr.validators.instance_of(Label),
+            value_validator=attr.validators.instance_of(int)))
+
+    # computed content properties
+
+    @utils.cached_property
+    def best_label(self) -> Label:
+        return max(self.label_to_score.items(), key=lambda t: t[1])[0]
+
+    # computed properties for identifying good label scores
+
+    @utils.cached_property
+    def is_all_zero(self) -> bool:
+        return all(v == 0 for v in self.label_to_score.values())
+
+    @utils.cached_property
+    def has_unique_highest_scoring_label(self) -> bool:
+        max_score = max(self.label_to_score.values())
+
+        return 1 == sum(v == max_score for v in self.label_to_score.values())
+
+    @utils.cached_property
+    def is_good(self) -> bool:
+        # N.B. place cheaper predicates earlier so short-circuiting can
+        # avoid evaluating more expensive predicates.
+        return (
+            not self.is_all_zero
+            and self.has_unique_highest_scoring_label
+        )
+
+
+@attr.s(frozen=True, kw_only=True)
 class Comment:
     """A class representing a comment.
 
     Attributes
     ----------
-    See `Parameters`_.
+    is_top_level : bool
+        ``True`` if the comment is a top-level comment (i.e., a direct
+        response to a link and not another comment).
+    has_empty_body : bool
+        ``True`` if the body text of the comment is empty.
+    is_deleted : bool
+        ``True`` if the comment is deleted.
+    is_by_automoderator : bool
+        ``True`` if the comment is by the AutoModerator.
+    is_good : bool
+        ``True`` if the comment is a good candidate for contributing a
+        label.
+
+    See `Parameters`_ for additional attributes.
 
     Parameters
     ----------
@@ -124,6 +196,39 @@ class Comment:
         validator=attr.validators.instance_of(int),
         converter=int)
 
+    # computed properties for identifying comments to count in label
+    # scores
+
+    @utils.cached_property
+    def is_top_level(self) -> bool:
+        return self.parent_id == self.link_id
+
+    @utils.cached_property
+    def has_empty_body(self) -> bool:
+        return self.body == ""
+
+    @utils.cached_property
+    def is_deleted(self) -> bool:
+        return (
+            self.body == '[deleted]'
+            or self.body == '[removed]'
+        )
+
+    @utils.cached_property
+    def is_by_automoderator(self) -> bool:
+        return self.author == settings.AUTO_MODERATOR_NAME
+
+    @utils.cached_property
+    def is_good(self) -> bool:
+        # N.B. place cheaper predicates earlier so short-circuiting can
+        # avoid evaluating more expensive predicates.
+        return (
+            self.is_top_level
+            and not self.has_empty_body
+            and not self.is_deleted
+            and not self.is_by_automoderator
+        )
+
 
 @attr.s(frozen=True, kw_only=True)
 class Post:
@@ -131,20 +236,42 @@ class Post:
 
     Attributes
     ----------
-    label_scores : Dict[Label, int]
-        A dictionary mapping each label to a score for that
-        label. Scores are computed by summing the score of each comment
-        expressing a particular label. ``label_scores`` is computed
-        lazily and cached (since ``Post`` objects are immutable), so
-        accessing the attribute the first time will be slower.
+    label_scores : LabelScores
+        The label scores for the post. Scores are computed by summing
+        one vote for each comment expressing a particular label.
     original_text : Optional[str]
         The original text of the post or ``None``. The post in it's
         original form is usually captured by the AutoModerator for the
         subreddit. If the original text can be found in the comments,
         then it will captured in this attribute; otherwise, the
-        attribute is ``None``. ``original_text`` is computed lazily and
-        cached (since ``Post`` objects are immutable), so accessing the
-        attribute the first time will be slower.
+        attribute is ``None``.
+    post_type : Optional[str]
+        A string representing the type of post it is. Possible post
+        types are 'AITA', 'WIBTA', and 'META'. If no post type can be
+        identified, then ``post_type`` is ``None``.
+    has_empty_selftext : bool
+        ``True`` if the post's selftext is empty.
+    is_deleted : bool
+        ``True`` if the post is deleted.
+    has_post_type : bool
+        ``True`` if the post's post type is not ``None``.
+    is_meta : bool
+        ``True`` if the post has the 'META' post type.
+    has_original_text : bool
+        ``True`` if the post's original text attribute is not ``None``,
+        i.e. if the original post text was successfully found and
+        extracted from the comments.
+    has_enough_content : bool
+        ``True`` if the post has more content tokens (tokens in the
+        title plus in the original text or selftext if it's not
+        available) than a certain threshold.
+    has_good_label_scores : bool
+       ``True`` if the post's label scores object is good, in other
+       words, if the label scores object is considered a good set of
+       label scores for a dataset instance.
+    is_good : bool
+        ``True`` if the post is considered a good candidate for creating
+        an instance for the dataset.
 
     See `Parameters`_ for additional attributes.
 
@@ -153,11 +280,11 @@ class Post:
     id : str
         A unique ID for the post.
     subreddit_id : str
-        The ID of the subreddit the comment was posted in. The ID has
+        The ID of the subreddit the post was posted in. The ID has
         ``"t5_"`` prepended to it to represent the fact that it is a
         *subreddit* ID.
     subreddit : str
-        The name of the subreddit the comment was posted in.
+        The name of the subreddit the post was posted in.
     permalink : str
         The permanent URL for the post relative to reddit's site.
     domain : str
@@ -199,7 +326,6 @@ class Post:
         subreddit.
     """
     # hidden class attributes
-    _AUTO_MODERATOR_NAME = 'AutoModerator'
     _ORIGINAL_COMMENT_PREFIX_AND_SUFFIX = (
         # prefix for the comment archiving the original post
         '^^^^AUTOMOD  ***This is a copy of the above post. It is a'
@@ -211,6 +337,19 @@ class Post:
         ' subreddit](/message/compose/?to=/r/AmItheAsshole) if you have'
         ' any questions or concerns.*'
     )
+    _POST_TYPE_PATTERNS = {
+        'AITA': [
+            regex.compile('^(?i:AITA).*'),
+            regex.compile('^(?i:Am I the Asshole){e<=2}.*')
+        ],
+        'WIBTA': [
+            regex.compile('^(?i:WIBTA).*'),
+            regex.compile('^(?i:Would I be the Asshole){e<=2}.*')
+        ],
+        'META': [
+            regex.compile('^(?i:META|\[META\]).*')
+        ]
+    }
 
     # identifying information
     id: str = attr.ib(
@@ -288,46 +427,98 @@ class Post:
         validator=attr.validators.instance_of(bool),
         converter=bool)
 
-    @property
-    def label_scores(self) -> Dict[Label, int]:
-        # Previously computed values can safely be cached since the
-        # object is intended to be immutable. We want to store this
-        # cached value on the object so that it can be garbage collected
-        # when the object is.
-        if not hasattr(self, '_label_scores'):
-            label_scores = {label: 0. for label in Label}
-            for comment in self.comments:
-                label = Label.extract_from_text(comment.body)
-                if label:
-                    label_scores[label] += 1
+    # computed content properties
 
-            # To get around the immutability of the instance, we have to
-            # use __setattr__ from object.
-            object.__setattr__(self, '_label_scores', label_scores)
+    @utils.cached_property
+    def label_scores(self) -> LabelScores:
+        label_to_score = {label: 0 for label in Label}
+        for comment in self.comments:
+            if not comment.is_good:
+                continue
 
-        return self._label_scores
+            label = Label.extract_from_text(comment.body)
+            if label:
+                label_to_score[label] += 1
 
-    @property
+        return LabelScores(label_to_score=label_to_score)
+
+    @utils.cached_property
     def original_text(self) -> Optional[str]:
-        # Previously computed values can safely be cached since the
-        # object is intended to be immutable. We want to store this
-        # cached value on the object so that it can be garbage collected
-        # when the object is.
-        if not hasattr(self, '_original_text'):
-            prefix, suffix = self._ORIGINAL_COMMENT_PREFIX_AND_SUFFIX
-            original_text = None
-            for comment in self.comments:
-                if (
-                        comment.author == self._AUTO_MODERATOR_NAME
-                        and comment.body.startswith(prefix)
-                ):
-                    if comment.body.endswith(suffix):
-                        original_text = comment.body[len(prefix):-len(suffix)]
-                    else:
-                        original_text = comment.body[len(prefix):]
+        prefix, suffix = self._ORIGINAL_COMMENT_PREFIX_AND_SUFFIX
+        original_text = None
+        for comment in self.comments:
+            if (
+                    comment.is_by_automoderator
+                    and comment.body.startswith(prefix)
+            ):
+                if comment.body.endswith(suffix):
+                    original_text = comment.body[len(prefix):-len(suffix)]
+                else:
+                    original_text = comment.body[len(prefix):]
 
-            # To get around the immutability of the instance, we have to
-            # use __setattr__ from object.
-            object.__setattr__(self, '_original_text', original_text)
+        return original_text
 
-        return self._original_text
+    @utils.cached_property
+    def post_type(self) -> Optional[str]:
+        post_types = {
+            post_type
+            for post_type, patterns in self._POST_TYPE_PATTERNS.items()
+            if any([pattern.match(self.title) for pattern in patterns])
+        }
+
+        if len(post_types) == 1:
+            post_type = post_types.pop()
+        else:
+            post_type = None
+
+        return post_type
+
+    # computed properties for identifying good instance candidates
+
+    @utils.cached_property
+    def has_empty_selftext(self) -> bool:
+        return self.selftext == ""
+
+    @utils.cached_property
+    def is_deleted(self) -> bool:
+        return (
+            self.selftext == '[deleted]'
+            or self.selftext == '[removed]'
+        )
+
+    @utils.cached_property
+    def has_post_type(self) -> bool:
+        return self.post_type is not None
+
+    @utils.cached_property
+    def is_meta(self) -> bool:
+        return self.post_type == 'META'
+
+    @utils.cached_property
+    def has_original_text(self) -> bool:
+        return self.original_text is not None
+
+    @utils.cached_property
+    def has_enough_content(self) -> bool:
+        content = self.title + ' ' + (self.original_text or self.selftext)
+
+        return utils.count_words(content) >= 16
+
+    @utils.cached_property
+    def has_good_label_scores(self) -> bool:
+        return self.label_scores.is_good
+
+    @utils.cached_property
+    def is_good(self) -> bool:
+        # N.B. place cheaper predicates earlier so short-circuiting can
+        # avoid evaluating more expensive predicates.
+        return (
+            self.is_self
+            and not self.has_empty_selftext
+            and not self.is_deleted
+            and self.has_post_type
+            and not self.is_meta
+            and self.has_original_text
+            and self.has_enough_content
+            and self.has_good_label_scores
+        )
