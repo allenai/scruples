@@ -105,6 +105,10 @@ class Comment:
 
     Attributes
     ----------
+    label : Optional[Label]
+        The label expressed by the comment. If no label can be extracted
+        or multiple labels are extracted from the comment, then this
+        attribute is ``None``.
     is_top_level : bool
         ``True`` if the comment is a top-level comment (i.e., a direct
         response to a link and not another comment).
@@ -195,6 +199,12 @@ class Comment:
     gilded: int = attr.ib(
         validator=attr.validators.instance_of(int),
         converter=int)
+
+    # computed content properties
+
+    @utils.cached_property
+    def label(self) -> Optional[Label]:
+        return Label.extract_from_text(self.body)
 
     # computed properties for identifying comments to count in label
     # scores
@@ -436,9 +446,8 @@ class Post:
             if not comment.is_good:
                 continue
 
-            label = Label.extract_from_text(comment.body)
-            if label:
-                label_to_score[label] += 1
+            if comment.label:
+                label_to_score[comment.label] += 1
 
         return LabelScores(label_to_score=label_to_score)
 
