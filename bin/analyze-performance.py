@@ -112,15 +112,18 @@ def analyze_performance(
             average='weighted')
 
         # create the classification report
+        label_names = [label.name for label in Label]
+
         classification_report = metrics.classification_report(
             y_true=dataset_labels,
-            y_pred=predicted_labels)
+            y_pred=predicted_labels,
+            labels=label_names)
 
         # create the confusion matrix
         confusion_matrix = utils.make_confusion_matrix_str(
             y_true=dataset_labels,
             y_pred=predicted_labels,
-            labels=[label.name for label in Label])
+            labels=label_names)
 
         output_file.write(
             REPORT_TEMPLATE.format(
