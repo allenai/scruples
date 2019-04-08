@@ -37,23 +37,24 @@ class Label(enum.Enum):
         when they're bound to the ``Label`` instance as an attribute.
     """
     YTA = (0, [
-        r'YTAH?',
-        r"(?i:you('re|r) (an?|the) (asshole|a-?hole)){e<=1}"
+        r'\m(?i:YTAH?)\M',
+        r"(?i:you(?:'re|r| are)? (?:(?:kind|sort) of |really )?(?:an? |the )?(?:asshole|a-?hole)){e<=1}"
+        r"(?i:you (?:(?:kind|sort) of |really )?are (?:an? |the )?(?:asshole|a-?hole)){e<=1}"
     ])
     NTA = (1, [
-        r'Y?NTAH?',
-        r'(?i:not (an?|the) (asshole|a-?hole)){e<=1}',
+        r'\m(?i:Y?NTAH?)\M',
+        r'(?i:not (?:really )?(an? |the )?(asshole|a-?hole)){e<=1}',
     ])
     ESH = (2, [
-        r'ESH',
-        r'(?i:every(one|body) sucks here){e<=1}',
+        r'\m(?i:ESH)\M',
+        r'(?i:every(?:one|body) sucks here){e<=1}',
     ])
     NAH = (3, [
-        r'NAH?H',
-        r'(?i:no (assholes|a-?holes) here){e<=1}'
+        r'\m(?i:NAH?H)\M',
+        r'(?i:no (?:assholes|a-?holes) here){e<=1}'
     ])
     INFO = (4, [
-        r'INFO',
+        r'\m(?i:INFO)\M',
         r'(?i:not enough info){e<=1}'
     ])
 
