@@ -84,7 +84,7 @@ def make_confusion_matrix_str(
     """
     labels = labels or [
         str(label)
-        for label in sorted(list(set(y_true) + set(y_pred)))
+        for label in sorted(list(set(y_true).union(set(y_pred))))
     ]
     confusion_matrix = metrics.confusion_matrix(
         y_true=y_true,
