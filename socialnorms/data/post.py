@@ -1,244 +1,17 @@
-"""Data models and utilities."""
+"""A class representing a post."""
 
 from typing import (
-    Any,
-    Dict,
     List,
     Optional)
 
 import attr
-import regex
 
-from socialnorms import (
-    settings,
-    utils)
-from socialnorms.labels import Label
-from socialnorms.post_types import PostType
-
-
-# utility functions
-
-def instantiate_attrs_with_extra_kwargs(
-        cls: Any,
-        **kwargs: Dict[str, Any]
-):
-    """Return ``cls`` instantiated with ``kwargs`` ignoring extra kwargs.
-
-    Parameters
-    ----------
-    cls : Object
-        An object that has been decorated with ``@attr.s``.
-    **kwargs : Dict[str, Any]
-        Any keyword arguments to use when instantiating ``cls``. Extra
-        keyword arguments will be ignored.
-    """
-    if not attr.has(cls):
-        raise ValueError(f'{cls} must be decorated with @attr.s')
-
-    attr_names = attr.fields_dict(cls).keys()
-    return cls(**{
-        k: kwargs[k]
-        for k in attr_names
-    })
-
-
-# data models
-
-@attr.s(frozen=True, kw_only=True)
-class LabelScores:
-    """A class representing scores for all the labels.
-
-    Attributes
-    ----------
-    best_label : Label
-        The overall highest scoring label. Ties are broken arbitrarily.
-    is_all_zero : bool
-        ``True`` if all the scores are zero.
-    has_unique_highest_scoring_label : bool
-        ``True`` if one of the labels scored higher than all others.
-    is_good : bool
-        ``True`` if the label scores are considered good for inclusion
-        in the final dataset.
-
-    See `Parameters`_ for additional attributes.
-
-    Parameters
-    ----------
-    label_to_score : Dict[Label, int]
-        A dictionary mapping each label to its corresponding score.
-    """
-    label_to_score: Dict[Label, int] = attr.ib(
-        validator=attr.validators.deep_mapping(
-            key_validator=attr.validators.instance_of(Label),
-            value_validator=attr.validators.instance_of(int)))
-
-    # computed content properties
-
-    @utils.cached_property
-    def best_label(self) -> Label:
-        return max(self.label_to_score.items(), key=lambda t: t[1])[0]
-
-    # computed properties for identifying good label scores
-
-    @utils.cached_property
-    def is_all_zero(self) -> bool:
-        return all(v == 0 for v in self.label_to_score.values())
-
-    @utils.cached_property
-    def has_unique_highest_scoring_label(self) -> bool:
-        max_score = max(self.label_to_score.values())
-
-        return 1 == sum(v == max_score for v in self.label_to_score.values())
-
-    @utils.cached_property
-    def is_good(self) -> bool:
-        # N.B. place cheaper predicates earlier so short-circuiting can
-        # avoid evaluating more expensive predicates.
-        return (
-            not self.is_all_zero
-            and self.has_unique_highest_scoring_label
-        )
-
-
-@attr.s(frozen=True, kw_only=True)
-class Comment:
-    """A class representing a comment.
-
-    Attributes
-    ----------
-    label : Optional[Label]
-        The label expressed by the comment. If no label can be extracted
-        or multiple labels are extracted from the comment, then this
-        attribute is ``None``.
-    is_top_level : bool
-        ``True`` if the comment is a top-level comment (i.e., a direct
-        response to a link and not another comment).
-    has_empty_body : bool
-        ``True`` if the body text of the comment is empty.
-    is_deleted : bool
-        ``True`` if the comment is deleted.
-    is_by_automoderator : bool
-        ``True`` if the comment is by the AutoModerator.
-    is_good : bool
-        ``True`` if the comment is a good candidate for contributing a
-        label.
-
-    See `Parameters`_ for additional attributes.
-
-    Parameters
-    ----------
-    id : str
-        A unique ID for the comment.
-    subreddit_id : str
-        The ID of the subreddit the comment was posted in. The ID has
-        ``"t5_"`` prepended to it to represent the fact that it is a
-        *subreddit* ID.
-    subreddit : str
-        The name of the subreddit the comment was posted in.
-    link_id : str
-        The ID of the post that the comment was made on. The ID has
-        ``"t3_"`` prepended to it to represent the fact that it is a
-        *post* ID.
-    parent_id : str
-        The ID of the parent object (either a comment or a post). If the
-        parent object is a post, the ID will begin with ``"t3_"``. If
-        the parent object is a comment, the ID will begin with
-        ``"t1_"``.
-    created_utc : int
-        The time that the comment was created in seconds since the
-        epoch.
-    author : str
-        The username of the comment's author.
-    body : str
-        The body text of the comment.
-    score : int
-        The score (upvotes minus downvotes) of the comment.
-    controversiality : int
-        The controversiality score for the comment.
-    gilded : int
-        The number of times the comment has been gilded.
-    """
-    # identifying information
-    id: str = attr.ib(
-        validator=attr.validators.instance_of(str),
-        converter=str)
-
-    # reddit location
-    subreddit_id: str = attr.ib(
-        validator=attr.validators.instance_of(str),
-        converter=str)
-    subreddit: str = attr.ib(
-        validator=attr.validators.instance_of(str),
-        converter=str)
-    link_id: str = attr.ib(
-        validator=attr.validators.instance_of(str),
-        converter=str)
-    parent_id: str = attr.ib(
-        validator=attr.validators.instance_of(str),
-        converter=str)
-
-    # creation
-    created_utc: int = attr.ib(
-        validator=attr.validators.instance_of(int),
-        converter=int)
-    author: str = attr.ib(
-        validator=attr.validators.instance_of(str),
-        converter=str)
-
-    # content
-    body: str = attr.ib(
-        validator=attr.validators.instance_of(str),
-        converter=str)
-
-    # user interactions
-    score: int = attr.ib(
-        validator=attr.validators.instance_of(int),
-        converter=int)
-    controversiality: int = attr.ib(
-        validator=attr.validators.instance_of(int),
-        converter=int)
-    gilded: int = attr.ib(
-        validator=attr.validators.instance_of(int),
-        converter=int)
-
-    # computed content properties
-
-    @utils.cached_property
-    def label(self) -> Optional[Label]:
-        return Label.extract_from_text(self.body)
-
-    # computed properties for identifying comments to count in label
-    # scores
-
-    @utils.cached_property
-    def is_top_level(self) -> bool:
-        return self.parent_id == self.link_id
-
-    @utils.cached_property
-    def has_empty_body(self) -> bool:
-        return self.body == ""
-
-    @utils.cached_property
-    def is_deleted(self) -> bool:
-        return (
-            self.body == '[deleted]'
-            or self.body == '[removed]'
-        )
-
-    @utils.cached_property
-    def is_by_automoderator(self) -> bool:
-        return self.author == settings.AUTO_MODERATOR_NAME
-
-    @utils.cached_property
-    def is_good(self) -> bool:
-        # N.B. place cheaper predicates earlier so short-circuiting can
-        # avoid evaluating more expensive predicates.
-        return (
-            self.is_top_level
-            and not self.has_empty_body
-            and not self.is_deleted
-            and not self.is_by_automoderator
-        )
+from .. import utils
+from . import utils as data_utils
+from .comment import Comment
+from .label_scores import LabelScores
+from .labels import Label
+from .post_types import PostType
 
 
 @attr.s(frozen=True, kw_only=True)
@@ -427,7 +200,7 @@ class Post:
 
     # computed content properties
 
-    @utils.cached_property
+    @data_utils.cached_property
     def label_scores(self) -> LabelScores:
         label_to_score = {label: 0 for label in Label}
         for comment in self.comments:
@@ -439,7 +212,7 @@ class Post:
 
         return LabelScores(label_to_score=label_to_score)
 
-    @utils.cached_property
+    @data_utils.cached_property
     def original_text(self) -> Optional[str]:
         prefix, suffix = self._ORIGINAL_COMMENT_PREFIX_AND_SUFFIX
         original_text = None
@@ -455,46 +228,46 @@ class Post:
 
         return original_text
 
-    @utils.cached_property
+    @data_utils.cached_property
     def post_type(self) -> Optional[PostType]:
         return PostType.extract_from_title(self.title)
 
     # computed properties for identifying good instance candidates
 
-    @utils.cached_property
+    @data_utils.cached_property
     def has_empty_selftext(self) -> bool:
         return self.selftext == ""
 
-    @utils.cached_property
+    @data_utils.cached_property
     def is_deleted(self) -> bool:
         return (
             self.selftext == '[deleted]'
             or self.selftext == '[removed]'
         )
 
-    @utils.cached_property
+    @data_utils.cached_property
     def has_post_type(self) -> bool:
         return self.post_type is not None
 
-    @utils.cached_property
+    @data_utils.cached_property
     def is_meta(self) -> bool:
         return self.post_type == PostType.META
 
-    @utils.cached_property
+    @data_utils.cached_property
     def has_original_text(self) -> bool:
         return self.original_text is not None
 
-    @utils.cached_property
+    @data_utils.cached_property
     def has_enough_content(self) -> bool:
         content = self.title + ' ' + (self.original_text or self.selftext)
 
         return utils.count_words(content) >= 16
 
-    @utils.cached_property
+    @data_utils.cached_property
     def has_good_label_scores(self) -> bool:
         return self.label_scores.is_good
 
-    @utils.cached_property
+    @data_utils.cached_property
     def is_good(self) -> bool:
         # N.B. place cheaper predicates earlier so short-circuiting can
         # avoid evaluating more expensive predicates.

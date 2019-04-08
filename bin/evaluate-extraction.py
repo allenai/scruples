@@ -17,12 +17,11 @@ import tqdm
 from socialnorms import (
     settings,
     utils)
-from socialnorms.data import (
-    Comment,
-    Post,
-    instantiate_attrs_with_extra_kwargs)
-from socialnorms.labels import Label
-from socialnorms.post_types import PostType
+from socialnorms.data.comment import Comment
+from socialnorms.data.post import Post
+from socialnorms.data.utils import instantiate_attrs_with_extra_kwargs
+from socialnorms.data.labels import Label
+from socialnorms.data.post_types import PostType
 
 
 logger = logging.getLogger(__name__)

@@ -7,7 +7,7 @@ import click
 from sklearn import metrics
 
 from socialnorms import utils
-from socialnorms.labels import Label
+from socialnorms.data.labels import Label
 
 
 logger = logging.getLogger(__name__)

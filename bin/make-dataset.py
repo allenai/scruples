@@ -13,10 +13,9 @@ import click
 import tqdm
 
 from socialnorms import settings
-from socialnorms.data import (
-    Comment,
-    Post,
-    instantiate_attrs_with_extra_kwargs)
+from socialnorms.data.comment import Comment
+from socialnorms.data.post import Post
+from socialnorms.data.utils import instantiate_attrs_with_extra_kwargs
 
 
 logger = logging.getLogger(__name__)

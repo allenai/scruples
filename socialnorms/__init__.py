@@ -2,6 +2,5 @@
 
 from . import (
     data,
-    labels,
     settings,
     utils)
