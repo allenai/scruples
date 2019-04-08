@@ -1,5 +1,6 @@
 """Utilities."""
 
+import collections
 from functools import wraps
 from typing import (
     Callable,
@@ -73,7 +74,7 @@ def make_confusion_matrix_str(
         The true labels.
     y_pred : List[str], required
         The predicted labels.
-    labels : Optional[List[str]], optional (default = None)
+    labels : Optional[List[str]], optional (default=None)
         The list of label names. If ``None`` then the list of possible
         labels is computed from ``y_true`` and ``y_pred``.
 
@@ -118,7 +119,7 @@ def make_confusion_matrix_str(
     header = (
         f'| {"": <{cell_length}} |'
         + '|'.join(f' {label: <{cell_length}} ' for label in labels)
-        + '|')
+        + '| predicted')
 
     body = (
         '|'
@@ -133,7 +134,91 @@ def make_confusion_matrix_str(
         f'{header}\n'
         f'{header_separator}\n'
         f'{body}\n'
-        f'{body_separator}'
+        f'{body_separator}\n'
+        f' true'
+    )
+
+
+def make_label_distribution_str(
+        y_true: List[str],
+        labels: Optional[List[str]] = None
+) -> str:
+    """Return a pretty printed table with the label distribution.
+
+    Parameters
+    ----------
+    y_true : List[str], required
+        The true labels.
+    labels : Optional[List[str]], optional (default=None)
+        The list of labels. If ``None`` then the labels are computed
+        from ``y_true``.
+
+    Returns
+    -------
+    str
+        A pretty printed table of the label distribution.
+    """
+    if len(y_true) == 0:
+        return "[no data]"
+
+    labels = labels or [
+        str(label)
+        for label in sorted(list(set(y_true)))
+    ]
+    label_counts = collections.defaultdict(int)
+    for label in y_true:
+        label_counts[label] += 1
+
+    total_n_labels = len(y_true)
+
+    # The cell length should be the longest of:
+    #
+    #   1. 8 characters (the length of the word "fraction")
+    #   2. The length of the longest label string
+    #   3. The maximum number of digits of any number in the list of
+    #      label counts
+    #
+    cell_length = max(
+        8,
+        max(len(label) for label in labels),
+        np.ceil(
+            np.log(np.max(np.abs(list(label_counts.values()))))
+            / np.log(10)))
+
+    header_separator = (
+        '+'
+        + '+'.join('=' * (cell_length + 2) for _ in range(len(labels) + 1))
+        + '+')
+
+    body_separator = (
+        '+'
+        + '+'.join('-' * (cell_length + 2) for _ in range(len(labels) + 1))
+        + '+')
+
+    header = (
+        f'| {"": <{cell_length}} |'
+        + '|'.join(f' {label: <{cell_length}} ' for label in labels)
+        + '|')
+
+    body = (
+        f'| {"fraction": <{cell_length}} |'
+        + '|'.join(
+            f' {label_counts[label] / total_n_labels:>{cell_length}.4f} '
+            for label in labels)
+        + '|\n'
+        + body_separator + '\n'
+        + f'| {"total": <{cell_length}} |'
+        + '|'.join(
+            f' {label_counts[label]: >{cell_length}} '
+            for label in labels)
+        + '|')
+
+    return (
+        f'{header_separator}\n'
+        f'{header}\n'
+        f'{header_separator}\n'
+        f'{body}\n'
+        f'{body_separator}\n'
     )
 
 
