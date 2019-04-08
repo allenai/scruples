@@ -87,7 +87,7 @@ def make_dataset(
 
             instance = {
                 'id': post.id,
-                'post_type': post.post_type,
+                'post_type': post.post_type.name,
                 'title': post.title,
                 'text': post.original_text or post.selftext,
                 'label_scores': {

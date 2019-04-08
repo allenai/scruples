@@ -90,10 +90,7 @@ class Label(enum.Enum):
             patterns: List[str]
     ) -> None:
         self.index = index
-        self.patterns = [
-            regex.compile(pattern)
-            for pattern in patterns
-        ]
+        self.patterns = [regex.compile(pattern) for pattern in patterns]
 
     def in_(
             self,

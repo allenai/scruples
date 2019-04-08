@@ -13,6 +13,7 @@ from socialnorms import (
     settings,
     utils)
 from socialnorms.labels import Label
+from socialnorms.post_types import PostType
 
 
 # utility functions
@@ -255,10 +256,10 @@ class Post:
         subreddit. If the original text can be found in the comments,
         then it will captured in this attribute; otherwise, the
         attribute is ``None``.
-    post_type : Optional[str]
-        A string representing the type of post it is. Possible post
-        types are 'AITA', 'WIBTA', and 'META'. If no post type can be
-        identified, then ``post_type`` is ``None``.
+    post_type : Optional[PostType]
+        The type of post the post is. If no post type can be extracted
+        or multiple post types are extracted for the post, then this
+        attribute is ``None``.
     has_empty_selftext : bool
         ``True`` if the post's selftext is empty.
     is_deleted : bool
@@ -347,19 +348,6 @@ class Post:
         ' subreddit](/message/compose/?to=/r/AmItheAsshole) if you have'
         ' any questions or concerns.*'
     )
-    _POST_TYPE_PATTERNS = {
-        'AITA': [
-            regex.compile('^(?i:AITA).*'),
-            regex.compile('^(?i:Am I the Asshole){e<=2}.*')
-        ],
-        'WIBTA': [
-            regex.compile('^(?i:WIBTA).*'),
-            regex.compile('^(?i:Would I be the Asshole){e<=2}.*')
-        ],
-        'META': [
-            regex.compile('^(?i:META|\[META\]).*')
-        ]
-    }
 
     # identifying information
     id: str = attr.ib(
@@ -468,19 +456,8 @@ class Post:
         return original_text
 
     @utils.cached_property
-    def post_type(self) -> Optional[str]:
-        post_types = {
-            post_type
-            for post_type, patterns in self._POST_TYPE_PATTERNS.items()
-            if any([pattern.match(self.title) for pattern in patterns])
-        }
-
-        if len(post_types) == 1:
-            post_type = post_types.pop()
-        else:
-            post_type = None
-
-        return post_type
+    def post_type(self) -> Optional[PostType]:
+        return PostType.extract_from_title(self.title)
 
     # computed properties for identifying good instance candidates
 
@@ -501,7 +478,7 @@ class Post:
 
     @utils.cached_property
     def is_meta(self) -> bool:
-        return self.post_type == 'META'
+        return self.post_type == PostType.META
 
     @utils.cached_property
     def has_original_text(self) -> bool:
