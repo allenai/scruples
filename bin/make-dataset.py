@@ -12,7 +12,7 @@ import random
 import click
 import tqdm
 
-from socialnorms import settings
+from socialnorms import settings, utils
 from socialnorms.data.comment import Comment
 from socialnorms.data.post import Post
 from socialnorms.data.utils import instantiate_attrs_with_extra_kwargs
@@ -33,10 +33,15 @@ logger = logging.getLogger(__name__)
 @click.argument(
     'output_path',
     type=click.Path(exists=False, file_okay=True, dir_okay=False))
+@click.option(
+    '--verbose',
+    is_flag=True,
+    help='Set the log level to DEBUG.')
 def make_dataset(
         comments_path: str,
         posts_path: str,
-        output_path: str
+        output_path: str,
+        verbose: bool
 ) -> None:
     """Create the social norms dataset and write it to OUTPUT_PATH.
 
@@ -44,6 +49,8 @@ def make_dataset(
     COMMENTS_PATH, create the social norms dataset, and write it to
     OUTPUT_PATH.
     """
+    utils.configure_logging(verbose=verbose)
+
     # Step 1: Read in the comments and index them by their link ids.
     link_id_to_comments = collections.defaultdict(list)
     with click.open_file(comments_path, 'r') as comments_file:

@@ -9,6 +9,8 @@ AUTO_MODERATOR_NAME = 'AutoModerator'
 
 # output and logging
 
+LOG_FORMAT = '%(asctime)s:%(levelname)s:%(name)s: %(message)s'
+
 TQDM_KWARGS = {
     'ncols': 72,
     'leave': False

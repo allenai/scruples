@@ -54,10 +54,15 @@ Confusion Matrix
 @click.argument(
     'output_path',
     type=click.Path(exists=False, file_okay=True, dir_okay=False))
+@click.option(
+    '--verbose',
+    is_flag=True,
+    help='Set the log level to DEBUG.')
 def analyze_performance(
         dataset_path: str,
         predictions_path: str,
-        output_path: str
+        output_path: str,
+        verbose: bool
 ) -> None:
     """Analyze classification performance and write a report.
 
@@ -65,6 +70,8 @@ def analyze_performance(
     PREDICTIONS_PATH, then analyze the predictions and write the
     results to OUTPUT_PATH.
     """
+    utils.configure_logging(verbose=verbose)
+
     # Step 1: Read in the dataset.
     with click.open_file(dataset_path, 'r') as dataset_file:
         id_to_dataset_label = {}

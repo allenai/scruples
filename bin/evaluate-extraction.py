@@ -166,12 +166,17 @@ Spam posts are filtered out and not reported on in all non-spam results.
 @click.argument(
     'output_dir',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
+@click.option(
+    '--verbose',
+    is_flag=True,
+    help='Set the log level to DEBUG.')
 def evaluate_extraction(
         comments_path: str,
         comment_annotations_path: str,
         posts_path: str,
         post_annotations_path: str,
-        output_dir: str
+        output_dir: str,
+        verbose: bool
 ) -> None:
     """Evaluate extractions and write a report.
 
@@ -199,6 +204,8 @@ def evaluate_extraction(
     files constructed according to the Annotation Guidelines
     (annotation-guidelines.md) document.
     """
+    utils.configure_logging(verbose=verbose)
+
     # Step 0: Construct important paths.
     os.makedirs(output_dir)
     report_path = os.path.join(output_dir, 'report.md')

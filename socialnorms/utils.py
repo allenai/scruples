@@ -1,6 +1,7 @@
 """Utilities."""
 
 import collections
+import logging
 from typing import (
     List,
     Optional)
@@ -8,6 +9,26 @@ from typing import (
 import numpy as np
 import regex
 from sklearn import metrics
+
+from . import settings
+
+
+def configure_logging(verbose: bool = False):
+    """Configure logging.
+
+    This function is useful in scripts when logging should be set up
+    with a basic configuration.
+
+    Parameters
+    ----------
+    verbose : bool, optional (default=False)
+        If ``True``, set the log level to DEBUG, else set the log level
+        to INFO.
+    """
+    logging.basicConfig(
+        level=logging.DEBUG if verbose else logging.INFO,
+        format=settings.LOG_FORMAT,
+        handlers=[logging.StreamHandler()])
 
 
 _character_filter_regex = regex.compile(r'[^\w\s]')
