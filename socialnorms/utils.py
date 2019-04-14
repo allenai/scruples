@@ -80,6 +80,29 @@ def count_words(text: str):
     return len(text.strip().split(' '))
 
 
+def xentropy(
+        y_true: np.ndarray,
+        y_pred: np.ndarray
+) -> np.float64:
+    """Return the xentropy of ``y_pred`` with respect to ``y_true``.
+
+    Parameters
+    ----------
+    y_true : np.ndarray, required
+        An ``n_samples`` by ``n_classes`` array for the class
+        probabilities given to each sample.
+    y_pred : np.ndarray, required
+        An ``n_samples`` by ``n_classes`` array for the predicted class
+        probabilities given to each sample.
+
+    Returns
+    -------
+    np.float64
+        The xentropy of ``y_pred` with respect to ``y_true``.
+    """
+    return np.mean(- np.sum(y_true * np.log(y_pred), axis=1))
+
+
 def make_confusion_matrix_str(
         y_true: List[str],
         y_pred: List[str],
