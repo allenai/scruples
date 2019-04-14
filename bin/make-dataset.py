@@ -1,7 +1,7 @@
-"""Make the social norms dataset from raw reddit data.
+"""Make the socialnorms dataset from raw reddit data.
 
 This script takes in posts and comments from the reddit API and creates
-the social norms dataset.
+the socialnorms dataset.
 """
 
 import collections
@@ -34,8 +34,7 @@ logger = logging.getLogger(__name__)
     'output_path',
     type=click.Path(exists=False, file_okay=True, dir_okay=False))
 @click.option(
-    '--verbose',
-    is_flag=True,
+    '--verbose', is_flag=True,
     help='Set the log level to DEBUG.')
 def make_dataset(
         comments_path: str,
@@ -43,10 +42,10 @@ def make_dataset(
         output_path: str,
         verbose: bool
 ) -> None:
-    """Create the social norms dataset and write it to OUTPUT_PATH.
+    """Create the socialnorms dataset and write it to OUTPUT_PATH.
 
     Read in the reddit posts from POSTS_PATH and comments from
-    COMMENTS_PATH, create the social norms dataset, and write it to
+    COMMENTS_PATH, create the socialnorms dataset, and write it to
     OUTPUT_PATH.
     """
     utils.configure_logging(verbose=verbose)
@@ -92,7 +91,8 @@ def make_dataset(
                 continue
 
             instance = {
-                'id': post.id,
+                'id': utils.make_id(),
+                'post_id': post.id,
                 'post_type': post.post_type.name,
                 'title': post.title,
                 'text': post.original_text or post.selftext,

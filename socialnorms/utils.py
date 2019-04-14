@@ -2,6 +2,8 @@
 
 import collections
 import logging
+import random
+import string
 from typing import (
     List,
     Optional)
@@ -101,6 +103,14 @@ def xentropy(
         The xentropy of ``y_pred` with respect to ``y_true``.
     """
     return np.mean(- np.sum(y_true * np.log(y_pred), axis=1))
+
+
+def make_id() -> str:
+    """Return a random ID string."""
+    return ''.join(
+        random.choices(
+            string.ascii_letters + string.digits,
+            k=32))
 
 
 def make_confusion_matrix_str(
