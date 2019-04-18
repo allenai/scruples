@@ -15,6 +15,7 @@ from torch.utils.data import DataLoader
 import tqdm
 
 from socialnorms import settings, utils
+from socialnorms.baselines.metrics import METRICS
 from socialnorms.data.labels import Label
 from socialnorms.dataset.transforms import (
     BertTransform,
@@ -75,6 +76,14 @@ def predict_bert(
     # manage paths
 
     os.makedirs(output_dir)
+    metrics_paths = {}
+    predictions_paths = {}
+    for split in splits:
+        os.makedirs(os.path.join(output_dir, split))
+        metrics_paths[split] = os.path.join(
+            output_dir, split, 'metrics.json')
+        predictions_paths[split] = os.path.join(
+            output_dir, split, 'predictions.jsonl')
 
     config_file_path = os.path.join(results_dir, 'config.json')
     checkpoint_file_path = os.path.join(
@@ -113,7 +122,7 @@ def predict_bert(
         device = torch.device('cpu')
 
 
-    # create the model and loss
+    # load the model
 
     model = torch.nn.DataParallel(
         BertForSequenceClassification.from_pretrained(
@@ -123,8 +132,6 @@ def predict_bert(
     model.load_state_dict(torch.load(checkpoint_file_path)['model'])
 
     model.to(device)
-
-    loss = torch.nn.CrossEntropyLoss()
 
 
     # create transformations for the dataset
@@ -142,7 +149,7 @@ def predict_bert(
         lambda d: {k: torch.tensor(v) for k, v in d.items()}
     ])
     labelize = lambda s: getattr(Label, s).index
-
+    delabelize = lambda idx: [l.name for l in Label if l.index == idx][0]
 
     for split in splits:
         logger.info(f'Loading the dataset from {data_dir}.')
@@ -161,73 +168,65 @@ def predict_bert(
 
         # run predictions
 
+        ids = []
+        predictions = []
+        probabilities = []
+        labels = []
+
         n_instances = len(dataset)
         n_batches = math.ceil(n_instances / predict_batch_size)
         with torch.no_grad():
             # set the model to evaluation mode
             model.eval()
 
-            ids_logits_and_predictions = []
-            total_loss = 0
-            total_accuracy = 0
-            for i, (ids, features, labels) in tqdm.tqdm(
+            for i, (mb_ids, mb_features, mb_labels) in tqdm.tqdm(
                     enumerate(data_loader),
                     total=n_batches,
                     **settings.TQDM_KWARGS):
                 # move the data onto the device
-                input_ids = features['input_ids'].to(device)
-                input_mask = features['input_mask'].to(device)
-                segment_ids = features['segment_ids'].to(device)
+                mb_input_ids = mb_features['input_ids'].to(device)
+                mb_input_mask = mb_features['input_mask'].to(device)
+                mb_segment_ids = mb_features['segment_ids'].to(device)
 
-                labels = labels.to(device)
+                mb_labels = mb_labels.to(device)
 
                 # make predictions
-                logits = model(
-                    input_ids=input_ids,
-                    attention_mask=input_mask,
-                    token_type_ids=segment_ids)
-                _, predictions = torch.max(logits, 1)
+                mb_logits = model(
+                    input_ids=mb_input_ids,
+                    attention_mask=mb_input_mask,
+                    token_type_ids=mb_segment_ids)
+                _, mb_predictions = torch.max(mb_logits, 1)
 
-                batch_loss = loss(logits, labels)
-                batch_accuracy = (predictions == labels).float().mean()
+                ids.extend(mb_ids)
+                predictions.extend(mb_predictions.cpu().numpy().tolist())
+                probabilities.extend(
+                    softmax(mb_logits.cpu().numpy(), axis=1).tolist())
+                labels.extend(mb_labels.cpu().numpy().tolist())
 
-                # update statistics
-                total_loss = (
-                    batch_loss.item() + i * total_loss
-                ) / (i + 1)
-                total_accuracy = (
-                    batch_accuracy.item() + i * total_accuracy
-                ) / (i + 1)
-                ids_logits_and_predictions.extend(
-                    zip(ids, logits.tolist(), predictions.tolist()))
-
-        logger.info(
-            f'\n\n'
-            f'  {split} results:\n'
-            f'    loss     : {total_loss:.4f}\n'
-            f'    accuracy : {total_accuracy:.4f}\n')
-
-        metrics_path = os.path.join(
-            output_dir, f'{split}-metrics.json')
-        with open(metrics_path, 'w') as metrics_file:
+        with open(metrics_paths[split], 'w') as metrics_file:
             json.dump(
-                {'loss': total_loss, 'accuracy': total_accuracy},
+                {
+                    key: metric(
+                        y_true=labels,
+                        y_pred=probabilities
+                          if scorer_kwargs['needs_proba']
+                          else predictions)
+                    for key, (_, metric, scorer_kwargs) in METRICS.items()
+                },
                 metrics_file)
 
-        labels = [label.name for label in Label]
-        index_to_label = {label.index: label.name for label in Label}
-        predictions_path = os.path.join(
-            output_dir, f'{split}-predictions.jsonl')
-        with open(predictions_path, 'w') as predictions_file:
-            for id_, logits, prediction in ids_logits_and_predictions:
+        with open(predictions_paths[split], 'w') as predictions_file:
+            for id_, probs, prediction in zip(
+                    ids, probabilities, predictions
+            ):
                 predictions_file.write(
                     json.dumps({
                         'id': id_,
-                        'label': index_to_label[prediction],
+                        'label': delabelize(prediction),
                         'label_scores': {
-                            label: score
-                            for label, score
-                            in zip(labels, softmax(logits))
+                            label.name: prob
+                            for label, prob
+                            in zip(Label, probs)
                         }
                     }) + '\n')
 
