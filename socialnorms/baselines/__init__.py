@@ -6,6 +6,7 @@ from . import (
     metrics,
     naivebayes,
     style,
+    trees,
     utils)
 
 
@@ -44,5 +45,10 @@ BASELINES = [
         'stylistic',
         style.StylisticXGBoostBaseline,
         style.STYLISTICXGBOOST_HYPER_PARAMETERS
+    ),
+    (
+        'randomforest',
+        trees.RandomForestBaseline,
+        trees.RANDOM_FOREST_HYPER_PARAMETERS
     )
 ]
