@@ -89,7 +89,7 @@ def count_words(text: str):
     # replace strings of whitespace with a single space
     text = _whitespace_regex.sub(' ', text)
 
-    return len(text.strip().split(' '))
+    return len(text.strip().split())
 
 
 def xentropy(
