@@ -8,6 +8,7 @@ from sklearn import metrics
 
 from socialnorms import utils
 from socialnorms.data.labels import Label
+from socialnorms.baselines.metrics import METRICS
 
 
 logger = logging.getLogger(__name__)
@@ -23,12 +24,11 @@ Analysis of classification performance on socialnorms.
 
 Main Metrics
 ------------
-Accuracy          : {accuracy:.4f}
-Balanced Accuracy : {balanced_accuracy:.4f}
-F1 (micro)        : {f1_micro:.4f}
-F1 (macro)        : {f1_macro:.4f}
-F1 (weighted)     : {f1_weighted:.4f}
-Cross-Entropy     : {xentropy:.4f}
+Note that the xentropy score, if present, is computed with respect to
+the estimated true label distribution rather than the hard labels. All
+other scores are standard and computed against the most frequent label.
+
+{metrics_report}
 
 
 Classification Report
@@ -56,10 +56,10 @@ Confusion Matrix
     'output_path',
     type=click.Path(exists=False, file_okay=True, dir_okay=False))
 @click.option(
-    '--compute-xentropy', is_flag=True,
-    help='Compute the cross-entropy based on label scores and include'
-         ' it in the report. Predictions must have "label_scores" keys'
-         ' to use this option.')
+    '--label-scores', is_flag=True,
+    help='Compute metrics which require predictions of label'
+         ' probabilities, and include them in the report. Predictions'
+         ' must have "label_scores" keys to use this option.')
 @click.option(
     '--verbose', is_flag=True,
     help='Set the log level to DEBUG.')
@@ -67,7 +67,7 @@ def analyze_performance(
         dataset_path: str,
         predictions_path: str,
         output_path: str,
-        compute_xentropy: bool,
+        label_scores: bool,
         verbose: bool
 ) -> None:
     """Analyze classification performance and write a report.
@@ -121,7 +121,7 @@ def analyze_performance(
         label
         for label, _ in predicted_labels_and_label_scores
     ]
-    if compute_xentropy:
+    if label_scores:
         dataset_label_scores = [
             [count / sum(scores.values()) for count in scores.values()]
             for _, scores in dataset_labels_and_label_scores
@@ -133,31 +133,34 @@ def analyze_performance(
 
     # Step 4: Write the report.
     with click.open_file(output_path, 'w') as output_file:
-        # compute main metrics
-        accuracy = metrics.accuracy_score(
-            y_true=dataset_labels,
-            y_pred=predicted_labels)
-        balanced_accuracy = metrics.balanced_accuracy_score(
-            y_true=dataset_labels,
-            y_pred=predicted_labels)
-        f1_micro = metrics.f1_score(
-            y_true=dataset_labels,
-            y_pred=predicted_labels,
-            average='micro')
-        f1_macro = metrics.f1_score(
-            y_true=dataset_labels,
-            y_pred=predicted_labels,
-            average='macro')
-        f1_weighted = metrics.f1_score(
-            y_true=dataset_labels,
-            y_pred=predicted_labels,
-            average='weighted')
-        if compute_xentropy:
-            xentropy = utils.xentropy(
+        # create the metrics report
+        metric_name_to_value = {
+            name:
+                metric(
+                    y_true=dataset_labels,
+                    y_pred=predicted_label_scores
+                      if scorer_kwargs['needs_proba']
+                      else predicted_labels)
+            for name, metric, scorer_kwargs in METRICS.values()
+            if label_scores or not scorer_kwargs['needs_proba']
+        }
+        if label_scores:
+            if 'xentropy' in metric_name_to_value:
+                raise ValueError(
+                    'METRICS should not have a key named'
+                    ' "xentropy". This issue is a bug in the library,'
+                    ' please notify the maintainers.')
+
+            metric_name_to_value['xentropy'] = utils.xentropy(
                 y_true=dataset_label_scores,
                 y_pred=predicted_label_scores)
-        else:
-            xentropy = float('nan')
+
+        metric_name_width = 1 + max(
+            len(name)
+            for name in metric_name_to_value.keys())
+        metrics_report = '\n'.join(
+            f'{name: <{metric_name_width}}: {value:.4f}'
+            for name, value in metric_name_to_value.items())
 
         # create the classification report
         label_names = [label.name for label in Label]
@@ -175,12 +178,7 @@ def analyze_performance(
 
         output_file.write(
             REPORT_TEMPLATE.format(
-                accuracy=accuracy,
-                balanced_accuracy=balanced_accuracy,
-                f1_micro=f1_micro,
-                f1_macro=f1_macro,
-                f1_weighted=f1_weighted,
-                xentropy=xentropy,
+                metrics_report=metrics_report,
                 classification_report=classification_report,
                 confusion_matrix=confusion_matrix))
 
