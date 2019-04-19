@@ -15,7 +15,7 @@ from spacy.parts_of_speech import IDS as POS_TAGS
 from xgboost import XGBClassifier
 
 
-# constants
+# classes
 
 class StyleFeaturizer(BaseEstimator, TransformerMixin):
     """Convert text to a suite a stylistic features.
