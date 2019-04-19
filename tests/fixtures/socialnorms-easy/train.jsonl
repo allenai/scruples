@@ -1,0 +1,20 @@
+{"id": "0", "post_type": "AITA", "title": "AITA test post", "text": "This post is nta.", "label_scores": {"YTA": 0, "NTA": 10, "ESH": 0, "NAH": 0, "INFO": 0}, "label": "NTA"}
+{"id": "1", "post_type": "AITA", "title": "AITA test post", "text": "This post is yta.", "label_scores": {"YTA": 10, "NTA": 0, "ESH": 0, "NAH": 0, "INFO": 0}, "label": "YTA"}
+{"id": "2", "post_type": "AITA", "title": "AITA test post", "text": "This post is esh.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 10, "NAH": 0, "INFO": 0}, "label": "ESH"}
+{"id": "3", "post_type": "AITA", "title": "AITA test post", "text": "This post is nah.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 0, "NAH": 10, "INFO": 0}, "label": "NAH"}
+{"id": "4", "post_type": "AITA", "title": "AITA test post", "text": "This post is info.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 0, "NAH": 0, "INFO": 10}, "label": "INFO"}
+{"id": "5", "post_type": "AITA", "title": "AITA test post", "text": "Another post that is nta.", "label_scores": {"YTA": 0, "NTA": 10, "ESH": 0, "NAH": 0, "INFO": 0}, "label": "NTA"}
+{"id": "6", "post_type": "AITA", "title": "AITA test post", "text": "Another post that is yta.", "label_scores": {"YTA": 10, "NTA": 0, "ESH": 0, "NAH": 0, "INFO": 0}, "label": "YTA"}
+{"id": "7", "post_type": "AITA", "title": "AITA test post", "text": "Another post that is esh.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 10, "NAH": 0, "INFO": 0}, "label": "ESH"}
+{"id": "8", "post_type": "AITA", "title": "AITA test post", "text": "Another post that is nah.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 0, "NAH": 10, "INFO": 0}, "label": "NAH"}
+{"id": "9", "post_type": "AITA", "title": "AITA test post", "text": "Another post that is info.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 0, "NAH": 0, "INFO": 10}, "label": "INFO"}
+{"id": "10", "post_type": "AITA", "title": "AITA test post", "text": "This post's label is nta.", "label_scores": {"YTA": 0, "NTA": 10, "ESH": 0, "NAH": 0, "INFO": 0}, "label": "NTA"}
+{"id": "11", "post_type": "AITA", "title": "AITA test post", "text": "This post's label is yta.", "label_scores": {"YTA": 10, "NTA": 0, "ESH": 0, "NAH": 0, "INFO": 0}, "label": "YTA"}
+{"id": "12", "post_type": "AITA", "title": "AITA test post", "text": "This post's label is esh.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 10, "NAH": 0, "INFO": 0}, "label": "ESH"}
+{"id": "13", "post_type": "AITA", "title": "AITA test post", "text": "This post's label is nah.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 0, "NAH": 10, "INFO": 0}, "label": "NAH"}
+{"id": "14", "post_type": "AITA", "title": "AITA test post", "text": "This post's label is info.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 0, "NAH": 0, "INFO": 10}, "label": "INFO"}
+{"id": "15", "post_type": "AITA", "title": "AITA test post", "text": "Predict nta.", "label_scores": {"YTA": 0, "NTA": 10, "ESH": 0, "NAH": 0, "INFO": 0}, "label": "NTA"}
+{"id": "16", "post_type": "AITA", "title": "AITA test post", "text": "Predict yta.", "label_scores": {"YTA": 10, "NTA": 0, "ESH": 0, "NAH": 0, "INFO": 0}, "label": "YTA"}
+{"id": "17", "post_type": "AITA", "title": "AITA test post", "text": "Predict esh.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 10, "NAH": 0, "INFO": 0}, "label": "ESH"}
+{"id": "18", "post_type": "AITA", "title": "AITA test post", "text": "Predict nah.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 0, "NAH": 10, "INFO": 0}, "label": "NAH"}
+{"id": "19", "post_type": "AITA", "title": "AITA test post", "text": "Predict info.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 0, "NAH": 0, "INFO": 10}, "label": "INFO"}

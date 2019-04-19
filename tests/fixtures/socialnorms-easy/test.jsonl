@@ -1,0 +1,5 @@
+{"id": "25", "post_type": "AITA", "title": "AITA test post", "text": "The label for this post should be nta.", "label_scores": {"YTA": 0, "NTA": 10, "ESH": 0, "NAH": 0, "INFO": 0}, "label": "NTA"}
+{"id": "26", "post_type": "AITA", "title": "AITA test post", "text": "The label for this post should be yta.", "label_scores": {"YTA": 10, "NTA": 0, "ESH": 0, "NAH": 0, "INFO": 0}, "label": "YTA"}
+{"id": "27", "post_type": "AITA", "title": "AITA test post", "text": "The label for this post should be esh.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 10, "NAH": 0, "INFO": 0}, "label": "ESH"}
+{"id": "28", "post_type": "AITA", "title": "AITA test post", "text": "The label for this post should be nah.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 0, "NAH": 10, "INFO": 0}, "label": "NAH"}
+{"id": "29", "post_type": "AITA", "title": "AITA test post", "text": "The label for this post should be info.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 0, "NAH": 0, "INFO": 10}, "label": "INFO"}
