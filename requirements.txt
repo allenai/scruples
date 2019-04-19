@@ -16,3 +16,4 @@ tensorflow==1.13.1
 torch==1.0.1.post2
 torchvision==0.2.2.post3
 xgboost==0.82
+pytest==4.4.1
