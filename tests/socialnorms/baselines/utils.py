@@ -56,14 +56,15 @@ class BaselineTestMixin:
                 'Subclasses of BaselineTestMixin must provide a'
                 ' BASELINE_HYPER_PARAMETERS class attribute.')
 
-        self.train_easy = pd.read_json(
-            pkg_resources.resource_stream(
-                'tests', settings.SOCIALNORMS_EASY_TRAIN_PATH),
-            lines=True)
-        self.dev_easy = pd.read_json(
-            pkg_resources.resource_stream(
-                'tests', settings.SOCIALNORMS_EASY_DEV_PATH),
-            lines=True)
+        with pkg_resources.resource_stream(
+                'tests', settings.SOCIALNORMS_EASY_TRAIN_PATH
+        ) as train_file:
+            self.train_easy = pd.read_json(train_file, lines=True)
+
+        with pkg_resources.resource_stream(
+                'tests', settings.SOCIALNORMS_EASY_DEV_PATH
+        ) as dev_file:
+            self.dev_easy = pd.read_json(dev_file, lines=True)
 
     @pytest.mark.slow
     def test_it_solves_socialnorms_easy_when_untuned(self):

@@ -13,8 +13,10 @@ class CommentTestCase(unittest.TestCase):
     """Test socialnorms.data.comment.Comment."""
 
     def setUp(self):
-        self.comment_kwargs = json.load(pkg_resources.resource_stream(
-            'tests', settings.TEST_COMMENT_PATH))
+        with pkg_resources.resource_stream(
+                'tests', settings.TEST_COMMENT_PATH
+        ) as comment_file:
+            self.comment_kwargs = json.load(comment_file)
 
     def test_extracts_labels_correctly(self):
         # test that NTA is extracted correctly
