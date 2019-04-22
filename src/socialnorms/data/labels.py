@@ -38,16 +38,16 @@ class Label(enum.Enum):
     """
     YTA = (0, [
         r'\m(?i:YTAH?)\M',
-        r"(?i:you(?:'re|r| are)? (?:(?:kind|sort) of |really )?(?:an? |the )?(?:asshole|a-?hole)){e<=1}"
+        r"(?i:you(?:'re|r| are)? (?:(?:kind|sort) of |really )?(?:an? |the )?(?:asshole|a-?hole)){e<=1}",
         r"(?i:you (?:(?:kind|sort) of |really )?are (?:an? |the )?(?:asshole|a-?hole)){e<=1}"
     ])
     NTA = (1, [
         r'\m(?i:Y?NTAH?)\M',
-        r'(?i:not (?:really )?(an? |the )?(asshole|a-?hole)){e<=1}',
+        r'(?i:not (?:really )?(an? |the )?(asshole|a-?hole)\M){e<=1}'
     ])
     ESH = (2, [
         r'\m(?i:ESH)\M',
-        r'(?i:every(?:one|body) sucks here){e<=1}',
+        r'(?i:every(?:one|body) sucks here){e<=1}'
     ])
     NAH = (3, [
         r'\m(?i:NAH?H)\M',
@@ -55,7 +55,9 @@ class Label(enum.Enum):
     ])
     INFO = (4, [
         r'\m(?i:INFO)\M',
-        r'(?i:not enough info){e<=1}'
+        r'(?i:not enough info){e<=1}',
+        r'(?i:needs? more info){e<=1}',
+        r"(?i:more info(?:'s| is)? required){e<=1}"
     ])
 
     @classmethod
