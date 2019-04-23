@@ -11,3 +11,4 @@ SOCIALNORMS_EASY_TEST_PATH = 'fixtures/socialnorms-easy/test.jsonl'
 
 TEST_COMMENT_PATH = 'fixtures/raw-data/test-comment.jsonl'
 TEST_POST_PATH = 'fixtures/raw-data/test-post.jsonl'
+TEST_POST_COMMENTS_PATH = 'fixtures/raw-data/test-post-comments.jsonl'
