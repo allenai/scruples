@@ -3,6 +3,7 @@
 from typing import (
     Any,
     Callable,
+    Dict,
     List,
     Optional,
     Sequence,
@@ -62,7 +63,10 @@ class BertTransform(object):
         self.max_sequence_length = max_sequence_length
         self.truncation_strategy = truncation_strategy
 
-    def __call__(self, feature: Tuple[str, Optional[str]]):
+    def __call__(
+            self,
+            feature: Tuple[str, Optional[str]]
+    ) -> Dict[str, List[int]]:
         """Return ``feature`` transformed into BERT inputs.
 
         Parameters
@@ -139,11 +143,11 @@ class BertTransform(object):
             tokens_to_keep1 = None
         else:
             tokens_to_keep0 = max(
-                self.max_sequence_length // 2,
-                self.max_sequence_length - len(feature1)) - 3
+                (self.max_sequence_length - 3) // 2,
+                self.max_sequence_length - len(feature1) - 3)
             tokens_to_keep1 = max(
-                self.max_sequence_length // 2,
-                self.max_sequence_length - len(feature0)) - 3
+                (self.max_sequence_length - 3) // 2,
+                self.max_sequence_length - len(feature0) - 3)
 
         if strategy0 == 'beginning':
             feature0 = feature0[:tokens_to_keep0]
