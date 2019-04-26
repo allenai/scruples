@@ -95,7 +95,7 @@ def make_dataset(
                 'post_id': post.id,
                 'post_type': post.post_type.name,
                 'title': post.title,
-                'text': post.original_text or post.selftext,
+                'text': post.original_text,
                 'label_scores': {
                     label.name: score
                     for label, score
