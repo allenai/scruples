@@ -3,6 +3,8 @@ apex==0.1
 attrs==19.1.0
 ftfy==5.5.1
 numpy==1.16.2
+pandas==0.24.2
+pytest==4.4.1
 pytorch-pretrained-bert==0.6.1
 regex==2018.1.10
 scikit-learn==0.20.3
@@ -16,4 +18,3 @@ tensorflow==1.13.1
 torch==1.0.1.post2
 torchvision==0.2.2.post3
 xgboost==0.82
-pytest==4.4.1

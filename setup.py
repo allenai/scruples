@@ -36,6 +36,7 @@ setup(
         'attrs >= 19.1.0',
         'ftfy >= 5.5.1',
         'numpy >= 1.16.2',
+        'pandas >= 0.24.2',
         'pytorch-pretrained-bert >= 0.6.1',
         'regex >= 2018.1.10',
         'scikit-learn >= 0.20.3',
