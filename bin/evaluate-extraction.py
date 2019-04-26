@@ -167,8 +167,7 @@ Spam posts are filtered out and not reported on in all non-spam results.
     'output_dir',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
 @click.option(
-    '--verbose',
-    is_flag=True,
+    '--verbose', is_flag=True,
     help='Set the log level to DEBUG.')
 def evaluate_extraction(
         comments_path: str,

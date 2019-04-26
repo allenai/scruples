@@ -162,7 +162,7 @@ def run_baselines(
                             'id': id_,
                             'label': prediction,
                             'label_scores': {
-                                class_: prob
+                                class_: prob.tolist()
                                 for class_, prob
                                 in zip(model.classes_, probs)
                             }
