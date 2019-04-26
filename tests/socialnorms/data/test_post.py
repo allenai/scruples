@@ -5,6 +5,8 @@ import pkg_resources
 import unittest
 from unittest.mock import patch
 
+import attr
+
 from socialnorms.data import post
 from socialnorms.data.comment import Comment
 from socialnorms.data.label_scores import LabelScores
@@ -64,6 +66,24 @@ class PostTestCase(unittest.TestCase):
         self.assertEqual(
             post.Post(**kwargs).original_text,
             None)
+
+        # test when the original text is the empty string, since the
+        # empty string being false-y can cause it to be treated
+        # similarly to None
+        kwargs = self.post_kwargs.copy()
+        original_text_comment = kwargs['comments'][-1]
+        original_text_comment = attr.evolve(
+            original_text_comment,
+            body='^^^^AUTOMOD  ***This is a copy of the above post.'
+                 ' It is a record of the post as originally written, in'
+                 ' case the post is deleted or edited.***\n\n\n\n*I am'
+                 ' a bot, and this action was performed automatically.'
+                 ' Please [contact the moderators of this'
+                 ' subreddit](/message/compose/?to=/r/AmItheAsshole)'
+                 ' if you have any questions or concerns.*')
+        kwargs.update(comments=[original_text_comment])
+
+        self.assertEqual(post.Post(**kwargs).original_text, '')
 
     def test_post_type(self):
         # test when post type should be AITA
