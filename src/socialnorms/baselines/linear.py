@@ -40,7 +40,7 @@ LogisticRegressionBaseline = Pipeline([
             tol=1e-4,
             intercept_scaling=1.,
             solver='saga',
-            max_iter=5000,
+            max_iter=500,
             warm_start=False)
     )
 ])
