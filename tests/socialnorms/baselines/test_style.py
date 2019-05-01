@@ -69,6 +69,105 @@ class StyleFeaturizerTestCase(unittest.TestCase):
                 ]
             ])
 
+    def test_transform_on_text_with_no_punctuation(self):
+        # test transform on text that has no punctuation
+        X = ['Interesting thought']
+        y = [0]
+
+        transformer = style.StyleFeaturizer()
+        transformer.fit(X=X, y=y)
+
+        features = transformer.transform(X)
+
+        self.assertEqual(
+            features.tolist(),
+            [
+                [
+                    # number of tokens in the document
+                    2.,
+                    # number of sentences in the document
+                    1.,
+                    # min sentence length in tokens
+                    2.,
+                    # max sentence length in tokens
+                    2.,
+                    # median sentence length in tokens
+                    2.,
+                    # average sentence length in tokens
+                    2.,
+                    # standard deviation of sentence length in tokens
+                    0.,
+                    # lexical diversity (type-token ratio) of the full
+                    # document
+                    1.,
+                    # average lexical diversity (type-token ratio) of
+                    # each sentence
+                    1.,
+                    # average word length (in characters), excluding
+                    # punctuation
+                    9.,
+                    # average punctuation counts per sentence
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    # average POS tag counts per sentence
+                    0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+                ]
+            ])
+
+    def test_transform_the_empty_string(self):
+        # test transform produces correct output when the input is the
+        # empty string
+        X = ['']
+        y = [0]
+
+        transformer = style.StyleFeaturizer()
+        transformer.fit(X=X, y=y)
+
+        features = transformer.transform(X)
+
+        self.assertEqual(
+            features.tolist(),
+            [
+                [
+                    # number of tokens in the document
+                    0.,
+                    # number of sentences in the document
+                    0.,
+                    # min sentence length in tokens
+                    0.,
+                    # max sentence length in tokens
+                    0.,
+                    # median sentence length in tokens
+                    0.,
+                    # average sentence length in tokens
+                    0.,
+                    # standard deviation of sentence length in tokens
+                    0.,
+                    # lexical diversity (type-token ratio) of the full
+                    # document
+                    0.,
+                    # average lexical diversity (type-token ratio) of
+                    # each sentence
+                    0.,
+                    # average word length (in characters), excluding
+                    # punctuation
+                    0.,
+                    # average punctuation counts per sentence
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    # average POS tag counts per sentence
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+                ]
+            ])
+
 
 class StylisticXGBoostBaselineTestCase(unittest.TestCase):
     """Test the stylistic features baseline."""

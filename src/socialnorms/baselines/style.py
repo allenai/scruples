@@ -83,6 +83,8 @@ class StyleFeaturizer(BaseEstimator, TransformerMixin):
     def transform(self, X: Iterable[str]):
         """Transform ``X`` into the stylistic features.
 
+        The empty string is encoded as the zero vector, by convention.
+
         Parameters
         ----------
         X : Iterable[str]
@@ -98,6 +100,12 @@ class StyleFeaturizer(BaseEstimator, TransformerMixin):
 
         style_features = []
         for doc in self._nlp.pipe(X, batch_size=64):
+            if doc.text == '':
+                # return the vector of all zeros for the empty string
+                style_features.append(np.zeros(
+                    10 + len(self._PUNCT_TO_IDX) + len(self._POS_TAG_TO_IDX)))
+                continue
+
             sent_n_words = [len(sent) for sent in doc.sents]
 
             # compute the style features
