@@ -98,9 +98,21 @@ class StyleFeaturizer(BaseEstimator, TransformerMixin):
         """
         check_is_fitted(self, '_fitted')
 
+        # N.B. a hack to fix an issue in spaCy:
+        # https://github.com/explosion/spaCy/issues/3456, where the
+        # pipes can't handle empty documents. The empty string token has
+        # 16 random ascii letters (upper and lower) and digits appended
+        # to make collisions with actual documents very unlikely.
+        #
+        # Once issue 3456 is fixed in spaCy, these lines can be removed
+        # and ``if doc.text == EMPTY_STRING_TOKEN:`` below can be
+        # replaced with ``if doc.text == '':``.
+        EMPTY_STRING_TOKEN = '<empty_string@jnk7pk8fsLyI6LI6>'
+        X = [x if x != '' else EMPTY_STRING_TOKEN for x in X]
+
         style_features = []
         for doc in self._nlp.pipe(X, batch_size=64):
-            if doc.text == '':
+            if doc.text == EMPTY_STRING_TOKEN:
                 # return the vector of all zeros for the empty string
                 style_features.append(np.zeros(
                     10 + len(self._PUNCT_TO_IDX) + len(self._POS_TAG_TO_IDX)))
