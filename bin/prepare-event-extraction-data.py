@@ -54,6 +54,8 @@ def prepare_event_extraction_data(
                 'id': row['id'],
                 'text': '@%@'.join(
                     html.escape(t.text)
+                      .encode('ascii', 'xmlcharrefreplace')
+                      .decode()
                     for t in nlp(ftfy.fix_text(row['text']))
                 )
             }) + '\n')
