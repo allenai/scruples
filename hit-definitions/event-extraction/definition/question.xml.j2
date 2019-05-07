@@ -1,0 +1,578 @@
+<HTMLQuestion xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2011-11-11/HTMLQuestion.xsd">
+  <HTMLContent>
+    <![CDATA[
+      <!DOCTYPE html>
+      <html>
+        <!--
+            (LICENSE for ieturk)
+
+            The following license is for
+            https://github.com/Varal7/ieturk/tree/46687804b7830eceb369f129c870aeb867911813,
+            portions of which have been used in creating this HIT
+            template.
+
+            MIT License
+
+            Copyright (c) 2018 Victor Quach
+
+            Permission is hereby granted, free of charge, to any person obtaining a copy
+            of this software and associated documentation files (the "Software"), to deal
+            in the Software without restriction, including without limitation the rights
+            to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+            copies of the Software, and to permit persons to whom the Software is
+            furnished to do so, subject to the following conditions:
+
+            The above copyright notice and this permission notice shall be included in all
+            copies or substantial portions of the Software.
+
+            THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+            IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+            FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+            AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+            LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+            OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+            SOFTWARE.
+        -->
+        <head>
+          <meta
+             http-equiv='Content-Type'
+             content='text/html; charset=UTF-8'/>
+          <meta
+             content='width=device-width,initial-scale=1'
+             name='viewport'/>
+
+          <link
+             href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+             integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+             crossorigin="anonymous"
+             rel="stylesheet"/>
+
+          <!--
+            The following content in the style tag was adapted from
+            https://github.com/Varal7/ieturk/blob/46687804b7830eceb369f129c870aeb867911813/style.css,
+            see the (LICENSE for ieturk) comment for the license.
+          -->
+          <style>
+            #collapseTrigger{
+              color:#fff;
+              display: block;
+              text-decoration: none;
+            }
+            #choice{
+              display: block;
+              margin-top: 10px;
+            }
+            .content{
+              margin-bottom: 15px;
+            }
+            .ann {
+              font-size: 20px;
+            }
+            .ann > span.token {
+              cursor: pointer;
+            }
+            .ann > span.token:hover {
+              text-decoration: underline;
+            }
+            .ann > strong.annotation:hover {
+              text-decoration: line-through;
+            }
+            .annotation {
+              font-weight: normal;
+              background-color: #EAD379;
+            }
+            input[disabled] {
+              color: #000
+            }
+            #key-name {
+              background-color: #EAD379;
+            }
+          </style>
+          <script
+             type='text/javascript'
+             src='https://s3.amazonaws.com/mturk-public/externalHIT_v1.js'></script>
+        </head>
+        <body>
+          <!--
+            The following content in the section tag was adapted from
+            https://github.com/Varal7/ieturk/blob/46687804b7830eceb369f129c870aeb867911813/annotation.html,
+            see the (LICENSE for ieturk) comment for the license.
+          -->
+          <section class="container">
+            <div class="row">
+              <div class="col-xs-12 col-md-12">
+                <div class="panel panel-primary">
+                  <a
+                     id="collapseTrigger"
+                     class="panel-heading"
+                     href="javascript:void(0);">
+                    <strong>Instructions</strong> <span class="collapse-text">(Click to expand)</span>
+                  </a>
+                  <div
+                     id="instructionBody"
+                     class="panel-body">
+                    <strong>Highlight 4 events in the anecdote.</strong>
+                    <p>
+                      We're collecting data to help machines learn right from wrong. To accomplish this goal,
+                      we need text describing good and bad actions. We'd like you to highlight
+                      <strong>four</strong> different actions taken by people in the anecdote. They can be four
+                      actions by the same person or by different people, as long as they're four different
+                      events.
+                    </p>
+                    <p>
+                      Submissions <strong>must</strong> follow these criteria when highlighting the events:
+                      <ul>
+                        <li>
+                          Each event should have a <em>person</em> (the subject) performing an <em>action</em>.
+                        </li>
+                        <li>
+                          Each event should include <em>all relevant information</em> required to judge if it's
+                          a socially acceptable or unacceptable thing to do.
+                        </li>
+                        <li>
+                          Each event should <strong>not</strong> include irrelevant information that doesn't
+                          help determine if the action was good or bad.
+                        </li>
+                      </ul>
+                    </p>
+                    <p>
+                      Similarly, use your best judgment but generally follow these guidelines:
+                      <ul>
+                        <li>
+                          Include as many events as possible (up to 4). Only mark an event as missing if
+                          you're <em>very</em> confident there are no more events meeting the criteria.
+                        </li>
+                        <li>
+                          Events should be short, generally a sentence or less.
+                        </li>
+                        <li>
+                          When considering what information is relevant to an event, think of the event
+                          in isolation from the rest of the story.
+                        </li>
+                      </ul>
+                    </p>
+
+                    <p>
+                      Click and drag to highlight the event you're annotating, and use the buttons on the right
+                      hand side of the form to switch between events. You can double check what you've
+                      highlighted in the text boxes in the form. If there are no more events, check the
+                      &quot;There is no event&quot; boxes for the missing events. Submit the form when all events
+                      are selected.
+                    </p>
+                    <p>
+                      <strong>HINT:</strong> if you're having trouble getting the text to highlight, make sure
+                      you click <em>on</em> the first word and release your click <em>on</em> the last word,
+                      rather than on the spaces next to the words.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <h2>Highlight <strong id="key-name" class="key-name">name</strong> in the text</h2>
+
+            <div id="raw">{{ text }}</div>
+
+            <div class="row" id="workContent">
+              <div class="col-xs-12 col-sm-8 content">
+                <div id="well" class="ann well"></div>
+              </div>
+              <div class="col-xs-12 col-sm-4 fields">
+                <div id="button-div">
+                  <button id="undo" class="btn btn-primary" type="button" value="undo">
+                    <span class="glyphicon glyphicon-backward"></span> Undo
+                  </button>
+                  <button id="remove" class="btn btn-danger" type="button" value="remove">
+                    <span class="glyphicon glyphicon-remove"></span> Reset
+                  </button>
+                </div>
+                <div id="choice" class="btn-group-vertical" data-toggle="buttons"></div>
+              </div>
+            </div>
+
+            <form
+               id='mturk_form'
+               name='mturk_form'
+               method='post'
+               action='/mturk/externalSubmit'>
+              <input id='assignmentId' type='hidden' value='' name='assignmentId'/>
+              <input id='instanceId' type='hidden' value='{{ id }}' name='instanceId'/>
+              <div id="form" class="row"></div>
+              <span title="Highlight all fields before submitting">
+                <input id="submit" class="btn btn-default" data-key="Enter" type="submit" disabled=disabled/>
+              </span>
+            </form>
+          </section>
+
+          <script
+             src="https://code.jquery.com/jquery-3.1.0.min.js"
+             integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="
+             crossorigin="anonymous"></script>
+          <script
+             src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+             crossorigin="anonymous"></script>
+          <script
+             src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+
+          <!-- configuration for ieturk -->
+          <script>
+            var fieldName = {
+              "event1": "Event 1",
+              "event2": "Event 2",
+              "event3": "Event 3",
+              "event4": "Event 4"
+            };
+            var shortName = {
+              "event1": "event 1",
+              "event2": "event 2",
+              "event3": "event 3",
+              "event4": "event 4"
+            };
+            var longDesc = {
+              "event1": "The first event.",
+              "event2": "The second event.",
+              "event3": "The third event.",
+              "event4": "The fourth event."
+            };
+            var shortcutKey = {
+              "event1": "a",
+              "event2": "s",
+              "event3": "d",
+              "event4": "f"
+            };
+          </script>
+
+          <!--
+            The following content in the script tag was adapted from
+            https://github.com/Varal7/ieturk/blob/46687804b7830eceb369f129c870aeb867911813/annotation.js,
+            see the (LICENSE for ieturk) comment for the license.
+          -->
+          <script>
+            // ---------------------------------------------------------
+            // Global
+            // ---------------------------------------------------------
+
+            var keys = Object.keys(fieldName);
+            var annotations = {};
+            var values = {};
+            var key;
+
+
+            // ---------------------------------------------------------
+            // Create jQuery elements
+            // ---------------------------------------------------------
+
+            var raw = $('#raw');
+            var well = $('#well');
+            var submit = $('#submit');
+            var choice = $('#choice');
+            var keyname = $('#key-name');
+
+            var form = $("#form");
+            var answer = {};
+            var tagHidden = {};
+            var noVal = {};
+            var radios = {};
+            // answerHidden duplicates value of answer but is needed because
+            // otherwise the data is not sent
+            var answerHidden = {};
+
+            var makeChoice = function(key) {
+                var input = ($(
+                    '<input>')
+                    .attr({
+                        'name': 'choice', 'id': key + "-choice",
+                        'value': key, 'type': 'radio', 'data-key': shortcutKey[key]
+                    })
+                    .text(fieldName[key])
+                );
+                radios[key] = input;
+                var label = ($(
+                    '<label>')
+                    .addClass('btn btn-default')
+                    .text(fieldName[key])
+                    .append(input)
+                    .attr({'title': "Shortcut: " +  shortcutKey[key]})
+                );
+                return label;
+            }
+
+            var makeAnswerHidden = function(key) {
+                var input = ($(
+                    '<input>')
+                    .attr({'type': 'hidden', 'name': key, 'id': key + "-hidden"})
+                );
+                answerHidden[key] = input;
+                return input;
+            }
+
+            var makeTagHidden = function(key) {
+                var input = ($(
+                    '<input>')
+                    .attr({'type': 'hidden', 'name': key + "-tag", 'id': key + "-tag"})
+                );
+                tagHidden[key] = input;
+                return input;
+            }
+
+            var  makeFormRow = function(key) {
+                var checkbox = ($(
+                    '<input>')
+                    .attr({'type': 'checkbox', 'id': "no-" + key})
+                    .addClass('form-check-input')
+                    .change(function() { show(); })
+                );
+                var label = ($(
+                    '<label>')
+                    .attr({'for': "no-" + key})
+                    .addClass('form-check-label')
+                    .text(' There is no ' + shortName[key])
+                );
+
+                var input = ($(
+                    '<input>')
+                    .attr({'type': 'text', 'disabled':'disabled', 'id': key})
+                    .addClass('form-control')
+                );
+
+                var div = ($(
+                    '<div>')
+                    .addClass('col-xs-12 col-sm-12 content')
+                    .append($('<label>')
+                        .attr({'for': key})
+                        .text(fieldName[key])
+                    )
+                    .append($('<div>')
+                        .addClass('form-row')
+                        .append($('<div>')
+                            .addClass('col-sm-8')
+                            .append(input)
+                        )
+                        .append($('<div>')
+                            .addClass('col-sm-4')
+                            .append($('<div>')
+                                .addClass('form-check')
+                                .append(checkbox)
+                                .append(' ')
+                                .append(label)
+                            )
+                        )
+                    )
+                );
+                answer[key] = input;
+                noVal[key] = checkbox;
+                return div;
+            }
+
+            var makeDom = function() {
+                for (var key of keys) {
+                    form.append(makeFormRow(key));
+                    form.append(makeTagHidden(key));
+                    form.append(makeAnswerHidden(key));
+                    choice.append(makeChoice(key));
+                    annotations[key] = [];
+                    values[key] = "";
+                }
+            }
+
+
+            // ---------------------------------------------------------
+            // Annotation logic
+            // ---------------------------------------------------------
+
+            var old_annotations = [];
+
+            var get_annotation_id = function(token_id, annotations) {
+                var found = annotations.findIndex(function(annotation) {
+                    return token_id >= annotation[0] && token_id < annotation[1];
+                });
+                return found;
+            };
+
+            var mouse_down = function(id) {
+                var annotation_id = get_annotation_id(id, annotations[key]);
+                if (annotation_id > -1) {
+                    delete_annotation(annotation_id);
+                    show();
+                } else {
+                    first_token = id;
+                }
+            };
+
+            var mouse_up = function(id) {
+                if (first_token > -1) {
+                    if (first_token <= id) {
+                        add_annotation([first_token, id + 1]);
+                    } else {
+                        add_annotation([id, first_token + 1]);
+                    }
+                    first_token = -1;
+                    show();
+                }
+                clear_selection();
+            };
+
+            var clear_selection = function() {
+                if (document.selection) {
+                    document.selection.empty();
+                } else if ( window.getSelection ) {
+                    window.getSelection().removeAllRanges();
+                }
+            };
+
+            var get_value = function() {
+                var values = _.map(annotations[key], function(annotation) {
+                    return tokens.slice(annotation[0], annotation[1]).join(" ");
+                });
+                return values.join(" ");
+            };
+
+            var remove_all_annotations = function() {
+                old_annotations = annotations[key].slice();
+                annotations[key] = []
+            };
+
+            var delete_annotation = function(annotation_id) {
+                if (annotation_id > -1) {
+                    old_annotations = annotations[key].slice();
+                    annotations[key].splice(annotation_id, 1);
+                }
+            }
+
+            var add_annotation = function(annotation) {
+                old_annotations = annotations[key].slice();
+                annotations[key].push(annotation);
+            }
+
+            var toggle_old_new = function() {
+                var new_annotations = annotations[key].slice();
+                annotations[key] = old_annotations.slice();
+                old_annotations = new_annotations;
+            }
+
+
+            // ---------------------------------------------------------
+            // Displaying
+            // ---------------------------------------------------------
+
+            var sequence_html = function(sequence, annotations) {
+                var ret = _.map(sequence, function(token, index) {
+                    return '<span class="token" id=tok_' + index + '> '
+                        + token + ' </span>';
+                });
+                _.each(annotations, function(annotation) {
+                    ret[annotation[0]] = '<strong class="annotation">'
+                        + ret[annotation[0]];
+                    ret[annotation[1]-1] = ret[annotation[1]-1] + '</strong>';
+                });
+
+                return ret.join(' ');
+            }
+
+            var canSubmit = function() {
+                for (var key of keys) {
+                    if (values[key] == "" && !noVal[key].is(":checked")) { return false; }
+                }
+                return true;
+            }
+
+            var show = function() {
+                annotations[key].sort(function(a, b) {
+                    return a[0] - b[0];
+                });
+                seq_html = sequence_html(tokens, annotations[key]);
+                well.html(seq_html);
+                values[key] = get_value();
+                answer[key].val(values[key]);
+                answerHidden[key].val(values[key]);
+                tagHidden[key].val(annotations[key]);
+
+                keyname.html(shortName[key]);
+
+                // Handler on tokens
+                $(".token").mousedown(function() {
+                    mouse_down(parseInt($(this).attr('id').split("_")[1]));
+                });
+                $(".token").mouseup(function() {
+                    mouse_up(parseInt($(this).attr('id').split("_")[1]));
+                });
+
+                if (canSubmit()) {
+                    submit.removeAttr("disabled");
+                    submit.removeClass("btn-default");
+                    submit.addClass("btn-success");
+                } else {
+                    submit.attr("disabled", "disabled");
+                    submit.removeClass("btn-success");
+                    submit.addClass("btn-default");
+                }
+            };
+
+            makeDom();
+
+
+            // ---------------------------------------------------------
+            // Event handlers
+            // ---------------------------------------------------------
+
+            $("#undo").click(function() {
+                toggle_old_new();
+                show();
+            });
+
+            $("#remove").click(function() {
+                remove_all_annotations();
+                show();
+            });
+
+            // highlight selected category
+            var inputs = $("#choice input:radio");
+            inputs.change(function(){
+                inputs.parent().removeClass("btn-success");
+                inputs.parent().addClass("btn-default");
+                if ($(this).is(":checked")) {
+                    key =  $(this).val();
+                    $(this).parent().removeClass("btn-default");
+                    $(this).parent().addClass("btn-success");
+                    show();
+                } else {
+                    $(this).parent().removeClass("btn-success");
+                    $(this).parent().addClass("btn-default");
+                }
+            });
+
+            // Instructions expand/collapse
+            var content = $('#instructionBody');
+            var trigger = $('#collapseTrigger');
+            content.hide();
+            $('.collapse-text').text('(Click to expand)');
+            trigger.click(function(){
+                content.toggle();
+                var isVisible = content.is(':visible');
+                if (isVisible) {
+                    $('.collapse-text').text('(Click to collapse)');
+                } else {
+                    $('.collapse-text').text('(Click to expand)');
+                }
+            });
+
+
+            // ---------------------------------------------------------
+            // Initialize
+            // ---------------------------------------------------------
+
+            key = keys[0];
+            radios[key].click();
+            var tokens = raw.text().split(' ');
+            raw.hide();
+            show();
+          </script>
+
+          <script language='Javascript'>turkSetAssignmentID();</script>
+        </body>
+      </html>
+    ]]>
+  </HTMLContent>
+  <FrameHeight>600</FrameHeight>
+</HTMLQuestion>

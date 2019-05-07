@@ -1,0 +1,8 @@
+{
+    "AutoApprovalDelayInSeconds": 86400,
+    "AssignmentDurationInSeconds": 3600,
+    "Reward": "0.50",
+    "Title": "Extract Events from the Anecdote",
+    "Keywords": "text natural language processing ethics social norms",
+    "Description": "Highlight key events in an anecdote that discusses challenging real-world ethical situations."
+}
