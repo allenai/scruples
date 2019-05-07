@@ -111,7 +111,8 @@
                   <div
                      id="instructionBody"
                      class="panel-body">
-                    <strong>Highlight 4 events in the anecdote.</strong>
+                    <h2>Highlight 4 events in the anecdote.</h2>
+
                     <p>
                       We're collecting data to help machines learn right from wrong. To accomplish this goal,
                       we need text describing good and bad actions. We'd like you to highlight
@@ -119,6 +120,9 @@
                       actions by the same person or by different people, as long as they're four different
                       events.
                     </p>
+
+                    <h3>Instructions</h3>
+
                     <p>
                       Submissions <strong>must</strong> follow these criteria when highlighting the events:
                       <ul>
@@ -135,9 +139,15 @@
                         </li>
                       </ul>
                     </p>
+
                     <p>
                       Similarly, use your best judgment but generally follow these guidelines:
                       <ul>
+                        <li>
+                          Include a good mix of socially acceptable / unacceptable events. Try to pick
+                          the nicest / most charitable action, the meanest / most evil action, and a
+                          neutral action.
+                        </li>
                         <li>
                           Include as many events as possible (up to 4). Only mark an event as missing if
                           you're <em>very</em> confident there are no more events meeting the criteria.
@@ -159,11 +169,64 @@
                       &quot;There is no event&quot; boxes for the missing events. Submit the form when all events
                       are selected.
                     </p>
+
                     <p>
                       <strong>HINT:</strong> if you're having trouble getting the text to highlight, make sure
                       you click <em>on</em> the first word and release your click <em>on</em> the last word,
                       rather than on the spaces next to the words.
                     </p>
+
+                    <h3>Examples</h3>
+
+                    <p>For the following anecdote:</p>
+
+                    <div class="well">
+                      I hadn't seen a friend of mine for a few years, but I heard he was visiting the area.
+                      So, I offered to have him come over my place to catch up and eat lunch. He said that
+                      there's actually a lunch place he'd been hoping to try and asked if we could eat there.
+                      I accepted and we did. At the end of the meal though, he told me that I had to pick up
+                      the tab because I invited him out to lunch &mdash; I wasn't expecting to. I ended up
+                      buying him lunch, but would I have been wrong if I refused to buy his lunch?
+                    </div>
+
+                    <p>You <strong>could</strong> highlight:</p>
+
+                    <ul>
+                      <li>
+                        <em>"He said that there's actually a lunch place he'd been hoping to try and asked
+                          if we could eat there."</em> because it's one of the more neutral events and helps
+                        add a good mix of positive / negative / neutral events.
+                      </li>
+                      <li>
+                        <em>"he told me that I had to pick up the tab because I invited him out to lunch"</em>
+                        because it's one of the more negative events. Notice that it's unnecessary to include
+                        the whole sentence and you only need to highlight the relevant parts.
+                      </li>
+                      <li>
+                        <em>"I ended up buying him lunch"</em> because it's one of the more positive events.
+                        Again, you should highlight the smallest span of text that captures all the important
+                        pieces of the event.
+                      </li>
+                      <li>
+                        <em>"I refused to buy his lunch"</em>. When selecting an event from a hypothetical
+                        question, (the sentence this event comes from starts with "if I..."), you don't need
+                        to include the question and should highlight only the event.
+                      </li>
+                    </ul>
+
+                    <p>You <strong>should not</strong> highlight things like:</p>
+
+                    <ul>
+                      <li>
+                        <em>"I hadn't seen a friend of mine for a few years"</em> because that's not really an
+                        action the person is taking but rather a statement of something that is true.
+                      </li>
+                      <li>
+                        <em>"I heard he was visiting the area"</em> because hearing something is not something
+                        people actively do, but rather something that just happens to people. It's not really
+                        an <em>action</em> people take.
+                      </li>
+                    </ul>
                   </div>
                 </div>
               </div>
@@ -564,7 +627,7 @@
 
             key = keys[0];
             radios[key].click();
-            var tokens = raw.text().split(' ');
+            var tokens = raw.text().split('@%@');
             raw.hide();
             show();
           </script>
