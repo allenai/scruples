@@ -111,14 +111,13 @@
                   <div
                      id="instructionBody"
                      class="panel-body">
-                    <h2>Highlight 4 events in the anecdote.</h2>
+                    <h2>Rank 4 Events from Most Good to Most Evil</h2>
 
                     <p>
                       We're collecting data to help machines learn right from wrong. To accomplish this goal,
-                      we need text describing good and bad actions. We'd like you to highlight
-                      <strong>four</strong> different actions taken by people in the anecdote. They can be four
-                      actions by the same person or by different people, as long as they're four different
-                      events.
+                      we need text describing good and bad actions. Please highlight <strong>four</strong>
+                      different actions taken by people in the anecdote. They can be actions by the same person
+                      or by different people, as long as they're four different events.
                     </p>
 
                     <h3>Instructions</h3>
@@ -128,6 +127,9 @@
                       <ul>
                         <li>
                           Each event should have a <em>person</em> (the subject) performing an <em>action</em>.
+                        </li>
+                        <li>
+                          The events you choose should be easy to rank from most good to most evil.
                         </li>
                         <li>
                           Each event should include <em>all relevant information</em> required to judge if it's
@@ -144,9 +146,8 @@
                       Similarly, use your best judgment but generally follow these guidelines:
                       <ul>
                         <li>
-                          Include a good mix of socially acceptable / unacceptable events. Try to pick
-                          the nicest / most charitable action, the meanest / most evil action, and a
-                          neutral action.
+                          If possible, include a good / charitable action, a bad / mean action, and
+                          a neutral action.
                         </li>
                         <li>
                           Include as many events as possible (up to 4). Only mark an event as missing if
@@ -158,6 +159,9 @@
                         <li>
                           When considering what information is relevant to an event, think of the event
                           in isolation from the rest of the story.
+                        </li>
+                        <li>
+                          It's okay to omit irrelevant text in the middle of a phrase.
                         </li>
                       </ul>
                     </p>
@@ -281,10 +285,10 @@
           <!-- configuration for ieturk -->
           <script>
             var fieldName = {
-              "event1": "Event 1",
-              "event2": "Event 2",
-              "event3": "Event 3",
-              "event4": "Event 4"
+              "event1": "Most Good / Least Bad Event",
+              "event2": "More Good / Less Bad Event",
+              "event3": "Less Good / More Bad Event",
+              "event4": "Least Good / Most Bad Event"
             };
             var shortName = {
               "event1": "event 1",
@@ -293,10 +297,10 @@
               "event4": "event 4"
             };
             var longDesc = {
-              "event1": "The first event.",
-              "event2": "The second event.",
-              "event3": "The third event.",
-              "event4": "The fourth event."
+              "event1": "The most good or least bad event.",
+              "event2": "The second most good or second least bad event.",
+              "event3": "The third most good or third least bad event.",
+              "event4": "The least good or most bad event."
             };
             var shortcutKey = {
               "event1": "a",
