@@ -111,13 +111,14 @@
                   <div
                      id="instructionBody"
                      class="panel-body">
-                    <h2>Rank 4 Events from Most Good to Most Evil</h2>
+                    <h2>Rank 3 Events from Most Good to Most Evil</h2>
 
                     <p>
                       We're collecting data to help machines learn right from wrong. To accomplish this goal,
-                      we need text describing good and bad actions. Please highlight <strong>four</strong>
-                      different actions taken by people in the anecdote. They can be actions by the same person
-                      or by different people, as long as they're four different events.
+                      we need text describing good and bad actions. Please <strong>highlight</strong> and
+                      <strong>rank</strong> <em>three</em> different actions taken by people in the anecdote.
+                      They can be actions by the same person or by different people, as long as they're three
+                      different events.
                     </p>
 
                     <h3>Instructions</h3>
@@ -129,7 +130,8 @@
                           Each event should have a <em>person</em> (the subject) performing an <em>action</em>.
                         </li>
                         <li>
-                          The events you choose should be easy to rank from most good to most evil.
+                          Rank the events from most good to most evil in a way that <em>most people would agree</em>
+                          with how you ranked them.
                         </li>
                         <li>
                           Each event should include <em>all relevant information</em> required to judge if it's
@@ -150,7 +152,7 @@
                           a neutral action.
                         </li>
                         <li>
-                          Include as many events as possible (up to 4). Only mark an event as missing if
+                          Include as many events as possible (up to 3). Only mark an event as missing if
                           you're <em>very</em> confident there are no more events meeting the criteria.
                         </li>
                         <li>
@@ -197,24 +199,19 @@
 
                     <ul>
                       <li>
-                        <em>"He said that there's actually a lunch place he'd been hoping to try and asked
-                          if we could eat there."</em> because it's one of the more neutral events and helps
-                        add a good mix of positive / negative / neutral events.
-                      </li>
-                      <li>
-                        <em>"he told me that I had to pick up the tab because I invited him out to lunch"</em>
-                        because it's one of the more negative events. Notice that it's unnecessary to include
-                        the whole sentence and you only need to highlight the relevant parts.
-                      </li>
-                      <li>
-                        <em>"I ended up buying him lunch"</em> because it's one of the more positive events.
+                        <strong>(Most Good / Least Bad Event)</strong> <em>"I ended up buying him lunch"</em>,
                         Again, you should highlight the smallest span of text that captures all the important
                         pieces of the event.
                       </li>
                       <li>
-                        <em>"I refused to buy his lunch"</em>. When selecting an event from a hypothetical
-                        question, (the sentence this event comes from starts with "if I..."), you don't need
-                        to include the question and should highlight only the event.
+                        <strong>(Less Good / Less Bad Event)</strong> <em>"He said that there's actually a lunch
+                          place he'd been hoping to try and asked if we could eat there."</em>
+                      </li>
+                      <li>
+                        <strong>(Least Good / Most Bad Event)</strong> <em>"he told me that I had to pick up the
+                          tab because I invited him out to lunch &mdash; I wasn't expecting to"</em>
+                        While it's not necessary to include the whole sentence, important details like "I wasn't
+                        expecting to" that impact the goodness / badness of the action <em>should</em> be included.
                       </li>
                     </ul>
 
