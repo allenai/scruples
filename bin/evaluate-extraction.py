@@ -185,7 +185,8 @@ def evaluate_extraction(
     dataset instances using these ground truth annotations, and then
     write several files to OUTPUT_DIR, including:
 
-      - report.md: a report analyzing extraction performance.
+      - extraction-evaluation.md: a report analyzing extraction
+        performance.
       - comment-spam-misclassifications.jsonl: all the comments that
         were misclassified during spam filtering.
       - comment-label-misclassifications.jsonl: all the comments whose
@@ -207,7 +208,7 @@ def evaluate_extraction(
 
     # Step 0: Construct important paths.
     os.makedirs(output_dir)
-    report_path = os.path.join(output_dir, 'report.md')
+    report_path = os.path.join(output_dir, 'extraction-evaluation.md')
     comment_spam_misclassifications_path = os.path.join(
         output_dir, 'comment-spam-misclassifications.jsonl')
     comment_label_misclassifications_path = os.path.join(
@@ -310,22 +311,22 @@ def evaluate_extraction(
     comment_implicit_label = [
         getattr(comment.label, 'name', 'null')
         for comment, annotation in comment_and_annotations
-        if (not annotation['spam']) and annotation['implicit']
+        if (not annotation['spam']) and annotation['implied']
     ]
     comment_annotation_implicit_label = [
         annotation['label'] or 'null'
         for _, annotation in comment_and_annotations
-        if (not annotation['spam']) and annotation['implicit']
+        if (not annotation['spam']) and annotation['implied']
     ]
     comment_explicit_label = [
         getattr(comment.label, 'name', 'null')
         for comment, annotation in comment_and_annotations
-        if (not annotation['spam']) and (not annotation['implicit'])
+        if (not annotation['spam']) and (not annotation['implied'])
     ]
     comment_annotation_explicit_label = [
         annotation['label'] or 'null'
         for _, annotation in comment_and_annotations
-        if (not annotation['spam']) and (not annotation['implicit'])
+        if (not annotation['spam']) and (not annotation['implied'])
     ]
     comment_all_label = [
         getattr(comment.label, 'name', 'null')
@@ -351,22 +352,22 @@ def evaluate_extraction(
     post_implicit_post_type = [
         getattr(post.post_type, 'name', 'null')
         for post, annotation in post_and_annotations
-        if (not annotation['spam']) and annotation['implicit']
+        if (not annotation['spam']) and annotation['implied']
     ]
     post_annotation_implicit_post_type = [
         annotation['post_type'] or 'null'
         for _, annotation in post_and_annotations
-        if (not annotation['spam']) and annotation['implicit']
+        if (not annotation['spam']) and annotation['implied']
     ]
     post_explicit_post_type = [
         getattr(post.post_type, 'name', 'null')
         for post, annotation in post_and_annotations
-        if (not annotation['spam']) and (not annotation['implicit'])
+        if (not annotation['spam']) and (not annotation['implied'])
     ]
     post_annotation_explicit_post_type = [
         annotation['post_type'] or 'null'
         for _, annotation in post_and_annotations
-        if (not annotation['spam']) and (not annotation['implicit'])
+        if (not annotation['spam']) and (not annotation['implied'])
     ]
     post_all_post_type = [
         getattr(post.post_type, 'name', 'null')
@@ -386,7 +387,7 @@ def evaluate_extraction(
             labels=['spam', 'ham']),
         'comment_implicit_stats': utils.make_label_distribution_str(
             y_true=[
-                'implicit' if annotation['implicit'] else 'explicit'
+                'implicit' if annotation['implied'] else 'explicit'
                 for _, annotation in comment_and_annotations
                 if not annotation['spam']
             ],
@@ -432,7 +433,7 @@ def evaluate_extraction(
             labels=['spam', 'ham']),
         'post_implicit_stats': utils.make_label_distribution_str(
             y_true=[
-                'implicit' if annotation['implicit'] else 'explicit'
+                'implicit' if annotation['implied'] else 'explicit'
                 for _, annotation in post_and_annotations
                 if not annotation['spam']
             ],
