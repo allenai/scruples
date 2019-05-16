@@ -67,6 +67,9 @@ some phrase corresponding to the initialism, then use that label for the
 comment. Similarly, mark the comment with `implied` as `false` and
 `spam` as `false`.
 
+If the comment expresses multiple labels or is otherwise ambiguous, mark
+`label` as `null`, `implied` as `null`, and `spam` as `true`.
+
 If the comment expresses no labels explicitly but still has a viewpoint
 that clearly expresses one of the labels, then use that label for the
 comment. Mark `implied` as `true` and `spam` as `false`.
@@ -92,7 +95,7 @@ object has the following keys:
   </dd>
   <dt><code>implied</code></dt>
   <dd>
-    <code>true</code> if the post type is not explicit stated in the
+    <code>true</code> if the post type is not explicitly stated in the
     post title.
   </dd>
   <dt><code>spam</code></dt>
@@ -114,8 +117,10 @@ Possible post types are:
 
 If the post type is explicitly stated in the post title, then mark
 `post_type` as the stated post type, mark `implied` as `false`, and
-`spam` as `false`, unless the post type is clearly misrepresented by the
-author.
+`spam` as `false`, unless the post type is `META` in which case mark
+spam as `true`. Additionally, if the post type is explicitly stated but
+clearly wrong (such as using AITA for a WIBTA post), then use the true
+post type rather than the stated one.
 
 If the post type is not explicitly stated in the post title, but
 otherwise clear from the post, mark the appropriate post type, mark
