@@ -1,5 +1,0 @@
-This HIT asks MTurk workers to extract events from the socialnorms
-anecdotes.
-
-The input data should be rows from the socialnorms dataset run
-through the bin/prepare-event-extraction-data.py script.
