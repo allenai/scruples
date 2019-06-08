@@ -12,22 +12,12 @@ from typing import (
 import pandas as pd
 from torch.utils.data import Dataset
 
-
-# constants
-
-_SPLITS = ["train", "dev", "test"]
-"""The splits of socialnorms."""
-# N.B. This is the single source of truth for the splits, if this
-# changes make sure to update the doc strings for ``SocialNorms`` and
-# ``SocialNormsDataset``.
-
-_SPLIT_PATH_TEMPLATE = '{split}.jsonl'
-"""The template for split file paths."""
+from .. import settings
 
 
 # main classes
 
-class SocialNorms:
+class SocialnormsCorpus:
     """A class for reading the socialnorms dataset for sklearn.
 
     Attributes
@@ -60,7 +50,7 @@ class SocialNorms:
     data_dir : str, required
         The directory in which the dataset is stored.
     """
-    SPLITS = _SPLITS
+    SPLITS = [split['name'] for split in settings.SPLITS]
 
     def __init__(
             self,
@@ -73,7 +63,8 @@ class SocialNorms:
         # read split data and bind it to the instance
         for split in self.SPLITS:
             split_path = os.path.join(
-                data_dir, _SPLIT_PATH_TEMPLATE.format(split=split))
+                data_dir,
+                settings.CORPUS_FILENAME_TEMPLATE.format(split=split))
             split_data = pd.read_json(split_path, lines=True)
 
             ids_features_and_labels = (
@@ -85,7 +76,7 @@ class SocialNorms:
             setattr(self, split, ids_features_and_labels)
 
 
-class SocialNormsDataset(Dataset):
+class SocialnormsCorpusDataset(Dataset):
     """A PyTorch ``Dataset`` class for socialnorms.
 
     Iterating through this dataset returns ``(id, feature, label)``
@@ -111,7 +102,7 @@ class SocialNormsDataset(Dataset):
         in as strings ("YTA", "NTA", "ESH", "NAH", and "INFO"). If
         ``None``, no transformation is applied.
     """
-    SPLITS = _SPLITS
+    SPLITS = [split['name'] for split in settings.SPLITS]
 
     def __init__(
             self,
@@ -154,7 +145,7 @@ class SocialNormsDataset(Dataset):
 
         split_path = os.path.join(
             self.data_dir,
-            _SPLIT_PATH_TEMPLATE.format(split=self.split))
+            settings.CORPUS_FILENAME_TEMPLATE.format(split=self.split))
         with open(split_path, 'r') as split_file:
             for ln in split_file:
                 row = json.loads(ln)

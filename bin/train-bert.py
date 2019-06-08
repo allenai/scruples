@@ -25,7 +25,7 @@ import tqdm
 
 from socialnorms import settings, utils
 from socialnorms.data.labels import Label
-from socialnorms.dataset.readers import SocialNormsDataset
+from socialnorms.dataset.readers import SocialnormsCorpusDataset
 from socialnorms.dataset.transforms import (
     BertTransform,
     Compose)
@@ -218,12 +218,12 @@ def train_bert(
     ])
     labelize = lambda s: getattr(Label, s).index
 
-    train = SocialNormsDataset(
+    train = SocialnormsCorpusDataset(
         data_dir=data_dir,
         split='train',
         transform=featurize,
         label_transform=labelize)
-    dev = SocialNormsDataset(
+    dev = SocialnormsCorpusDataset(
         data_dir=data_dir,
         split='dev',
         transform=featurize,

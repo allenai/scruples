@@ -15,7 +15,7 @@ import tqdm
 from socialnorms import settings, utils
 from socialnorms.baselines import BASELINES
 from socialnorms.baselines.metrics import METRICS
-from socialnorms.dataset.readers import SocialNorms
+from socialnorms.dataset.readers import SocialnormsCorpus
 
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
     'RESULTS_DIR',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
 @click.argument(
-    'SPLITS', type=click.Choice(SocialNorms.SPLITS), nargs=-1)
+    'SPLITS', type=click.Choice(SocialnormsCorpus.SPLITS), nargs=-1)
 @click.option(
     '--metric',
     type=click.Choice(METRICS.keys()),
@@ -100,7 +100,7 @@ def run_baselines(
 
     # load the data
 
-    socialnorms = SocialNorms(data_dir=data_dir)
+    socialnorms = SocialnormsCorpus(data_dir=data_dir)
 
 
     # run the baselines

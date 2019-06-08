@@ -20,7 +20,7 @@ from socialnorms.data.labels import Label
 from socialnorms.dataset.transforms import (
     BertTransform,
     Compose)
-from socialnorms.dataset.readers import SocialNormsDataset
+from socialnorms.dataset.readers import SocialnormsCorpusDataset
 
 
 logger = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
     'OUTPUT_DIR',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
 @click.argument(
-    'SPLITS', type=click.Choice(SocialNormsDataset.SPLITS), nargs=-1)
+    'SPLITS', type=click.Choice(SocialnormsCorpusDataset.SPLITS), nargs=-1)
 @click.option(
     '--predict-batch-size', type=int, default=64,
     help='The batch size for prediction.')
@@ -154,7 +154,7 @@ def predict_bert(
     for split in splits:
         logger.info(f'Loading the dataset from {data_dir}.')
 
-        dataset = SocialNormsDataset(
+        dataset = SocialnormsCorpusDataset(
             data_dir=data_dir,
             split=split,
             transform=featurize,

@@ -8,12 +8,13 @@ from unittest.mock import Mock
 
 import pandas as pd
 
+import socialnorms.settings as socialnorms_settings
 from socialnorms.dataset import readers
 from ... import settings
 
 
-class SocialNormsTestCase(unittest.TestCase):
-    """Test socialnorms.dataset.readers.SocialNorms."""
+class SocialnormsCorpusTestCase(unittest.TestCase):
+    """Test socialnorms.dataset.readers.SocialnormsCorpus."""
 
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -26,7 +27,11 @@ class SocialNormsTestCase(unittest.TestCase):
                 'tests', settings.SOCIALNORMS_EASY_TRAIN_PATH
         ) as train_in,\
         open(
-            os.path.join(self.temp_dir.name, 'train.jsonl'), 'wb'
+            os.path.join(
+                self.temp_dir.name,
+                socialnorms_settings.CORPUS_FILENAME_TEMPLATE.format(
+                    split='train')),
+            'wb'
         ) as train_out:
             train_out.write(train_in.read())
 
@@ -35,7 +40,11 @@ class SocialNormsTestCase(unittest.TestCase):
                 'tests', settings.SOCIALNORMS_EASY_DEV_PATH
         ) as dev_in,\
         open(
-            os.path.join(self.temp_dir.name, 'dev.jsonl'), 'wb'
+            os.path.join(
+                self.temp_dir.name,
+                socialnorms_settings.CORPUS_FILENAME_TEMPLATE.format(
+                    split='dev')),
+            'wb'
         ) as dev_out:
             dev_out.write(dev_in.read())
 
@@ -44,7 +53,11 @@ class SocialNormsTestCase(unittest.TestCase):
                 'tests', settings.SOCIALNORMS_EASY_TEST_PATH
         ) as test_in,\
         open(
-            os.path.join(self.temp_dir.name, 'test.jsonl'), 'wb'
+            os.path.join(
+                self.temp_dir.name,
+                socialnorms_settings.CORPUS_FILENAME_TEMPLATE.format(
+                    split='test')),
+            'wb'
         ) as test_out:
             test_out.write(test_in.read())
 
@@ -53,12 +66,12 @@ class SocialNormsTestCase(unittest.TestCase):
 
     def test_socialnorms_has_correct_splits(self):
         self.assertEqual(
-            set(readers.SocialNorms.SPLITS),
+            set(readers.SocialnormsCorpus.SPLITS),
             set(['train', 'dev', 'test']))
 
     def test_reads_in_splits(self):
         # read the dataset
-        socialnorms = readers.SocialNorms(data_dir=self.temp_dir.name)
+        socialnorms = readers.SocialnormsCorpus(data_dir=self.temp_dir.name)
 
         # train
         train_ids, train_features, train_labels = socialnorms.train
@@ -103,8 +116,8 @@ class SocialNormsTestCase(unittest.TestCase):
         self.assertEqual(test_labels.tolist()[0], 'NTA')
 
 
-class SocialNormsDatasetTestCase(unittest.TestCase):
-    """Test socialnorms.dataset.readers.SocialNormsDataset."""
+class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
+    """Test socialnorms.dataset.readers.SocialnormsCorpusDataset."""
 
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -117,7 +130,11 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
                 'tests', settings.SOCIALNORMS_EASY_TRAIN_PATH
         ) as train_in,\
         open(
-            os.path.join(self.temp_dir.name, 'train.jsonl'), 'wb'
+            os.path.join(
+                self.temp_dir.name,
+                socialnorms_settings.CORPUS_FILENAME_TEMPLATE.format(
+                    split='train')),
+            'wb'
         ) as train_out:
             train_out.write(train_in.read())
 
@@ -126,7 +143,11 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
                 'tests', settings.SOCIALNORMS_EASY_DEV_PATH
         ) as dev_in,\
         open(
-            os.path.join(self.temp_dir.name, 'dev.jsonl'), 'wb'
+            os.path.join(
+                self.temp_dir.name,
+                socialnorms_settings.CORPUS_FILENAME_TEMPLATE.format(
+                    split='dev')),
+            'wb'
         ) as dev_out:
             dev_out.write(dev_in.read())
 
@@ -135,7 +156,11 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
                 'tests', settings.SOCIALNORMS_EASY_TEST_PATH
         ) as test_in,\
         open(
-            os.path.join(self.temp_dir.name, 'test.jsonl'), 'wb'
+            os.path.join(
+                self.temp_dir.name,
+                socialnorms_settings.CORPUS_FILENAME_TEMPLATE.format(
+                    split='test')),
+            'wb'
         ) as test_out:
             test_out.write(test_in.read())
 
@@ -144,7 +169,7 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
 
     def test_socialnormsdataset_has_correct_splits(self):
         self.assertEqual(
-            set(readers.SocialNormsDataset.SPLITS),
+            set(readers.SocialnormsCorpusDataset.SPLITS),
             set(['train', 'dev', 'test']))
 
     def test_init_raises_error_if_bad_split_provided(self):
@@ -152,7 +177,7 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
                 ValueError,
                 r'split must be one of train, dev, test\.'
         ):
-          readers.SocialNormsDataset(
+          readers.SocialnormsCorpusDataset(
               data_dir=self.temp_dir.name,
               split='val',
               transform=None,
@@ -160,7 +185,7 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
 
     def test_len(self):
         # test len on train
-        train = readers.SocialNormsDataset(
+        train = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
@@ -168,7 +193,7 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
         self.assertEqual(len(train), 20)
 
         # test len on dev
-        dev = readers.SocialNormsDataset(
+        dev = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
@@ -176,7 +201,7 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
         self.assertEqual(len(dev), 5)
 
         # test len on test
-        test = readers.SocialNormsDataset(
+        test = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
@@ -185,7 +210,7 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
 
     def test___get_item__(self):
         # test __get_item__ on train
-        train = readers.SocialNormsDataset(
+        train = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
@@ -199,7 +224,7 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
         self.assertEqual(label, 'NTA')
 
         # test __get_item__ on dev
-        dev = readers.SocialNormsDataset(
+        dev = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
@@ -213,7 +238,7 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
         self.assertEqual(label, 'NTA')
 
         # test __get_item__ on test
-        test = readers.SocialNormsDataset(
+        test = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
@@ -229,7 +254,7 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
     def test_init_with_transform(self):
         # test the train split
         train_transform = Mock()
-        train = readers.SocialNormsDataset(
+        train = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=train_transform,
@@ -246,7 +271,7 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
 
         # test the dev split
         dev_transform = Mock()
-        dev = readers.SocialNormsDataset(
+        dev = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=dev_transform,
@@ -263,7 +288,7 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
 
         # test the test split
         test_transform = Mock()
-        test = readers.SocialNormsDataset(
+        test = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=test_transform,
@@ -281,7 +306,7 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
     def test_init_with_label_transform(self):
         # test the train split
         train_label_transform = Mock()
-        train = readers.SocialNormsDataset(
+        train = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
@@ -295,7 +320,7 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
 
         # test the dev split
         dev_label_transform = Mock()
-        dev = readers.SocialNormsDataset(
+        dev = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
@@ -309,7 +334,7 @@ class SocialNormsDatasetTestCase(unittest.TestCase):
 
         # test the test split
         test_label_transform = Mock()
-        test = readers.SocialNormsDataset(
+        test = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,

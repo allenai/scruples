@@ -7,6 +7,7 @@ the socialnorms dataset.
 import collections
 import json
 import logging
+import os
 import random
 
 import click
@@ -31,15 +32,15 @@ logger = logging.getLogger(__name__)
     'posts_path',
     type=click.Path(exists=True, file_okay=True, dir_okay=False))
 @click.argument(
-    'output_path',
-    type=click.Path(exists=False, file_okay=True, dir_okay=False))
+    'output_dir',
+    type=click.Path(exists=False, file_okay=False, dir_okay=True))
 @click.option(
     '--verbose', is_flag=True,
     help='Set the log level to DEBUG.')
 def make_dataset(
         comments_path: str,
         posts_path: str,
-        output_path: str,
+        output_dir: str,
         verbose: bool
 ) -> None:
     """Create the socialnorms dataset and write it to OUTPUT_PATH.
@@ -49,6 +50,9 @@ def make_dataset(
     OUTPUT_PATH.
     """
     utils.configure_logging(verbose=verbose)
+
+    # Create the output directory.
+    os.makedirs(output_dir)
 
     # Step 1: Read in the comments and index them by their link ids.
     link_id_to_comments = collections.defaultdict(list)
@@ -77,34 +81,61 @@ def make_dataset(
 
             posts.append(post)
 
-    # Step 3: Extract labels with scores from the comments for each
-    # post, filter out bad posts, try and retrieve the original post
-    # text from the comments, and then write the dataset instances to
-    # disk.
-    with click.open_file(output_path, 'w') as output_file:
-        for post in tqdm.tqdm(
-                # shuffle the posts
-                random.sample(posts, len(posts)),
-                **settings.TQDM_KWARGS
-        ):
-            if not post.is_good:
-                continue
+    # Step 3: Filter out the bad posts.
+    dataset_posts = [
+        post
+        for post in tqdm.tqdm(posts, **settings.TQDM_KWARGS)
+        if post.is_good
+    ]
 
-            instance = {
-                'id': utils.make_id(),
-                'post_id': post.id,
-                'post_type': post.post_type.name,
-                'title': post.title,
-                'text': post.original_text,
-                'label_scores': {
-                    label.name: score
-                    for label, score
-                    in post.label_scores.label_to_score.items()
-                },
-                'label': post.label_scores.best_label.name
-            }
+    # Step 4: Create the splits then write them to disk.
 
-            output_file.write(json.dumps(instance) + '\n')
+    # Shuffle dataset_posts so that the splits will be random.
+    random.shuffle(dataset_posts)
+
+    if [split['size'] for split in settings.SPLITS].count(None) > 1:
+        raise ValueError(
+            'The settings.SPLITS constant should have at most ONE split'
+            ' with a size of None.')
+
+    # Make sure that the split with a size of ``None`` will be processed
+    # last.
+    splits = [
+        split
+        for split in settings.SPLITS
+        if split['size'] is not None
+    ] + [
+        split
+        for split in settings.SPLITS
+        if split['size'] is None
+    ]
+    for split in splits:
+        split_path = os.path.join(
+            output_dir,
+            settings.CORPUS_FILENAME_TEMPLATE.format(split=split['name']))
+        with click.open_file(split_path, 'w') as output_file:
+            if split['size'] is None:
+                split_posts = dataset_posts
+                dataset_posts = []
+            else:
+                split_posts = dataset_posts[:split['size']]
+                dataset_posts = dataset_posts[split['size']:]
+            for post in tqdm.tqdm(split_posts, **settings.TQDM_KWARGS):
+                instance = {
+                    'id': utils.make_id(),
+                    'post_id': post.id,
+                    'title': post.title,
+                    'text': post.original_text,
+                    'post_type': post.post_type.name,
+                    'label_scores': {
+                        label.name: score
+                        for label, score
+                        in post.label_scores.label_to_score.items()
+                    },
+                    'label': post.label_scores.best_label.name
+                }
+
+                output_file.write(json.dumps(instance) + '\n')
 
 
 if __name__ == '__main__':
