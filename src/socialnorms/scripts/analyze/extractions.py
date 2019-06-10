@@ -1,8 +1,4 @@
-"""Evaluate extraction.
-
-This script evaluates various elements of the project's extraction
-process, and writes the analysis to a report.
-"""
+"""Analyze the dataset extraction process."""
 
 import collections
 import json
@@ -14,14 +10,14 @@ import click
 from sklearn import metrics
 import tqdm
 
-from socialnorms import (
+from ... import (
     settings,
     utils)
-from socialnorms.data.comment import Comment
-from socialnorms.data.post import Post
-from socialnorms.data.utils import instantiate_attrs_with_extra_kwargs
-from socialnorms.data.labels import Label
-from socialnorms.data.post_types import PostType
+from ...data.comment import Comment
+from ...data.post import Post
+from ...data.utils import instantiate_attrs_with_extra_kwargs
+from ...data.labels import Label
+from ...data.post_types import PostType
 
 
 logger = logging.getLogger(__name__)
@@ -166,16 +162,12 @@ Spam posts are filtered out and not reported on in all non-spam results.
 @click.argument(
     'output_dir',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
-@click.option(
-    '--verbose', is_flag=True,
-    help='Set the log level to DEBUG.')
-def evaluate_extraction(
+def extractions(
         comments_path: str,
         comment_annotations_path: str,
         posts_path: str,
         post_annotations_path: str,
-        output_dir: str,
-        verbose: bool
+        output_dir: str
 ) -> None:
     """Evaluate extractions and write a report.
 
@@ -204,8 +196,6 @@ def evaluate_extraction(
     files constructed according to the Annotation Guidelines
     (annotation-guidelines.md) document.
     """
-    utils.configure_logging(verbose=verbose)
-
     # Step 0: Construct important paths.
     os.makedirs(output_dir)
     report_path = os.path.join(output_dir, 'extraction-evaluation.md')
@@ -514,7 +504,3 @@ def evaluate_extraction(
             if annotation['post_type'] != post_type:
                 post_type_misclassifications_file.write(
                     json.dumps(attr.asdict(post)) + '\n')
-
-
-if __name__ == '__main__':
-    evaluate_extraction()

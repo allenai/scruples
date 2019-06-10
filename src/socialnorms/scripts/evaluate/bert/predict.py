@@ -14,13 +14,13 @@ import torch
 from torch.utils.data import DataLoader
 import tqdm
 
-from socialnorms import settings, utils
-from socialnorms.baselines.metrics import METRICS
-from socialnorms.data.labels import Label
-from socialnorms.dataset.transforms import (
+from .... import settings
+from ....baselines.metrics import METRICS
+from ....data.labels import Label
+from ....dataset.transforms import (
     BertTransform,
     Compose)
-from socialnorms.dataset.readers import SocialnormsCorpusDataset
+from ....dataset.readers import SocialnormsCorpusDataset
 
 
 logger = logging.getLogger(__name__)
@@ -49,18 +49,14 @@ logger = logging.getLogger(__name__)
 @click.option(
     '--gpu-ids', type=str, default='',
     help='The GPU IDs to use for training as a comma-separated list.')
-@click.option(
-    '--verbose', is_flag=True,
-    help='Set the log level to DEBUG.')
-def predict_bert(
+def predict(
         cache_dir: str,
         data_dir: str,
         results_dir: str,
         output_dir: str,
         splits: List[str],
         predict_batch_size: int,
-        gpu_ids: str,
-        verbose: bool
+        gpu_ids: str
 ) -> None:
     """Predict using BERT on socialnorms.
 
@@ -68,11 +64,6 @@ def predict_bert(
     model from RESULTS_DIR, and write the metrics and predictions to
     OUTPUT_DIR, for each split provided as an argument.
     """
-    # configure logging
-
-    utils.configure_logging(verbose=verbose)
-
-
     # manage paths
 
     os.makedirs(output_dir)
@@ -229,7 +220,3 @@ def predict_bert(
                             in zip(Label, probs)
                         }
                     }) + '\n')
-
-
-if __name__ == '__main__':
-    predict_bert()

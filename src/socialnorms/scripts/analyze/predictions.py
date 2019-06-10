@@ -1,4 +1,4 @@
-"""Analyze classification performance on socialnorms."""
+"""Analyze predictions on socialnorms."""
 
 import json
 import logging
@@ -6,9 +6,9 @@ import logging
 import click
 from sklearn import metrics
 
-from socialnorms import utils
-from socialnorms.data.labels import Label
-from socialnorms.baselines.metrics import METRICS
+from ... import utils
+from ...data.labels import Label
+from ...baselines.metrics import METRICS
 
 
 logger = logging.getLogger(__name__)
@@ -60,15 +60,11 @@ Confusion Matrix
     help='Compute metrics which require predictions of label'
          ' probabilities, and include them in the report. Predictions'
          ' must have "label_scores" keys to use this option.')
-@click.option(
-    '--verbose', is_flag=True,
-    help='Set the log level to DEBUG.')
-def analyze_performance(
+def predictions(
         dataset_path: str,
         predictions_path: str,
         output_path: str,
-        label_scores: bool,
-        verbose: bool
+        label_scores: bool
 ) -> None:
     """Analyze classification performance and write a report.
 
@@ -79,8 +75,6 @@ def analyze_performance(
     "label_scores" keys, corresponding to the ID for the instance, the
     predicted label, and the predicted probabilities for each class.
     """
-    utils.configure_logging(verbose=verbose)
-
     # Step 1: Read in the dataset.
     with click.open_file(dataset_path, 'r') as dataset_file:
         id_to_dataset_label_and_label_scores = {}
@@ -181,7 +175,3 @@ def analyze_performance(
                 metrics_report=metrics_report,
                 classification_report=classification_report,
                 confusion_matrix=confusion_matrix))
-
-
-if __name__ == '__main__':
-    analyze_performance()

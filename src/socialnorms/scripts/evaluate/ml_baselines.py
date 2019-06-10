@@ -12,10 +12,10 @@ from sklearn.metrics import make_scorer
 from skopt import BayesSearchCV
 import tqdm
 
-from socialnorms import settings, utils
-from socialnorms.baselines import BASELINES
-from socialnorms.baselines.metrics import METRICS
-from socialnorms.dataset.readers import SocialnormsCorpus
+from ... import settings
+from ...baselines import BASELINES
+from ...baselines.metrics import METRICS
+from ...dataset.readers import SocialnormsCorpus
 
 
 logger = logging.getLogger(__name__)
@@ -55,10 +55,7 @@ logger = logging.getLogger(__name__)
          ' hyper-parameters. At most n_folds * n_points processses can'
          ' be used at a given time. If 0, then the same number of'
          ' processes as CPUs will be used. Defaults to 0.')
-@click.option(
-    '--verbose', is_flag=True,
-    help='Set the log level to DEBUG.')
-def run_baselines(
+def ml_baselines(
         data_dir: str,
         results_dir: str,
         splits: List[str],
@@ -66,8 +63,7 @@ def run_baselines(
         n_iter: int,
         n_points: int,
         n_folds: int,
-        n_jobs: int,
-        verbose: bool
+        n_jobs: int
 ) -> None:
     """Train baselines on socialnorms and report performance on SPLITS.
 
@@ -75,11 +71,6 @@ def run_baselines(
     DATA_DIR, and writing trained models, logs, and other results to
     RESULTS_DIR.
     """
-    # configure logging
-
-    utils.configure_logging(verbose=verbose)
-
-
     # manage paths
 
     os.makedirs(results_dir)
@@ -167,7 +158,3 @@ def run_baselines(
                                 in zip(model.classes_, probs)
                             }
                         }) + '\n')
-
-
-if __name__ == '__main__':
-    run_baselines()

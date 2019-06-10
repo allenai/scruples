@@ -1,4 +1,4 @@
-"""Make the socialnorms dataset from raw reddit data.
+"""Make the socialnorms corpus from raw reddit data.
 
 This script takes in posts and comments from the reddit API and creates
 the socialnorms dataset.
@@ -13,10 +13,10 @@ import random
 import click
 import tqdm
 
-from socialnorms import settings, utils
-from socialnorms.data.comment import Comment
-from socialnorms.data.post import Post
-from socialnorms.data.utils import instantiate_attrs_with_extra_kwargs
+from ... import settings, utils
+from ...data.comment import Comment
+from ...data.post import Post
+from ...data.utils import instantiate_attrs_with_extra_kwargs
 
 
 logger = logging.getLogger(__name__)
@@ -34,14 +34,10 @@ logger = logging.getLogger(__name__)
 @click.argument(
     'output_dir',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
-@click.option(
-    '--verbose', is_flag=True,
-    help='Set the log level to DEBUG.')
-def make_dataset(
+def corpus(
         comments_path: str,
         posts_path: str,
-        output_dir: str,
-        verbose: bool
+        output_dir: str
 ) -> None:
     """Create the socialnorms dataset and write it to OUTPUT_PATH.
 
@@ -49,8 +45,6 @@ def make_dataset(
     COMMENTS_PATH, create the socialnorms dataset, and write it to
     OUTPUT_PATH.
     """
-    utils.configure_logging(verbose=verbose)
-
     # Create the output directory.
     os.makedirs(output_dir)
 
@@ -136,7 +130,3 @@ def make_dataset(
                 }
 
                 output_file.write(json.dumps(instance) + '\n')
-
-
-if __name__ == '__main__':
-    make_dataset()

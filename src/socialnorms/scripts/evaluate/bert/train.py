@@ -23,10 +23,10 @@ import torch
 from torch.utils.data import DataLoader
 import tqdm
 
-from socialnorms import settings, utils
-from socialnorms.data.labels import Label
-from socialnorms.dataset.readers import SocialnormsCorpusDataset
-from socialnorms.dataset.transforms import (
+from .... import settings
+from ....data.labels import Label
+from ....dataset.readers import SocialnormsCorpusDataset
+from ....dataset.transforms import (
     BertTransform,
     Compose)
 
@@ -93,10 +93,7 @@ logger = logging.getLogger(__name__)
 @click.option(
     '--gpu-ids', type=str, default=None,
     help='The GPU IDs to use for training as a comma-separated list.')
-@click.option(
-    '--verbose', is_flag=True,
-    help='Set the log level to DEBUG.')
-def train_bert(
+def train(
         cache_dir: str,
         data_dir: str,
         results_dir: str,
@@ -112,19 +109,13 @@ def train_bert(
         n_epochs: int,
         mixed_precision: bool,
         n_gradient_accumulation: int,
-        gpu_ids: Optional[str],
-        verbose: bool
+        gpu_ids: Optional[str]
 ) -> None:
     """Train BERT on socialnorms and report dev performance.
 
     Train BERT on socialnorms, reading the dataset from DATA_DIR, and
     writing checkpoint files, logs, and other results to RESULTS_DIR.
     """
-    # configure logging
-
-    utils.configure_logging(verbose=verbose)
-
-
     # manage paths
 
     logging.info('Creating results directories.')
@@ -174,8 +165,7 @@ def train_bert(
             'n_epochs': n_epochs,
             'mixed_precision': mixed_precision,
             'n_gradient_accumulation': n_gradient_accumulation,
-            'gpu_ids': gpu_ids,
-            'verbose': verbose
+            'gpu_ids': gpu_ids
         }, config_file)
 
 
@@ -434,7 +424,3 @@ def train_bert(
         if epoch_dev_accuracy > best_dev_accuracy:
             shutil.copyfile(last_checkpoint_path, best_checkpoint_path)
             best_dev_accuracy = epoch_dev_accuracy
-
-
-if __name__ == '__main__':
-    train_bert()

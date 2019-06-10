@@ -30,6 +30,9 @@ setup(
     license='Apache',
     packages=['socialnorms'],
     package_dir={'': 'src'},
+    scripts=[
+        'bin/socialnorms'
+    ],
     install_requires=[
         'Click >= 7.0',
         'apex >= 0.1',
