@@ -32,6 +32,9 @@ def configure_logging(verbose: bool = False) -> logging.Handler:
     logging.Handler
         The log handler set up by this function to handle basic logging.
     """
+    # unset the log level from root (defaults to WARNING)
+    logging.root.setLevel(logging.NOTSET)
+
     # set up the log handler
     handler = logging.StreamHandler()
     handler.setLevel(logging.DEBUG if verbose else logging.INFO)
