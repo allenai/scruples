@@ -35,6 +35,7 @@ setup(
     ],
     install_requires=[
         'Click >= 7.0',
+        'Pattern >= 3.6',
         'apex >= 0.1',
         'attrs >= 19.1.0',
         'ftfy >= 5.5.1',

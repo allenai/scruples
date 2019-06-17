@@ -10,6 +10,7 @@ import logging
 import os
 import random
 
+import attr
 import click
 import tqdm
 
@@ -118,6 +119,10 @@ def corpus(
                 instance = {
                     'id': utils.make_id(),
                     'post_id': post.id,
+                    'action':
+                        attr.asdict(post.action)
+                        if post.action is not None else
+                        None,
                     'title': post.title,
                     'text': post.original_text,
                     'post_type': post.post_type.name,

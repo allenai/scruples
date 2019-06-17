@@ -8,6 +8,7 @@ import attr
 
 from .. import utils
 from . import utils as data_utils
+from .action import Action
 from .comment import Comment
 from .label_scores import LabelScores
 from .labels import Label
@@ -23,6 +24,10 @@ class Post:
     label_scores : LabelScores
         The label scores for the post. Scores are computed by summing
         one vote for each comment expressing a particular label.
+    action : Optional[Action]
+        An action summarizing the main action of the post or
+        ``None``. The action is extracted from the post title with
+        scores derived from the post's label scores.
     original_text : Optional[str]
         The original text of the post or ``None``. The post in it's
         original form is usually captured by the AutoModerator for the
@@ -211,6 +216,27 @@ class Post:
                 label_to_score[comment.label] += 1
 
         return LabelScores(label_to_score=label_to_score)
+
+    @data_utils.cached_property
+    def action(self) -> Optional[Action]:
+        description = Action.extract_description_from_title(self.title)
+
+        if description is None:
+            return None
+
+        pronormative_score = (
+            self.label_scores.label_to_score[Label.NTA]
+            + self.label_scores.label_to_score[Label.NAH]
+        )
+        contranormative_score = (
+            self.label_scores.label_to_score[Label.YTA]
+            + self.label_scores.label_to_score[Label.ESH]
+        )
+
+        return Action(
+            description=description,
+            pronormative_score=pronormative_score,
+            contranormative_score=contranormative_score)
 
     @data_utils.cached_property
     def original_text(self) -> Optional[str]:

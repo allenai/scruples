@@ -50,6 +50,25 @@ class PostTestCase(unittest.TestCase):
                 Label.INFO: 0
             }))
 
+    def test_action(self):
+        # test that action extraction failures become None
+        kwargs = self.post_kwargs.copy()
+
+        self.assertEqual(post.Post(**kwargs).action, None)
+
+        # test a correct action extraction
+        kwargs = self.post_kwargs.copy()
+        kwargs.update(
+            title='AITA for telling someone that they were in my way?')
+
+        action = post.Post(**kwargs).action
+
+        self.assertEqual(
+            action.description,
+            'telling someone that they were in my way')
+        self.assertEqual(action.pronormative_score, 2)
+        self.assertEqual(action.contranormative_score, 1)
+
     def test_original_text(self):
         # test when the original text can be extracted from the comments
         kwargs = self.post_kwargs.copy()
