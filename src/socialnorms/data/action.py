@@ -150,6 +150,9 @@ class Action:
        A float between zero and one describing the proportion of people
        that would rate the action as not norm-violating. Closer to zero
        means more people view it as violating a norm.
+    is_good : bool
+       ``True`` if the action is considered a good candidate for
+       creating an instance in the benchmark, otherwise ``False``.
 
     See `Parameters`_ for additional attributes.
 
@@ -245,6 +248,13 @@ class Action:
         return (
             self.pronormative_score
             / (self.pronormative_score + self.contranormative_score)
+        )
+
+    @data_utils.cached_property
+    def is_good(self) -> bool:
+        return (
+            self.pronormative_score > 0
+            or self.contranormative_score > 0
         )
 
     # methods

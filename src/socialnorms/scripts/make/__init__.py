@@ -4,7 +4,9 @@ import logging
 
 import click
 
-from . import corpus
+from . import (
+    benchmark,
+    corpus)
 
 
 logger = logging.getLogger(__name__)
@@ -19,6 +21,7 @@ def make():
 
 
 subcommands = [
+    benchmark.benchmark,
     corpus.corpus
 ]
 

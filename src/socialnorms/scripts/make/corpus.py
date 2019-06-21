@@ -33,23 +33,25 @@ logger = logging.getLogger(__name__)
     'posts_path',
     type=click.Path(exists=True, file_okay=True, dir_okay=False))
 @click.argument(
-    'output_dir',
+    'corpus_dir',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
 def corpus(
         comments_path: str,
         posts_path: str,
-        output_dir: str
+        corpus_dir: str
 ) -> None:
-    """Create the socialnorms dataset and write it to OUTPUT_PATH.
+    """Create the socialnorms corpus and write it to CORPUS_DIR.
 
     Read in the reddit posts from POSTS_PATH and comments from
-    COMMENTS_PATH, create the socialnorms dataset, and write it to
-    OUTPUT_PATH.
+    COMMENTS_PATH, create the socialnorms corpus, and write it to
+    CORPUS_DIR.
     """
     # Create the output directory.
-    os.makedirs(output_dir)
+    os.makedirs(corpus_dir)
 
     # Step 1: Read in the comments and index them by their link ids.
+    logger.info('Reading the comments.')
+
     link_id_to_comments = collections.defaultdict(list)
     with click.open_file(comments_path, 'r') as comments_file:
         for ln in tqdm.tqdm(comments_file.readlines(), **settings.TQDM_KWARGS):
@@ -65,6 +67,8 @@ def corpus(
             link_id_to_comments[comment.link_id[3:]].append(comment)
 
     # Step 2: Read in the posts and join them with their comments.
+    logger.info('Reading the posts.')
+
     posts = []
     with click.open_file(posts_path, 'r') as posts_file:
         for ln in tqdm.tqdm(posts_file.readlines(), **settings.TQDM_KWARGS):
@@ -77,6 +81,8 @@ def corpus(
             posts.append(post)
 
     # Step 3: Filter out the bad posts.
+    logger.info('Filtering out bad posts.')
+
     dataset_posts = [
         post
         for post in tqdm.tqdm(posts, **settings.TQDM_KWARGS)
@@ -84,6 +90,7 @@ def corpus(
     ]
 
     # Step 4: Create the splits then write them to disk.
+    logger.info('Creating splits and writing them to disk.')
 
     # Shuffle dataset_posts so that the splits will be random.
     random.shuffle(dataset_posts)
@@ -106,9 +113,9 @@ def corpus(
     ]
     for split in splits:
         split_path = os.path.join(
-            output_dir,
+            corpus_dir,
             settings.CORPUS_FILENAME_TEMPLATE.format(split=split['name']))
-        with click.open_file(split_path, 'w') as output_file:
+        with open(split_path, 'w') as split_file:
             if split['size'] is None:
                 split_posts = dataset_posts
                 dataset_posts = []
@@ -134,4 +141,4 @@ def corpus(
                     'label': post.label_scores.best_label.name
                 }
 
-                output_file.write(json.dumps(instance) + '\n')
+                split_file.write(json.dumps(instance) + '\n')

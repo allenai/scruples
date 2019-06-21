@@ -34,9 +34,17 @@ used in the other splits should go to that split.
 # names and their sizes (in terms of the number of posts used to create
 # them). If this variable is modified, make sure to update the doc
 # strings for ``SocialnormsCorpus``, ``SocialnormsCorpusDataset``.
+#
+# Note that the benchmark splits will have a different number of
+# instances than the number of posts used to create them, in
+# general. So, the 'size' attribute doesn't necessarily give the size of
+# the benchmark splits.
 
 CORPUS_FILENAME_TEMPLATE = '{split}.socialnorms-corpus.jsonl'
 """A template string for the corpus's split filenames."""
+
+BENCHMARK_FILENAME_TEMPLATE = '{split}.socialnorms-benchmark.jsonl'
+"""A template string for the benchmark's split filenames."""
 
 
 # output and logging

@@ -5,6 +5,8 @@ import math
 import unittest
 
 import numpy as np
+import pytest
+from scipy import stats
 
 from socialnorms import utils
 
@@ -371,3 +373,69 @@ class MakeLabelDistributionStrTestCase(unittest.TestCase):
             '+----------+----------+----------+\n'
             '| total    |        2 |        1 |\n'
             '+----------+----------+----------+\n')
+
+
+class EstimateBetaBinomialParametersTestCase(unittest.TestCase):
+    """Test socialnorms.utils.estimate_beta_binomial_parameters."""
+
+    @pytest.mark.slow
+    def test_estimates_parameters_for_beta_binomial_with_fixed_n(self):
+        a_bs = [
+            (1, 1), # uniform prior (beta(1, 1))
+            (5, 0.5), # right-skewed prior (beta(5, 0.5))
+            (0.5, 5) # left-skewed prior (beta(0.5, 5))
+        ]
+        for a, b in a_bs:
+            n = 100
+            ps = stats.beta.rvs(a=a, b=b, size=100000)
+            ss = stats.binom.rvs(n, ps)
+            fs = n - ss
+
+            a_hat, b_hat = utils.estimate_beta_binomial_parameters(
+                successes=ss, failures=fs)
+
+            self.assertLess(abs(a_hat - a), 0.1)
+            self.assertLess(abs(b_hat - b), 0.1)
+
+    @pytest.mark.slow
+    def test_estimates_parameters_for_beta_binomial_with_random_n(self):
+        a_bs = [
+            (1, 1), # uniform prior (beta(1, 1))
+            (5, 0.5), # right-skewed prior (beta(5, 0.5))
+            (0.5, 5) # left-skewed prior (beta(0.5, 5))
+        ]
+        for a, b in a_bs:
+            ps = stats.beta.rvs(a=a, b=b, size=100000)
+            ns = np.random.choice(range(50, 151), size=100000)
+            ss = stats.binom.rvs(ns, ps)
+            fs = ns - ss
+
+            a_hat, b_hat = utils.estimate_beta_binomial_parameters(
+                successes=ss, failures=fs)
+
+            self.assertLess(abs(a_hat - a), 0.1)
+            self.assertLess(abs(b_hat - b), 0.1)
+
+
+class ProbP1GreaterThanP2TestCase(unittest.TestCase):
+    """Test socialnorms.utils.prob_p1_greater_than_p2."""
+
+    def test_computes_probability_correctly(self):
+        margins = [0.0, 0.25, 0.5]
+        a_bs = [
+            (1, 1), # uniform (beta(1, 1))
+            (5, 0.5), # right-skewed (beta(5, 0.5))
+            (0.5, 5) # left-skewed (beta(0.5, 5))
+        ]
+        for margin in margins:
+            for a1, b1 in a_bs:
+                for a2, b2 in a_bs:
+                    p1s = stats.beta.rvs(a1, b1, size=10000)
+                    p2s = stats.beta.rvs(a2, b2, size=10000)
+
+                    self.assertLess(
+                        abs(
+                            np.mean(p1s - p2s > margin)
+                            - utils.prob_p1_greater_than_p2(
+                                a1=a1, b1=b1, a2=a2, b2=b2, margin=margin)),
+                        0.05)

@@ -182,6 +182,32 @@ class ActionTestCase(unittest.TestCase):
             ).normativity,
             0.5)
 
+    def test_is_good(self):
+        # when both scores are positive
+        action_ = action.Action(
+            description='foo',
+            pronormative_score=1,
+            contranormative_score=1)
+        self.assertTrue(action_.is_good)
+        # when only the pronormative score is positive
+        action_ = action.Action(
+            description='foo',
+            pronormative_score=1,
+            contranormative_score=0)
+        self.assertTrue(action_.is_good)
+        # when only the contranormative_score is positive
+        action_ = action.Action(
+            description='foo',
+            pronormative_score=0,
+            contranormative_score=1)
+        self.assertTrue(action_.is_good)
+        # when both scores are zero
+        action_ = action.Action(
+            description='foo',
+            pronormative_score=0,
+            contranormative_score=0)
+        self.assertFalse(action_.is_good)
+
     def test_normativity_when_divisor_is_zero(self):
         self.assertTrue(
             math.isnan(

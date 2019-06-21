@@ -6,10 +6,18 @@ import random
 import string
 from typing import (
     List,
-    Optional)
+    Optional,
+    Tuple)
 
-import numpy as np
+from autograd import grad
+import autograd.numpy as np
+from autograd.scipy.special import (
+    beta,
+    betainc,
+    gammaln)
 import regex
+from scipy.integrate import quad
+from scipy.optimize import minimize
 from sklearn import metrics
 
 from . import settings
@@ -285,3 +293,96 @@ def make_label_distribution_str(
         f'{body}\n'
         f'{body_separator}\n'
     )
+
+
+def estimate_beta_binomial_parameters(
+        successes: np.ndarray,
+        failures: np.ndarray
+) -> Tuple[float, float]:
+    """Return the MLE estimate for the beta binomial distribution.
+
+    Given success counts, ``successes``, and failure counts,
+    ``failures``, return the MLE estimate for the parameters of a
+    beta-binomial model of that data.
+
+    Parameters
+    ----------
+    successes : np.ndarray
+        An array of integers giving the observed number of successes for
+        each trial.
+    failures : np.ndarray
+        An array of integers giving the observed number of failures for
+        each trail.
+
+    Returns
+    -------
+    a : float, b : float
+        A tuple, ``(a, b)``, giving the MLE of the alpha and beta
+        parameters for the beta-binomial model.
+    """
+    # This function computes the negative log-likelihood for the
+    # beta-binomial model with parameters a and b on the provided data
+    # (successes and failures)
+    def nll(params):
+        a, b = params
+        # N.B. the likelihood must be expressed as a sum of log-gamma
+        # factors in order to avoid overflow / underflow for large
+        # numbers of successes or failures in an observation.
+        return - np.sum(
+            gammaln(successes + failures + 1)
+            + gammaln(successes + a)
+            + gammaln(failures + b)
+            + gammaln(a + b)
+            - gammaln(successes + 1)
+            - gammaln(failures + 1)
+            - gammaln(successes + failures + a + b)
+            - gammaln(a)
+            - gammaln(b))
+
+    # minimize the negative log-likelihood
+    a, b = minimize(
+        fun=nll,
+        x0=[1., 1.],
+        jac=grad(nll),
+        bounds=[(1e-10, None), (1e-10, None)]
+    ).x
+
+    return a, b
+
+
+def prob_p1_greater_than_p2(a1, b1, a2, b2, margin):
+    """Return the probability that p1 is greater than p2 by ``margin``.
+
+    If p1 ~ Beta(a1, b1) and p2 ~ Beta(a2, b2), then return
+    P(p1 - p2 > margin).
+
+    Parameters
+    ----------
+    a1 : float
+        The alpha parameter of the first beta distribution. Must be
+        greater than zero.
+    b1 : float
+        The beta parameter of the first beta distribution. Must be
+        greater than zero.
+    a2 : float
+        The alpha parameter of the second beta distribution. Must be
+        greater than zero.
+    b2 : float
+        The beta parameter of the second beta distribution. Must be
+        greater than zero.
+    margin : float
+        The margin for which to compute the probability. Must be greater
+        than zero and less than one.
+
+    Returns
+    -------
+    float
+        The probability that ``p1 ~ Beta(a1, b1)`` is greater than
+        ``p2 ~ Beta(a2, b2)`` by ``margin``.
+    """
+    def integrand(x):
+        return x**(a1 - 1) * (1 - x)**(b1 - 1) * betainc(a2, b2, x - margin)
+
+    res, _ = quad(integrand, margin, 1) / beta(a1, b1)
+
+    return res
