@@ -1,25 +1,20 @@
-"""Predict labels for socialnorms using a fine-tuned BERT model."""
+"""Predict labels for the corpus with a fine-tuned language model."""
 
 import json
 import math
 import logging
 import os
-from typing import List
+from typing import List, Optional
 
 import click
-from pytorch_pretrained_bert.modeling import BertForSequenceClassification
-from pytorch_pretrained_bert.tokenization import BertTokenizer
 from scipy.special import softmax
 import torch
 from torch.utils.data import DataLoader
 import tqdm
 
-from .... import settings
+from .... import settings, baselines
 from ....baselines.metrics import METRICS
 from ....data.labels import Label
-from ....dataset.transforms import (
-    BertTransform,
-    Compose)
 from ....dataset.readers import SocialnormsCorpusDataset
 
 
@@ -30,69 +25,67 @@ logger = logging.getLogger(__name__)
 
 @click.command()
 @click.argument(
-    'CACHE_DIR',
-    type=click.Path(file_okay=False, dir_okay=True))
-@click.argument(
-    'DATA_DIR',
+    'data_dir',
     type=click.Path(exists=True, file_okay=False, dir_okay=True))
 @click.argument(
-    'RESULTS_DIR',
+    'model_dir',
     type=click.Path(exists=True, file_okay=False, dir_okay=True))
 @click.argument(
-    'OUTPUT_DIR',
+    'results_dir',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
 @click.argument(
-    'SPLITS', type=click.Choice(SocialnormsCorpusDataset.SPLITS), nargs=-1)
+    'splits', type=click.Choice(SocialnormsCorpusDataset.SPLITS), nargs=-1)
 @click.option(
     '--predict-batch-size', type=int, default=64,
     help='The batch size for prediction.')
 @click.option(
-    '--gpu-ids', type=str, default='',
+    '--gpu-ids', type=str, default=None,
     help='The GPU IDs to use for training as a comma-separated list.')
-def predict(
-        cache_dir: str,
+def predict_lm(
         data_dir: str,
+        model_dir: str,
         results_dir: str,
-        output_dir: str,
         splits: List[str],
         predict_batch_size: int,
-        gpu_ids: str
+        gpu_ids: Optional[str]
 ) -> None:
-    """Predict using BERT on socialnorms.
+    """Predict using a fine-tuned LM baseline on the corpus.
 
-    Read the socialnorms dataset from DATA_DIR, load a fine-tuned BERT
-    model from RESULTS_DIR, and write the metrics and predictions to
-    OUTPUT_DIR, for each split provided as an argument.
+    Read the corpus dataset from DATA_DIR, load the fine-tuned LM
+    baseline model from MODEL_DIR, and write the metrics and predictions
+    to RESULTS_DIR, for each split provided as an argument.
     """
-    # manage paths
+    # Step 1: Manage and construct paths.
 
-    os.makedirs(output_dir)
+    logger.info('Creating the results directory.')
+
+    os.makedirs(results_dir)
     metrics_paths = {}
     predictions_paths = {}
     for split in splits:
-        os.makedirs(os.path.join(output_dir, split))
+        os.makedirs(os.path.join(results_dir, split))
         metrics_paths[split] = os.path.join(
-            output_dir, split, 'metrics.json')
+            results_dir, split, 'metrics.json')
         predictions_paths[split] = os.path.join(
-            output_dir, split, 'predictions.jsonl')
+            results_dir, split, 'predictions.jsonl')
 
-    config_file_path = os.path.join(results_dir, 'config.json')
+    config_file_path = os.path.join(model_dir, 'config.json')
     checkpoint_file_path = os.path.join(
-        results_dir, 'checkpoints', 'best.checkpoint.pkl')
+        model_dir, 'checkpoints', 'best.checkpoint.pkl')
 
 
-    # read in the fine-tuning arguments
+    # Step 2: Read in the training arguments.
+
+    logger.info('Reading in the training arguments.')
 
     with open(config_file_path, 'r') as config_file:
         config = json.load(config_file)
 
-    pretrained_bert = config['pretrained_bert']
-    max_sequence_length = config['max_sequence_length']
-    truncation_strategy_title = config['truncation_strategy_title']
-    truncation_strategy_text = config['truncation_strategy_text']
+    Model, hyper_params, make_transform =\
+        baselines.CORPUS_FINE_TUNE_LM_BASELINES[config['baseline']]
 
 
-    # configure GPUs
+    # Step 3: Configure GPUs.
 
     if gpu_ids:
         gpu_ids = [int(gpu_id) for gpu_id in gpu_ids.split(',')]
@@ -113,36 +106,26 @@ def predict(
         device = torch.device('cpu')
 
 
-    # load the model
+    # Step 4: Load the model.
 
-    model = torch.nn.DataParallel(
-        BertForSequenceClassification.from_pretrained(
-            pretrained_bert,
-            cache_dir=cache_dir,
-            num_labels=len(Label)))
+    model = torch.nn.DataParallel(Model(**hyper_params['model']))
     model.load_state_dict(torch.load(checkpoint_file_path)['model'])
 
     model.to(device)
 
 
-    # create transformations for the dataset
+    # Step 5: Create transformations for the dataset.
 
-    featurize = Compose([
-        BertTransform(
-            tokenizer=BertTokenizer.from_pretrained(
-                pretrained_bert,
-                do_lower_case=pretrained_bert.endswith('-uncased')),
-            max_sequence_length=max_sequence_length,
-            truncation_strategy=(
-                truncation_strategy_title,
-                truncation_strategy_text
-            )),
-        lambda d: {k: torch.tensor(v) for k, v in d.items()}
-    ])
+    featurize = make_transform(**hyper_params['transform'])
     labelize = lambda s: getattr(Label, s).index
-    delabelize = lambda idx: [l.name for l in Label if l.index == idx][0]
+    delabelize = lambda idx: next(l.name for l in Label if l.index == idx)
+
+
+    # Step 6: Make predictions for the splits.
 
     for split in splits:
+        # load the split
+
         logger.info(f'Loading the dataset from {data_dir}.')
 
         dataset = SocialnormsCorpusDataset(
@@ -158,6 +141,8 @@ def predict(
 
 
         # run predictions
+
+        logger.info(f'Running predictions for {split}.')
 
         ids = []
         predictions = []
@@ -175,17 +160,11 @@ def predict(
                     total=n_batches,
                     **settings.TQDM_KWARGS):
                 # move the data onto the device
-                mb_input_ids = mb_features['input_ids'].to(device)
-                mb_input_mask = mb_features['input_mask'].to(device)
-                mb_segment_ids = mb_features['segment_ids'].to(device)
-
+                mb_features = {k: v.to(device) for k, v in mb_features.items()}
                 mb_labels = mb_labels.to(device)
 
                 # make predictions
-                mb_logits = model(
-                    input_ids=mb_input_ids,
-                    attention_mask=mb_input_mask,
-                    token_type_ids=mb_segment_ids)
+                mb_logits = model(**mb_features)
                 _, mb_predictions = torch.max(mb_logits, 1)
 
                 ids.extend(mb_ids)
@@ -193,6 +172,10 @@ def predict(
                 probabilities.extend(
                     softmax(mb_logits.cpu().numpy(), axis=1).tolist())
                 labels.extend(mb_labels.cpu().numpy().tolist())
+
+        # write metrics to disk
+
+        logger.info(f'Writing metrics for {split} to disk.')
 
         with open(metrics_paths[split], 'w') as metrics_file:
             json.dump(
@@ -205,6 +188,10 @@ def predict(
                     for key, (_, metric, scorer_kwargs) in METRICS.items()
                 },
                 metrics_file)
+
+        # write predictions to disk
+
+        logger.info(f'Writing predictions for {split} to disk.')
 
         with open(predictions_paths[split], 'w') as predictions_file:
             for id_, probs, prediction in zip(

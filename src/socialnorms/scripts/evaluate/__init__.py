@@ -5,8 +5,8 @@ import logging
 import click
 
 from . import (
-    bert,
-    ml_baselines)
+    benchmark,
+    corpus)
 
 
 logger = logging.getLogger(__name__)
@@ -23,8 +23,8 @@ def evaluate():
 # register subcommands to the command group
 
 subcommands = [
-    bert.bert,
-    ml_baselines.ml_baselines
+    benchmark.benchmark,
+    corpus.corpus
 ]
 
 for subcommand in subcommands:

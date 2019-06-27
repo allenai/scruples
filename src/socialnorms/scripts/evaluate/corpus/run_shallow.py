@@ -1,21 +1,20 @@
-"""Run baseline models on socialnorms."""
+"""Run shallow baseline models on the socialnorms corpus."""
 
 import collections
 import json
 import logging
 import os
-import pickle
 from typing import List
 
 import click
+import dill
 from sklearn.metrics import make_scorer
 from skopt import BayesSearchCV
 import tqdm
 
-from ... import settings
-from ...baselines import BASELINES
-from ...baselines.metrics import METRICS
-from ...dataset.readers import SocialnormsCorpus
+from .... import settings, baselines
+from ....baselines.metrics import METRICS
+from ....dataset.readers import SocialnormsCorpus
 
 
 logger = logging.getLogger(__name__)
@@ -25,19 +24,19 @@ logger = logging.getLogger(__name__)
 
 @click.command()
 @click.argument(
-    'DATA_DIR',
+    'data_dir',
     type=click.Path(exists=True, file_okay=False, dir_okay=True))
 @click.argument(
-    'RESULTS_DIR',
+    'results_dir',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
 @click.argument(
-    'SPLITS', type=click.Choice(SocialnormsCorpus.SPLITS), nargs=-1)
+    'splits', type=click.Choice(SocialnormsCorpus.SPLITS), nargs=-1)
 @click.option(
     '--metric',
     type=click.Choice(METRICS.keys()),
-    default='matthews_corrcoef',
+    default='f1_macro',
     help='The metric to use for hyper-parameter tuning. Defaults to'
-         ' matthews_corrcoef.')
+         ' f1_macro.')
 @click.option(
     '--n-iter', type=int, default=256,
     help='The number of iterations of Bayesian optimization to run when'
@@ -55,7 +54,7 @@ logger = logging.getLogger(__name__)
          ' hyper-parameters. At most n_folds * n_points processses can'
          ' be used at a given time. If 0, then the same number of'
          ' processes as CPUs will be used. Defaults to 0.')
-def ml_baselines(
+def run_shallow(
         data_dir: str,
         results_dir: str,
         splits: List[str],
@@ -65,19 +64,22 @@ def ml_baselines(
         n_folds: int,
         n_jobs: int
 ) -> None:
-    """Train baselines on socialnorms and report performance on SPLITS.
+    """Evaluate shallow baselines on the socialnorms corpus.
 
-    Train baseline models on socialnorms, reading the dataset from
-    DATA_DIR, and writing trained models, logs, and other results to
-    RESULTS_DIR.
+    Train shallow baseline models on the socialnorms corpus, reading the
+    dataset from DATA_DIR, and writing trained models, logs, and other
+    results to RESULTS_DIR. Performance is reported for each split
+    provided as an argument.
     """
-    # manage paths
+    # Step 1: Manage and construct paths.
+
+    logger.info('Creating the results directory.')
 
     os.makedirs(results_dir)
     model_paths = {}
     metrics_paths = collections.defaultdict(dict)
     predictions_paths = collections.defaultdict(dict)
-    for baseline, _, _ in BASELINES:
+    for baseline in baselines.CORPUS_SHALLOW_BASELINES.keys():
         os.makedirs(os.path.join(results_dir, baseline))
         model_paths[baseline] = os.path.join(
             results_dir, baseline, 'model.pkl')
@@ -88,20 +90,22 @@ def ml_baselines(
             predictions_paths[baseline][split] = os.path.join(
                 results_dir, baseline, split, 'predictions.jsonl')
 
+    # Step 2: Load the data.
 
-    # load the data
+    logger.info(f'Loading data from {data_dir}.')
 
-    socialnorms = SocialnormsCorpus(data_dir=data_dir)
+    dataset = SocialnormsCorpus(data_dir=data_dir)
 
+    # Step 3: Run the baselines.
 
-    # run the baselines
+    logger.info('Running the baselines.')
 
-    for baseline, Model, hyper_parameter_space in tqdm.tqdm(
-            BASELINES, **settings.TQDM_KWARGS):
-        ids, features, labels = socialnorms.train
-
-        # tune hyper-parameters and train the model
-
+    for baseline, (Model, hyper_parameter_space) in tqdm.tqdm(
+            baselines.CORPUS_SHALLOW_BASELINES.items(),
+            **settings.TQDM_KWARGS
+    ):
+        # tune the hyper-parameters and train the model
+        ids, features, labels = dataset.train
         if hyper_parameter_space:
             model = BayesSearchCV(
                 Model,
@@ -112,21 +116,21 @@ def ml_baselines(
                 n_iter=n_iter,
                 n_points=n_points,
                 cv=n_folds,
-                n_jobs=n_jobs or os.cpu_count(),
+                n_jobs=os.cpu_count() if n_jobs == 0 else n_jobs,
                 refit=True)
         else:
             model = Model
         model.fit(features, labels)
 
-        # save the model
+        # Step 4: Save the model.
 
         with open(model_paths[baseline], 'wb') as model_file:
-            pickle.dump(model, model_file)
+            dill.dump(model, model_file)
 
-        # run evaluation on the splits
+        # Step 5: Run evaluation on the splits.
 
         for split in splits:
-            ids, features, labels = getattr(socialnorms, split)
+            ids, features, labels = getattr(dataset, split)
 
             predictions = model.predict(features)
             probabilities = model.predict_proba(features)
@@ -137,8 +141,8 @@ def ml_baselines(
                         key: metric(
                             y_true=labels,
                             y_pred=probabilities
-                              if scorer_kwargs['needs_proba']
-                              else predictions)
+                                if scorer_kwargs['needs_proba']
+                                else predictions)
                         for key, (_, metric, scorer_kwargs) in METRICS.items()
                     },
                     metrics_file)

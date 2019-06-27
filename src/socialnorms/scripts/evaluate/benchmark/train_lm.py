@@ -1,4 +1,4 @@
-"""Train BERT on socialnorms."""
+"""Fine-tune pre-trained LMs on the socialnorms benchmark."""
 
 import json
 import logging
@@ -11,24 +11,16 @@ from apex.optimizers import (
     FP16_Optimizer,
     FusedAdam)
 import click
-from pytorch_pretrained_bert.modeling import (
-    BertForSequenceClassification,
-    PRETRAINED_MODEL_ARCHIVE_MAP)
 from pytorch_pretrained_bert.optimization import (
     BertAdam,
     warmup_linear)
-from pytorch_pretrained_bert.tokenization import BertTokenizer
 import tensorboardX
 import torch
 from torch.utils.data import DataLoader
 import tqdm
 
-from .... import settings
-from ....data.labels import Label
-from ....dataset.readers import SocialnormsCorpusDataset
-from ....dataset.transforms import (
-    BertTransform,
-    Compose)
+from .... import settings, baselines
+from ....dataset.readers import SocialnormsBenchmarkDataset
 
 
 logger = logging.getLogger(__name__)
@@ -38,138 +30,95 @@ logger = logging.getLogger(__name__)
 
 @click.command()
 @click.argument(
-    'CACHE_DIR',
-    type=click.Path(file_okay=False, dir_okay=True))
-@click.argument(
-    'DATA_DIR',
+    'data_dir',
     type=click.Path(exists=True, file_okay=False, dir_okay=True))
 @click.argument(
-    'RESULTS_DIR',
+    'model_dir',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
 @click.option(
+    '--baseline',
+    type=click.Choice(baselines.BENCHMARK_FINE_TUNE_LM_BASELINES.keys()),
+    default='bert',
+    help='The model to train. Defaults to "bert".')
+@click.option(
     '--train-batch-size', type=int, default=32,
-    help='The batch size for training.')
+    help='The batch size for training. Defaults to 32.')
 @click.option(
-    '--predict-batch-size', type=int, default=128,
-    help='The batch size for prediction.')
-@click.option(
-    '--pretrained-bert',
-    type=click.Choice(PRETRAINED_MODEL_ARCHIVE_MAP.keys()),
-    default='bert-base-uncased',
-    help='The pretrained BERT model to use. Defaults to'
-         ' "bert-base-uncased".')
-@click.option(
-    '--max-sequence-length', type=int, default=512,
-    help='The maximum sequence length accepted by the BERT model.')
-@click.option(
-    '--truncation-strategy-title',
-    type=click.Choice(BertTransform.TRUNCATION_STRATEGIES),
-    default='beginning',
-    help='The strategy to use for truncating too long titles.')
-@click.option(
-    '--truncation-strategy-text',
-    type=click.Choice(BertTransform.TRUNCATION_STRATEGIES),
-    default='beginning',
-    help='The strategy to use for truncating too long body texts.')
-@click.option(
-    '--lr', type=float, default=5e-5,
-    help='The initial learning rate for Adam.')
-@click.option(
-    '--weight-decay', type=float, default=0.01,
-    help='The weight decay to apply during optimization.')
-@click.option(
-    '--warmup-proportion', type=float, default=0.1,
-    help='The proportion of optimization steps to use for warming up the'
-          ' learning rate during training.')
+    '--predict-batch-size', type=int, default=64,
+    help='The batch size for prediction. Defaults to 64.')
 @click.option(
     '--n-epochs', type=int, default=3,
-    help='The number of epochs to train for.')
+    help='The number of epochs to train the model. Defaults to 3.')
+@click.option(
+    '--n-gradient-accumulation', type=int, default=8,
+    help='The number of gradient accumulation steps. Defaults to 8.')
 @click.option(
     '--mixed-precision', is_flag=True,
     help='Use mixed precision training.')
 @click.option(
-    '--n-gradient-accumulation', type=int, default=1,
-    help='The number of gradient accumulation steps. Defaults to 1.')
-@click.option(
     '--gpu-ids', type=str, default=None,
     help='The GPU IDs to use for training as a comma-separated list.')
-def train(
-        cache_dir: str,
+def train_lm(
         data_dir: str,
-        results_dir: str,
+        model_dir: str,
+        baseline: str,
         train_batch_size: int,
         predict_batch_size: int,
-        pretrained_bert: str,
-        max_sequence_length: int,
-        truncation_strategy_title: str,
-        truncation_strategy_text: str,
-        lr: float,
-        weight_decay: float,
-        warmup_proportion: float,
         n_epochs: int,
-        mixed_precision: bool,
         n_gradient_accumulation: int,
+        mixed_precision: bool,
         gpu_ids: Optional[str]
 ) -> None:
-    """Train BERT on socialnorms and report dev performance.
+    """Fine-tune a pre-trained LM baseline on the socialnorms benchmark.
 
-    Train BERT on socialnorms, reading the dataset from DATA_DIR, and
-    writing checkpoint files, logs, and other results to RESULTS_DIR.
+    Fine-tune a pre-trained language model on the socialnorms benchmark,
+    reading the dataset from DATA_DIR, and writing checkpoint files,
+    logs, and other results to MODEL_DIR.
     """
-    # manage paths
+    # Step 1: Manage and construct paths.
 
-    logging.info('Creating results directories.')
+    logger.info('Creating the model directory.')
 
-    checkpoints_dir = os.path.join(results_dir, 'checkpoints')
-    tensorboard_dir = os.path.join(results_dir, 'tensorboard')
-    os.makedirs(results_dir)
+    checkpoints_dir = os.path.join(model_dir, 'checkpoints')
+    tensorboard_dir = os.path.join(model_dir, 'tensorboard')
+    os.makedirs(model_dir)
     os.makedirs(checkpoints_dir)
     os.makedirs(tensorboard_dir)
 
-    config_file_path = os.path.join(results_dir, 'config.json')
-    log_file_path = os.path.join(results_dir, 'log.txt')
+    config_file_path = os.path.join(model_dir, 'config.json')
+    log_file_path = os.path.join(model_dir, 'log.txt')
     best_checkpoint_path = os.path.join(
         checkpoints_dir, 'best.checkpoint.pkl')
     last_checkpoint_path = os.path.join(
         checkpoints_dir, 'last.checkpoint.pkl')
 
+    # Step 2: Setup the log file.
 
-    # setup the log file
-
-    logging.info('Configuring log files.')
+    logger.info('Configuring log files.')
 
     log_file_handler = logging.FileHandler(log_file_path)
     log_file_handler.setLevel(logging.DEBUG)
     log_file_handler.setFormatter(logging.Formatter(settings.LOG_FORMAT))
     logging.root.addHandler(log_file_handler)
 
-
-    # record the script arguments
+    # Step 3: Record the script's arguments.
 
     logger.info(f'Writing arguments to {config_file_path}.')
 
     with open(config_file_path, 'w') as config_file:
         json.dump({
-            'cache_dir': cache_dir,
             'data_dir': data_dir,
-            'results_dir': results_dir,
+            'model_dir': model_dir,
+            'baseline': baseline,
             'train_batch_size': train_batch_size,
             'predict_batch_size': predict_batch_size,
-            'pretrained_bert': pretrained_bert,
-            'max_sequence_length': max_sequence_length,
-            'truncation_strategy_title': truncation_strategy_title,
-            'truncation_strategy_text': truncation_strategy_text,
-            'lr': lr,
-            'weight_decay': weight_decay,
-            'warmup_proportion': warmup_proportion,
             'n_epochs': n_epochs,
-            'mixed_precision': mixed_precision,
             'n_gradient_accumulation': n_gradient_accumulation,
+            'mixed_precision': mixed_precision,
             'gpu_ids': gpu_ids
         }, config_file)
 
-
-    # configure GPUs
+    # Step 4: Configure GPUs.
 
     if gpu_ids:
         gpu_ids = [int(gpu_id) for gpu_id in gpu_ids.split(',')]
@@ -189,35 +138,27 @@ def train(
 
         device = torch.device('cpu')
 
+    # Step 5: Fetch the baseline information.
 
-    # load the dataset
+    logger.info('Retrieving baseline and related parameters.')
+
+    Model, hyper_params, make_transform =\
+        baselines.BENCHMARK_FINE_TUNE_LM_BASELINES[baseline]
+
+    # Step 6: Load the dataset.
 
     logger.info(f'Loading the dataset from {data_dir}.')
 
-    featurize = Compose([
-        BertTransform(
-            tokenizer=BertTokenizer.from_pretrained(
-                pretrained_bert,
-                do_lower_case=pretrained_bert.endswith('-uncased')),
-            max_sequence_length=max_sequence_length,
-            truncation_strategy=(
-                truncation_strategy_title,
-                truncation_strategy_text
-            )),
-        lambda d: {k: torch.tensor(v) for k, v in d.items()}
-    ])
-    labelize = lambda s: getattr(Label, s).index
+    featurize = make_transform(**hyper_params['transform'])
 
-    train = SocialnormsCorpusDataset(
+    train = SocialnormsBenchmarkDataset(
         data_dir=data_dir,
         split='train',
-        transform=featurize,
-        label_transform=labelize)
-    dev = SocialnormsCorpusDataset(
+        transform=featurize)
+    dev = SocialnormsBenchmarkDataset(
         data_dir=data_dir,
         split='dev',
-        transform=featurize,
-        label_transform=labelize)
+        transform=featurize)
 
     train_loader = DataLoader(
         dataset=train,
@@ -232,16 +173,11 @@ def train(
         num_workers=len(gpu_ids),
         pin_memory=bool(gpu_ids))
 
-
-    # create the model, optimizer, and loss
+    # Step 7: Create the model, optimizer, and loss.
 
     logger.info('Initializing the model.')
 
-    model = torch.nn.DataParallel(
-        BertForSequenceClassification.from_pretrained(
-            pretrained_bert,
-            cache_dir=cache_dir,
-            num_labels=len(Label)))
+    model = torch.nn.DataParallel(Model(**hyper_params['model']))
 
     if mixed_precision:
         model.half()
@@ -258,7 +194,7 @@ def train(
                 or 'LayerNorm.bias' in name
                 or 'LayerNorm.weight' in name
             ],
-            'weight_decay': weight_decay,
+            'weight_decay': 0
         },
         {
             'params': [
@@ -268,28 +204,27 @@ def train(
                 and 'LayerNorm.bias' not in name
                 and 'LayerNorm.weight' not in name
             ],
-            'weight_decay': 0
+            'weight_decay': hyper_params['optimizer']['weight_decay']
         }
     ]
     if mixed_precision:
         optimizer = FP16_Optimizer(
             FusedAdam(
                 parameter_groups,
-                lr=lr,
+                lr=hyper_params['optimizer']['lr'],
                 bias_correction=False,
                 max_grad_norm=1.0),
             dynamic_loss_scale=True)
     else:
         optimizer = BertAdam(
             parameter_groups,
-            lr=lr,
-            warmup=warmup_proportion,
+            lr=hyper_params['optimizer']['lr'],
+            warmup=hyper_params['optimizer']['warmup_proportion'],
             t_total=n_optimization_steps)
 
     loss = torch.nn.CrossEntropyLoss()
 
-
-    # run training
+    # Step 8: Run training.
 
     n_train_batches_per_epoch = math.ceil(len(train) / train_batch_size)
     n_dev_batch_per_epoch = math.ceil(len(dev) / predict_batch_size)
@@ -307,19 +242,14 @@ def train(
         for i, (_, features, labels) in tqdm.tqdm(
                 enumerate(train_loader),
                 total=n_gradient_accumulation * n_train_batches_per_epoch,
-                **settings.TQDM_KWARGS):
+                **settings.TQDM_KWARGS
+        ):
             # move the data onto the device
-            input_ids = features['input_ids'].to(device)
-            input_mask = features['input_mask'].to(device)
-            segment_ids = features['segment_ids'].to(device)
-
+            features = {k: v.to(device) for k, v in features.items()}
             labels = labels.to(device)
 
             # make predictions
-            logits = model(
-                input_ids=input_ids,
-                attention_mask=input_mask,
-                token_type_ids=segment_ids)
+            logits = model(**features)
             _, predictions = torch.max(logits, 1)
 
             batch_loss = loss(logits, labels)
@@ -346,7 +276,8 @@ def train(
                             n_train_batches_per_epoch * epoch
                             + ((i+1) // n_gradient_accumulation)
                         ) / n_optimization_steps,
-                        warmup_proportion) * lr
+                        hyper_params['optimizer']['warmup_proportion']
+                    ) * hyper_params['optimizer']['lr']
                     for param_group in optimizer.param_groups:
                         param_group['lr'] = new_lr
 
@@ -355,8 +286,9 @@ def train(
 
             # write training statistics to tensorboard
 
-            step = i + n_train_batches_per_epoch * epoch
-            if i % 100 == 0:
+            step = n_train_batches_per_epoch * epoch + (
+                (i + 1) // n_gradient_accumulation)
+            if step % 100 == 0 and (i + 1) % n_gradient_accumulation == 0:
                 writer.add_scalar('train/loss', epoch_train_loss, step)
                 writer.add_scalar('train/accuracy', epoch_train_accuracy, step)
 
@@ -373,17 +305,11 @@ def train(
                     total=n_dev_batch_per_epoch,
                     **settings.TQDM_KWARGS):
                 # move the data onto the device
-                input_ids = features['input_ids'].to(device)
-                input_mask = features['input_mask'].to(device)
-                segment_ids = features['segment_ids'].to(device)
-
+                features = {k: v.to(device) for k, v in features.items()}
                 labels = labels.to(device)
 
                 # make predictions
-                logits = model(
-                    input_ids=input_ids,
-                    attention_mask=input_mask,
-                    token_type_ids=segment_ids)
+                logits = model(**features)
                 _, predictions = torch.max(logits, 1)
 
                 batch_loss = loss(logits, labels)
@@ -404,11 +330,10 @@ def train(
         logger.info(
             f'\n\n'
             f'  epoch {epoch}:\n'
-            f'    train loss    : {epoch_train_loss:.4f}\n'
+            f'    train loss     : {epoch_train_loss:.4f}\n'
             f'    train accuracy : {epoch_train_accuracy:.4f}\n'
             f'    dev loss       : {epoch_dev_loss:.4f}\n'
             f'    dev accuracy   : {epoch_dev_accuracy:.4f}\n')
-
 
         # update checkpoints
 
