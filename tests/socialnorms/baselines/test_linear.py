@@ -14,3 +14,4 @@ class LogististicRegressionBaselineTestCase(
 
     BASELINE_MODEL = linear.LogisticRegressionBaseline
     BASELINE_HYPER_PARAMETERS = linear.LOGISTIC_REGRESSION_HYPER_PARAMETERS
+    DATASET = 'corpus'

@@ -1,13 +1,16 @@
 """Utilities for testing baselines."""
 
-import pkg_resources
+import os
+import tempfile
 
 import pandas as pd
 import pytest
 from sklearn import metrics
 from skopt import BayesSearchCV
 
-from ... import settings
+from socialnorms import settings as socialnorms_settings
+from socialnorms.dataset import readers
+from ... import settings, utils
 
 
 # classes
@@ -22,12 +25,15 @@ class BaselineTestMixin:
     BASELINE_HYPER_PARAMETERS : Dict
         The dictionary defining the hyper-parameter search space for the
         baseline model.
+    DATASET : str
+        The dataset against which the baseline should be run. Must be
+        either ``"benchmark"`` or ``"corpus"``.
 
     Examples
     --------
     To create a test case for a baseline model, inherit from this class
     along with ``unittest.TestCase`` and provide the ``BASELINE_MODEL``
-    and ``BASELINE_HYPER_PARAMETERS`` class attributes::
+    ``BASELINE_HYPER_PARAMETERS``, and ``DATASET`` class attributes::
 
         class LogisticRegressionBaselineTestCase(
                 BaselineTestMixin,
@@ -37,14 +43,18 @@ class BaselineTestMixin:
 
             BASELINE_MODEL = LogisticRegressionBaseline
             BASELINE_HYPER_PARAMETERS = LOGISTIC_REGRESSION_HYPER_PARAMS
+            DATASET = 'corpus'
 
     """
 
     BASELINE_MODEL = None
     BASELINE_HYPER_PARAMETERS = None
+    DATASET = None
 
     def setUp(self):
         super().setUp()
+
+        # validate the class
 
         if self.BASELINE_MODEL is None:
             raise ValueError(
@@ -56,28 +66,61 @@ class BaselineTestMixin:
                 'Subclasses of BaselineTestMixin must provide a'
                 ' BASELINE_HYPER_PARAMETERS class attribute.')
 
-        with pkg_resources.resource_stream(
-                'tests', settings.SOCIALNORMS_EASY_TRAIN_PATH
-        ) as train_file:
-            self.train_easy = pd.read_json(train_file, lines=True)
+        if self.DATASET is None:
+            raise ValueError(
+                'Subclasses of BaselineTestMixin must provide a DATASET'
+                ' class attribute.')
 
-        with pkg_resources.resource_stream(
-                'tests', settings.SOCIALNORMS_EASY_DEV_PATH
-        ) as dev_file:
-            self.dev_easy = pd.read_json(dev_file, lines=True)
+        if self.DATASET not in ['benchmark', 'corpus']:
+            raise ValueError(
+                'The DATASET class attribute must either be'
+                ' "benchmark", or "corpus".')
+
+        # copy the dataset fixture from the package to disk
+
+        if self.DATASET == 'benchmark':
+            Reader = readers.SocialnormsBenchmark
+            fixture_path = settings.BENCHMARK_EASY_DIR
+            split_filename_template =\
+                socialnorms_settings.BENCHMARK_FILENAME_TEMPLATE
+        elif self.DATASET == 'corpus':
+            Reader = readers.SocialnormsCorpus
+            fixture_path = settings.CORPUS_EASY_DIR
+            split_filename_template =\
+                socialnorms_settings.CORPUS_FILENAME_TEMPLATE
+
+        self.temp_dir = tempfile.TemporaryDirectory()
+
+        for split in Reader.SPLITS:
+            split_filename = split_filename_template.format(split=split)
+            utils.copy_pkg_resource_to_disk(
+                pkg='tests',
+                src=os.path.join(fixture_path, split_filename),
+                dst=os.path.join(self.temp_dir.name, split_filename))
+
+        # load the dataset
+
+        self.dataset = Reader(data_dir=self.temp_dir.name)
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
 
     @pytest.mark.slow
     def test_it_solves_socialnorms_easy_when_untuned(self):
         baseline = self.BASELINE_MODEL
-        baseline.fit(
-            self.train_easy[['title', 'text']],
-            self.train_easy['label'])
-        predictions = baseline.predict(self.dev_easy[['title', 'text']])
+
+        # train the model
+        _, train_features, train_labels = self.dataset.train
+        baseline.fit(train_features, train_labels)
+
+        # predict with the model on dev
+        _, dev_features, dev_labels = self.dataset.dev
+        predictions = baseline.predict(dev_features)
 
         # check that the accuracy is 100%
         self.assertEqual(
             metrics.accuracy_score(
-                y_true=self.dev_easy['label'],
+                y_true=dev_labels,
                 y_pred=predictions),
             1.)
 
@@ -89,15 +132,20 @@ class BaselineTestMixin:
             n_iter=16,
             n_points=2,
             cv=4,
-            n_jobs=1)
-        baseline.fit(
-            self.train_easy[['title', 'text']],
-            self.train_easy['label'])
-        predictions = baseline.predict(self.dev_easy[['title', 'text']])
+            n_jobs=1,
+            refit=True)
+
+        # train the model, tuning hyper-parameters
+        _, train_features, train_labels = self.dataset.train
+        baseline.fit(train_features, train_labels)
+
+        # predict with the model on dev
+        _, dev_features, dev_labels = self.dataset.dev
+        predictions = baseline.predict(dev_features)
 
         # check that the accuracy is 100%
         self.assertEqual(
             metrics.accuracy_score(
-                y_true=self.dev_easy['label'],
+                y_true=dev_labels,
                 y_pred=predictions),
             1.)

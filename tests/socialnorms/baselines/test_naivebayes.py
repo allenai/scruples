@@ -14,6 +14,7 @@ class BernoulliNBBaselineTestCase(
 
     BASELINE_MODEL = naivebayes.BernoulliNBBaseline
     BASELINE_HYPER_PARAMETERS = naivebayes.BERNOULLINB_HYPER_PARAMETERS
+    DATASET = 'corpus'
 
 
 class MultinomialNBBaselineTestCase(
@@ -24,6 +25,7 @@ class MultinomialNBBaselineTestCase(
 
     BASELINE_MODEL = naivebayes.MultinomialNBBaseline
     BASELINE_HYPER_PARAMETERS = naivebayes.MULTINOMIALNB_HYPER_PARAMETERS
+    DATASET = 'corpus'
 
 
 class ComplementNBBaselineTestCase(
@@ -34,3 +36,4 @@ class ComplementNBBaselineTestCase(
 
     BASELINE_MODEL = naivebayes.ComplementNBBaseline
     BASELINE_HYPER_PARAMETERS = naivebayes.COMPLEMENTNB_HYPER_PARAMETERS
+    DATASET = 'corpus'

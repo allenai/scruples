@@ -1,0 +1,4 @@
+{"id": "id_20", "actions": [{"id": "action_id_20_0", "description": "Indeed, this describes a very good action."}, {"id": "action_id_20_1", "description": "Indeed, this describes a very bad action."}], "label": 0}
+{"id": "id_21", "actions": [{"id": "action_id_21_0", "description": "Always try to do bad."}, {"id": "action_id_21_1", "description": "Always try to do good."}], "label": 1}
+{"id": "id_22", "actions": [{"id": "action_id_22_0", "description": "Always try to do good."}, {"id": "action_id_22_1", "description": "Indeed, this describes a very bad action."}], "label": 0}
+{"id": "id_23", "actions": [{"id": "action_id_23_0", "description": "Always try to do bad."}, {"id": "action_id_23_1", "description": "Indeed, this describes a very good action."}], "label": 1}

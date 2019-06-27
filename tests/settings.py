@@ -3,18 +3,15 @@
 
 # fixture locations
 
-SOCIALNORMS_EASY_PATH = 'fixtures/socialnorms-easy'
+# easy version dataset fixtures
+CORPUS_EASY_DIR = 'fixtures/corpus-easy'
+BENCHMARK_EASY_DIR = 'fixtures/benchmark-easy'
 
-SOCIALNORMS_EASY_TRAIN_PATH =\
-    'fixtures/socialnorms-easy/train.socialnorms-corpus.jsonl'
-SOCIALNORMS_EASY_DEV_PATH =\
-    'fixtures/socialnorms-easy/dev.socialnorms-corpus.jsonl'
-SOCIALNORMS_EASY_TEST_PATH =\
-    'fixtures/socialnorms-easy/test.socialnorms-corpus.jsonl'
-
+# raw data fixtures
 TEST_COMMENT_PATH = 'fixtures/raw-data/test-comment.jsonl'
 TEST_POST_PATH = 'fixtures/raw-data/test-post.jsonl'
 TEST_POST_COMMENTS_PATH = 'fixtures/raw-data/test-post-comments.jsonl'
 
+# gold extraction examples
 GOLD_TITLE_DESCRIPTION_EXTRACTIONS_PATH =\
     'fixtures/gold-extractions/gold-title-description-extractions.jsonl'

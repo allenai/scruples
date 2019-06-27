@@ -223,7 +223,7 @@ class StyleFeaturizerTestCase(unittest.TestCase):
 class StylisticXGBoostBaselineTestCase(unittest.TestCase):
     """Test the stylistic features baseline."""
     # The stylistic features aren't powerful enough to solve
-    # socialnorms-easy (because the style is shared across the labels)
+    # corpus-easy (because the style is shared across the labels)
     # so we have to test this baseline differently from the others.
 
     def setUp(self):

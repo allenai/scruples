@@ -1,7 +1,6 @@
 """Tests for socialnorms.dataset.readers."""
 
 import os
-import pkg_resources
 import tempfile
 import unittest
 from unittest.mock import Mock
@@ -10,7 +9,7 @@ import pandas as pd
 
 import socialnorms.settings as socialnorms_settings
 from socialnorms.dataset import readers
-from ... import settings
+from ... import settings, utils
 
 
 class SocialnormsCorpusTestCase(unittest.TestCase):
@@ -18,63 +17,30 @@ class SocialnormsCorpusTestCase(unittest.TestCase):
 
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
-
-        # copy the socialnorms-easy dataset to the temporary
-        # directory
-
-        # train
-        with pkg_resources.resource_stream(
-                'tests', settings.SOCIALNORMS_EASY_TRAIN_PATH
-        ) as train_in,\
-        open(
-            os.path.join(
-                self.temp_dir.name,
+        # copy the corpus-easy fixture to the temporary directory
+        for split in readers.SocialnormsCorpus.SPLITS:
+            split_filename =\
                 socialnorms_settings.CORPUS_FILENAME_TEMPLATE.format(
-                    split='train')),
-            'wb'
-        ) as train_out:
-            train_out.write(train_in.read())
-
-        # dev
-        with pkg_resources.resource_stream(
-                'tests', settings.SOCIALNORMS_EASY_DEV_PATH
-        ) as dev_in,\
-        open(
-            os.path.join(
-                self.temp_dir.name,
-                socialnorms_settings.CORPUS_FILENAME_TEMPLATE.format(
-                    split='dev')),
-            'wb'
-        ) as dev_out:
-            dev_out.write(dev_in.read())
-
-        # test
-        with pkg_resources.resource_stream(
-                'tests', settings.SOCIALNORMS_EASY_TEST_PATH
-        ) as test_in,\
-        open(
-            os.path.join(
-                self.temp_dir.name,
-                socialnorms_settings.CORPUS_FILENAME_TEMPLATE.format(
-                    split='test')),
-            'wb'
-        ) as test_out:
-            test_out.write(test_in.read())
+                    split=split)
+            utils.copy_pkg_resource_to_disk(
+                pkg='tests',
+                src=os.path.join(settings.CORPUS_EASY_DIR, split_filename),
+                dst=os.path.join(self.temp_dir.name, split_filename))
 
     def tearDown(self):
         self.temp_dir.cleanup()
 
-    def test_socialnorms_has_correct_splits(self):
+    def test_corpus_has_correct_splits(self):
         self.assertEqual(
             set(readers.SocialnormsCorpus.SPLITS),
             set(['train', 'dev', 'test']))
 
     def test_reads_in_splits(self):
         # read the dataset
-        socialnorms = readers.SocialnormsCorpus(data_dir=self.temp_dir.name)
+        corpus = readers.SocialnormsCorpus(data_dir=self.temp_dir.name)
 
         # train
-        train_ids, train_features, train_labels = socialnorms.train
+        train_ids, train_features, train_labels = corpus.train
         self.assertIsInstance(train_ids, pd.Series)
         self.assertEqual(train_ids.tolist()[0], 'id_0')
         self.assertIsInstance(train_features, pd.DataFrame)
@@ -88,7 +54,7 @@ class SocialnormsCorpusTestCase(unittest.TestCase):
         self.assertEqual(train_labels.tolist()[0], 'NTA')
 
         # dev
-        dev_ids, dev_features, dev_labels = socialnorms.dev
+        dev_ids, dev_features, dev_labels = corpus.dev
         self.assertIsInstance(dev_ids, pd.Series)
         self.assertEqual(dev_ids.tolist()[0], 'id_20')
         self.assertIsInstance(dev_features, pd.DataFrame)
@@ -102,7 +68,7 @@ class SocialnormsCorpusTestCase(unittest.TestCase):
         self.assertEqual(dev_labels.tolist()[0], 'NTA')
 
         # test
-        test_ids, test_features, test_labels = socialnorms.test
+        test_ids, test_features, test_labels = corpus.test
         self.assertIsInstance(test_ids, pd.Series)
         self.assertEqual(test_ids.tolist()[0], 'id_25')
         self.assertIsInstance(test_features, pd.DataFrame)
@@ -121,53 +87,20 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
 
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
-
-        # copy the socialnorms-easy dataset to the temporary
-        # directory
-
-        # train
-        with pkg_resources.resource_stream(
-                'tests', settings.SOCIALNORMS_EASY_TRAIN_PATH
-        ) as train_in,\
-        open(
-            os.path.join(
-                self.temp_dir.name,
+        # copy the corpus-easy dataset to the temporary directory
+        for split in readers.SocialnormsCorpusDataset.SPLITS:
+            split_filename =\
                 socialnorms_settings.CORPUS_FILENAME_TEMPLATE.format(
-                    split='train')),
-            'wb'
-        ) as train_out:
-            train_out.write(train_in.read())
-
-        # dev
-        with pkg_resources.resource_stream(
-                'tests', settings.SOCIALNORMS_EASY_DEV_PATH
-        ) as dev_in,\
-        open(
-            os.path.join(
-                self.temp_dir.name,
-                socialnorms_settings.CORPUS_FILENAME_TEMPLATE.format(
-                    split='dev')),
-            'wb'
-        ) as dev_out:
-            dev_out.write(dev_in.read())
-
-        # test
-        with pkg_resources.resource_stream(
-                'tests', settings.SOCIALNORMS_EASY_TEST_PATH
-        ) as test_in,\
-        open(
-            os.path.join(
-                self.temp_dir.name,
-                socialnorms_settings.CORPUS_FILENAME_TEMPLATE.format(
-                    split='test')),
-            'wb'
-        ) as test_out:
-            test_out.write(test_in.read())
+                    split=split)
+            utils.copy_pkg_resource_to_disk(
+                pkg='tests',
+                src=os.path.join(settings.CORPUS_EASY_DIR, split_filename),
+                dst=os.path.join(self.temp_dir.name, split_filename))
 
     def tearDown(self):
         self.temp_dir.cleanup()
 
-    def test_socialnormsdataset_has_correct_splits(self):
+    def test_corpus_has_correct_splits(self):
         self.assertEqual(
             set(readers.SocialnormsCorpusDataset.SPLITS),
             set(['train', 'dev', 'test']))
@@ -253,14 +186,16 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
 
     def test_init_with_transform(self):
         # test the train split
-        train_transform = Mock()
+        train_transform = Mock(return_value='foo')
         train = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=train_transform,
             label_transform=None)
-        # get the item to call the transform
-        train[0]
+        # call the transform and check the return value
+        _, feature, _ = train[0]
+        self.assertEqual(feature, 'foo')
+        # check that the transform was called correctly
         self.assertEqual(train_transform.call_count, 1)
         args, kwargs = train_transform.call_args
         self.assertEqual(args, ((
@@ -270,14 +205,16 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
         self.assertEqual(kwargs, {})
 
         # test the dev split
-        dev_transform = Mock()
+        dev_transform = Mock(return_value='foo')
         dev = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=dev_transform,
             label_transform=None)
-        # get the item to call the transform
-        dev[0]
+        # call the transform and check the return value
+        _, feature, _ = dev[0]
+        self.assertEqual(feature, 'foo')
+        # check that the transform was called correctly
         self.assertEqual(dev_transform.call_count, 1)
         args, kwargs = dev_transform.call_args
         self.assertEqual(args, ((
@@ -287,14 +224,16 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
         self.assertEqual(kwargs, {})
 
         # test the test split
-        test_transform = Mock()
+        test_transform = Mock(return_value='foo')
         test = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=test_transform,
             label_transform=None)
-        # get the item to call the transform
-        test[0]
+        # call the transform and check the return value
+        _, feature, _ = test[0]
+        self.assertEqual(feature, 'foo')
+        # check that the transform was called correctly
         self.assertEqual(test_transform.call_count, 1)
         args, kwargs = test_transform.call_args
         self.assertEqual(args, ((
@@ -305,43 +244,329 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
 
     def test_init_with_label_transform(self):
         # test the train split
-        train_label_transform = Mock()
+        train_label_transform = Mock(return_value='foo')
         train = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
             label_transform=train_label_transform)
-        # get the item to call the transform
-        train[0]
+        # call the transform and check the return value
+        _, _, label = train[0]
+        self.assertEqual(label, 'foo')
+        # check that the transform was called correctly
         self.assertEqual(train_label_transform.call_count, 1)
         args, kwargs = train_label_transform.call_args
         self.assertEqual(args, ('NTA',))
         self.assertEqual(kwargs, {})
 
         # test the dev split
-        dev_label_transform = Mock()
+        dev_label_transform = Mock(return_value='foo')
         dev = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
             label_transform=dev_label_transform)
-        # get the item to call the transform
-        dev[0]
+        # call the transform and check the return value
+        _, _, label = dev[0]
+        self.assertEqual(label, 'foo')
+        # check that the transform was called correctly
         self.assertEqual(dev_label_transform.call_count, 1)
         args, kwargs = dev_label_transform.call_args
         self.assertEqual(args, ('NTA',))
         self.assertEqual(kwargs, {})
 
         # test the test split
-        test_label_transform = Mock()
+        test_label_transform = Mock(return_value='foo')
         test = readers.SocialnormsCorpusDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
             label_transform=test_label_transform)
-        # get the item to call the transform
-        test[0]
+        # call the transform and check the return value
+        _, _, label = test[0]
+        self.assertEqual(label, 'foo')
+        # check that the transform was called correctly
         self.assertEqual(test_label_transform.call_count, 1)
         args, kwargs = test_label_transform.call_args
         self.assertEqual(args, ('NTA',))
+        self.assertEqual(kwargs, {})
+
+
+class SocialnormsBenchmarkTestCase(unittest.TestCase):
+    """Test socialnorms.dataset.readers.SocialnormsBenchmark."""
+
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        # copy the benchmark-easy dataset to the temporary directory
+        for split in readers.SocialnormsBenchmark.SPLITS:
+            split_filename =\
+                socialnorms_settings.BENCHMARK_FILENAME_TEMPLATE.format(
+                    split=split)
+            utils.copy_pkg_resource_to_disk(
+                pkg='tests',
+                src=os.path.join(settings.BENCHMARK_EASY_DIR, split_filename),
+                dst=os.path.join(self.temp_dir.name, split_filename))
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def test_benchmark_has_correct_splits(self):
+        self.assertEqual(
+            set(readers.SocialnormsBenchmark.SPLITS),
+            set(['train', 'dev', 'test']))
+
+    def test_reads_in_splits(self):
+        # read the dataset
+        benchmark = readers.SocialnormsBenchmark(data_dir=self.temp_dir.name)
+
+        # train
+        train_ids, train_features, train_labels = benchmark.train
+        self.assertIsInstance(train_ids, pd.Series)
+        self.assertEqual(train_ids.tolist()[0], 'id_0')
+        self.assertIsInstance(train_features, pd.DataFrame)
+        self.assertEqual(
+            train_features.to_dict(orient='records')[0],
+            {
+                "action0": "A good action.",
+                "action1": "A bad action."
+            })
+        self.assertIsInstance(train_labels, pd.Series)
+        self.assertEqual(train_labels.tolist()[0], 0)
+
+        # dev
+        dev_ids, dev_features, dev_labels = benchmark.dev
+        self.assertIsInstance(dev_ids, pd.Series)
+        self.assertEqual(dev_ids.tolist()[0], 'id_16')
+        self.assertIsInstance(dev_features, pd.DataFrame)
+        self.assertEqual(
+            dev_features.to_dict(orient='records')[0],
+            {
+                "action0": "The good action.",
+                "action1": "The bad action."
+            })
+        self.assertIsInstance(dev_labels, pd.Series)
+        self.assertEqual(dev_labels.tolist()[0], 0)
+
+        # test
+        test_ids, test_features, test_labels = benchmark.test
+        self.assertIsInstance(test_ids, pd.Series)
+        self.assertEqual(test_ids.tolist()[0], 'id_20')
+        self.assertIsInstance(test_features, pd.DataFrame)
+        self.assertEqual(
+            test_features.to_dict(orient='records')[0],
+            {
+                "action0": "Indeed, this describes a very good action.",
+                "action1": "Indeed, this describes a very bad action."
+            })
+        self.assertIsInstance(test_labels, pd.Series)
+        self.assertEqual(test_labels.tolist()[0], 0)
+
+
+class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
+    """Test socialnorms.dataset.readers.SocialnormsBenchmarkDataset."""
+
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        # copy the benchmark-easy dataset to the temporary directory
+        for split in readers.SocialnormsBenchmarkDataset.SPLITS:
+            split_filename =\
+                socialnorms_settings.BENCHMARK_FILENAME_TEMPLATE.format(
+                    split=split)
+            utils.copy_pkg_resource_to_disk(
+                pkg='tests',
+                src=os.path.join(settings.BENCHMARK_EASY_DIR, split_filename),
+                dst=os.path.join(self.temp_dir.name, split_filename))
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def test_benchmark_has_correct_splits(self):
+        self.assertEqual(
+            set(readers.SocialnormsBenchmarkDataset.SPLITS),
+            set(['train', 'dev', 'test']))
+
+    def test_init_raises_error_if_bad_split_provided(self):
+        with self.assertRaisesRegex(
+                ValueError,
+                r'split must be one of train, dev, test\.'
+        ):
+          readers.SocialnormsBenchmarkDataset(
+              data_dir=self.temp_dir.name,
+              split='val',
+              transform=None,
+              label_transform=None)
+
+    def test_len(self):
+        # test len on train
+        train = readers.SocialnormsBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='train',
+            transform=None,
+            label_transform=None)
+        self.assertEqual(len(train), 16)
+
+        # test len on dev
+        dev = readers.SocialnormsBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='dev',
+            transform=None,
+            label_transform=None)
+        self.assertEqual(len(dev), 4)
+
+        # test len on test
+        test = readers.SocialnormsBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='test',
+            transform=None,
+            label_transform=None)
+        self.assertEqual(len(test), 4)
+
+    def test___get_item__(self):
+        # test __get_item__ on train
+        train = readers.SocialnormsBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='train',
+            transform=None,
+            label_transform=None)
+        id_, feature, label = train[0]
+        self.assertEqual(id_, 'id_0')
+        self.assertEqual(feature, (
+            "A good action.",
+            "A bad action."
+        ))
+        self.assertEqual(label, 0)
+
+        # test __get_item__ on dev
+        dev = readers.SocialnormsBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='dev',
+            transform=None,
+            label_transform=None)
+        id_, feature, label = dev[0]
+        self.assertEqual(id_, 'id_16')
+        self.assertEqual(feature, (
+            "The good action.",
+            "The bad action."
+        ))
+        self.assertEqual(label, 0)
+
+        # test __get_item__ on test
+        test = readers.SocialnormsBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='test',
+            transform=None,
+            label_transform=None)
+        id_, feature, label = test[0]
+        self.assertEqual(id_, 'id_20')
+        self.assertEqual(feature, (
+            "Indeed, this describes a very good action.",
+            "Indeed, this describes a very bad action."
+        ))
+        self.assertEqual(label, 0)
+
+    def test_init_with_transform(self):
+        # test the train split
+        train_transform = Mock(return_value='foo')
+        train = readers.SocialnormsBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='train',
+            transform=train_transform,
+            label_transform=None)
+        # call the transform and check the return value
+        _, feature, _ = train[0]
+        self.assertEqual(feature, 'foo')
+        # check that the transform was called correctly
+        self.assertEqual(train_transform.call_count, 1)
+        args, kwargs = train_transform.call_args
+        self.assertEqual(args, ((
+            "A good action.",
+            "A bad action."
+        ),))
+        self.assertEqual(kwargs, {})
+
+        # test the dev split
+        dev_transform = Mock(return_value='foo')
+        dev = readers.SocialnormsBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='dev',
+            transform=dev_transform,
+            label_transform=None)
+        # call the transform and check the return value
+        _, feature, _ = dev[0]
+        self.assertEqual(feature, 'foo')
+        # check that the transform was called correctly
+        self.assertEqual(dev_transform.call_count, 1)
+        args, kwargs = dev_transform.call_args
+        self.assertEqual(args, ((
+            "The good action.",
+            "The bad action."
+        ),))
+        self.assertEqual(kwargs, {})
+
+        # test the test split
+        test_transform = Mock(return_value='foo')
+        test = readers.SocialnormsBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='test',
+            transform=test_transform,
+            label_transform=None)
+        # call the transform and check the return value
+        _, feature, _ = test[0]
+        self.assertEqual(feature, 'foo')
+        # check that the transform was called correctly
+        self.assertEqual(test_transform.call_count, 1)
+        args, kwargs = test_transform.call_args
+        self.assertEqual(args, ((
+            "Indeed, this describes a very good action.",
+            "Indeed, this describes a very bad action."
+        ),))
+        self.assertEqual(kwargs, {})
+
+    def test_init_with_label_transform(self):
+        # test the train split
+        train_label_transform = Mock(return_value='foo')
+        train = readers.SocialnormsBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='train',
+            transform=None,
+            label_transform=train_label_transform)
+        # call the transform and check the return value
+        _, _, label = train[0]
+        self.assertEqual(label, 'foo')
+        # check that the transform was called correctly
+        self.assertEqual(train_label_transform.call_count, 1)
+        args, kwargs = train_label_transform.call_args
+        self.assertEqual(args, (0,))
+        self.assertEqual(kwargs, {})
+
+        # test the dev split
+        dev_label_transform = Mock(return_value='foo')
+        dev = readers.SocialnormsBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='dev',
+            transform=None,
+            label_transform=dev_label_transform)
+        # call the transform and check the return value
+        _, _, label = dev[0]
+        self.assertEqual(label, 'foo')
+        # check that the transform was called correctly
+        self.assertEqual(dev_label_transform.call_count, 1)
+        args, kwargs = dev_label_transform.call_args
+        self.assertEqual(args, (0,))
+        self.assertEqual(kwargs, {})
+
+        # test the test split
+        test_label_transform = Mock(return_value='foo')
+        test = readers.SocialnormsBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='test',
+            transform=None,
+            label_transform=test_label_transform)
+        # call the transform and check the return value
+        _, _, label = test[0]
+        self.assertEqual(label, 'foo')
+        # check that the transform was called correctly
+        self.assertEqual(test_label_transform.call_count, 1)
+        args, kwargs = test_label_transform.call_args
+        self.assertEqual(args, (0,))
         self.assertEqual(kwargs, {})
