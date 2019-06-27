@@ -180,10 +180,16 @@ class Compose(object):
         in pipeline order, i.e. the first transform to apply goes first
         in the list.
     """
-    def __init__(self, transforms: Sequence[Callable]) -> None:
+    def __init__(
+            self,
+            transforms: Sequence[Callable]
+    ) -> None:
         self.transforms = transforms
 
-    def __call__(self, feature: Any):
+    def __call__(
+            self,
+            feature: Any
+    ) -> Any:
         """Return ``feature`` with all the transforms applied.
 
         Returns
@@ -195,3 +201,35 @@ class Compose(object):
             feature = transform(feature)
 
         return feature
+
+
+class Map(object):
+    """Map a transform across a sequence.
+
+    Parameters
+    ----------
+    transform : Callable
+        The transform to map across the sequence.
+    """
+    def __init__(
+            self,
+            transform: Callable
+    ) -> None:
+        self.transform = transform
+
+    def __call__(
+            self,
+            feature: Sequence[Any]
+    ) -> List[Any]:
+        """Return ``feature`` mapped by ``self.transform``.
+
+        Return ``feature`` mapped by ``self.transform`` and cast to a
+        list.
+
+        Returns
+        -------
+        List[Any]
+            ``feature`` mapped by the transform with which this object
+            was initialized, and then cast to a list.
+        """
+        return [self.transform(x) for x in feature]

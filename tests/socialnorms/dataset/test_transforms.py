@@ -1,6 +1,7 @@
 """Tests for socialnorms.dataset.transforms."""
 
 import unittest
+from unittest.mock import Mock
 
 import pytest
 from pytorch_pretrained_bert.tokenization import BertTokenizer
@@ -307,7 +308,18 @@ class ComposeTestCase(unittest.TestCase):
         self.assertEqual(transform(1), 1)
         self.assertEqual(transform('a'), 'a')
 
-    def test_composes_functions(self):
+    def test_composes_mocked_functions(self):
+        mock1 = Mock(return_value='bar')
+        mock2 = Mock(return_value='baz')
+
+        transform = transforms.Compose([mock1, mock2])
+
+        self.assertEqual(transform('foo'), 'baz')
+
+        mock1.assert_called_with('foo')
+        mock2.assert_called_with('bar')
+
+    def test_composes_actual_functions(self):
         transform = transforms.Compose([
             lambda x: x**2,
             lambda x: x+1
@@ -321,3 +333,41 @@ class ComposeTestCase(unittest.TestCase):
         ])
 
         self.assertEqual(transform('A'), 'ab')
+
+
+class MapTestCase(unittest.TestCase):
+    """Test socialnorms.dataset.transforms.Map."""
+
+    def test_mapping_the_empty_list(self):
+        transform = transforms.Map(lambda x: x**2)
+
+        self.assertEqual(transform([]), [])
+
+    def test_it_maps_a_mocked_function(self):
+        mock = Mock(return_value='foo')
+
+        transform = transforms.Map(mock)
+
+        self.assertEqual(
+            transform([1, 2, 3]),
+            ['foo', 'foo', 'foo'])
+
+        mock.assert_any_call(1)
+        mock.assert_any_call(2)
+        mock.assert_any_call(3)
+
+        self.assertEqual(mock.call_count, 3)
+
+    def test_it_maps_an_actual_function(self):
+        transform = transforms.Map(transform=lambda x: x**2)
+
+        self.assertEqual(transform([1, 2, 3]), [1, 4, 9])
+
+        transform = transforms.Map(transform=str.lower)
+
+        self.assertEqual(transform(['Aa', 'BB', 'cC']), ['aa', 'bb', 'cc'])
+
+    def test_mapping_different_sequence_types(self):
+        transform = transforms.Map(transform=lambda x: x**2)
+
+        self.assertEqual(transform((1, 2, 3)), [1, 4, 9])
