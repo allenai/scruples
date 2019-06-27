@@ -72,7 +72,6 @@ def predict_lm(
     checkpoint_file_path = os.path.join(
         model_dir, 'checkpoints', 'best.checkpoint.pkl')
 
-
     # Step 2: Read in the training arguments.
 
     logger.info('Reading in the training arguments.')
@@ -81,8 +80,7 @@ def predict_lm(
         config = json.load(config_file)
 
     Model, hyper_params, make_transform =\
-        baselines.BENCHMARK_FINE_TUNE_LM_BASELINES[config['baseline']]
-
+        baselines.benchmark.FINE_TUNE_LM_BASELINES[config['baseline']]
 
     # Step 3: Configure GPUs.
 
@@ -104,7 +102,6 @@ def predict_lm(
 
         device = torch.device('cpu')
 
-
     # Step 4: Load the model.
 
     logger.info('Loading the fine-tuned model.')
@@ -114,11 +111,9 @@ def predict_lm(
 
     model.to(device)
 
-
     # Step 5: Create transformations for the dataset.
 
     featurize = make_transform(**hyper_params['transform'])
-
 
     # Step 6: Make predictions for the splits.
 
@@ -136,7 +131,6 @@ def predict_lm(
             dataset=dataset,
             batch_size=predict_batch_size,
             shuffle=False)
-
 
         # run predictions
 

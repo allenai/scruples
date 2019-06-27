@@ -79,7 +79,7 @@ def run_shallow(
     model_paths = {}
     metrics_paths = collections.defaultdict(dict)
     predictions_paths = collections.defaultdict(dict)
-    for baseline in baselines.CORPUS_SHALLOW_BASELINES.keys():
+    for baseline in baselines.corpus.SHALLOW_BASELINES.keys():
         os.makedirs(os.path.join(results_dir, baseline))
         model_paths[baseline] = os.path.join(
             results_dir, baseline, 'model.pkl')
@@ -101,7 +101,7 @@ def run_shallow(
     logger.info('Running the baselines.')
 
     for baseline, (Model, hyper_parameter_space) in tqdm.tqdm(
-            baselines.CORPUS_SHALLOW_BASELINES.items(),
+            baselines.corpus.SHALLOW_BASELINES.items(),
             **settings.TQDM_KWARGS
     ):
         # tune the hyper-parameters and train the model
