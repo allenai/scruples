@@ -28,9 +28,15 @@ class Comment:
         ``True`` if the comment is deleted.
     is_by_automoderator : bool
         ``True`` if the comment is by the AutoModerator.
+    is_spam : bool
+        ``True`` if the comment is is classified as spam (i.e., has
+        irrelevant or meaningless content) by a set of rules-based
+        filters.
     is_good : bool
         ``True`` if the comment is a good candidate for contributing a
-        label.
+        label. Some comments have good content but are not candidates
+        for inclusion in the dataset due to certain dataset design
+        decisions, such as requiring comments to be top-level.
 
     See `Parameters`_ for additional attributes.
 
@@ -139,12 +145,20 @@ class Comment:
         return self.author == settings.AUTO_MODERATOR_NAME
 
     @utils.cached_property
+    def is_spam(self) -> bool:
+        # N.B. place cheaper predicates earlier so short-circuiting can
+        # avoid evaluating more expensive predicates.
+        return (
+            self.has_empty_body
+            or self.is_deleted
+            or self.is_by_automoderator
+        )
+
+    @utils.cached_property
     def is_good(self) -> bool:
         # N.B. place cheaper predicates earlier so short-circuiting can
         # avoid evaluating more expensive predicates.
         return (
             self.is_top_level
-            and not self.has_empty_body
-            and not self.is_deleted
-            and not self.is_by_automoderator
+            and not self.is_spam
         )

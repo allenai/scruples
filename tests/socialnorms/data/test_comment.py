@@ -129,6 +129,34 @@ class CommentTestCase(unittest.TestCase):
             comment.Comment(**kwargs).is_by_automoderator,
             False)
 
+    def test_is_spam(self):
+        # test when is_spam should be false
+        kwargs = self.comment_kwargs.copy()
+
+        self.assertEqual(
+            comment.Comment(**kwargs).is_spam,
+            False)
+
+        # test when is_spam should be true
+        # has_empty_body == True
+        kwargs = self.comment_kwargs.copy()
+        kwargs.update(body='')
+        self.assertEqual(
+            comment.Comment(**kwargs).is_spam,
+            True)
+        # is_deleted == True
+        kwargs = self.comment_kwargs.copy()
+        kwargs.update(body='[deleted]')
+        self.assertEqual(
+            comment.Comment(**kwargs).is_spam,
+            True)
+        # is_by_automoderator == True
+        kwargs = self.comment_kwargs.copy()
+        kwargs.update(author='AutoModerator')
+        self.assertEqual(
+            comment.Comment(**kwargs).is_spam,
+            True)
+
     def test_is_good(self):
         # test when is_good should be true
         kwargs = self.comment_kwargs.copy()
@@ -144,21 +172,13 @@ class CommentTestCase(unittest.TestCase):
         self.assertEqual(
             comment.Comment(**kwargs).is_good,
             False)
-        # has_empty_body == True
+        # is_spam == True
         kwargs = self.comment_kwargs.copy()
-        kwargs.update(body='')
-        self.assertEqual(
-            comment.Comment(**kwargs).is_good,
-            False)
-        # is_deleted == True
-        kwargs = self.comment_kwargs.copy()
-        kwargs.update(body='[deleted]')
-        self.assertEqual(
-            comment.Comment(**kwargs).is_good,
-            False)
-        # is_by_automoderator == True
-        kwargs = self.comment_kwargs.copy()
-        kwargs.update(author='AutoModerator')
-        self.assertEqual(
-            comment.Comment(**kwargs).is_good,
-            False)
+        test_comment = comment.Comment(**kwargs)
+        # patch test_comment with True for is_spam. We'll patch where
+        # the cached_property decorator will look for the cached value,
+        # since the attribute itself is read-only. See
+        # socialnorms.data.utils.cached_property for how the cached
+        # properties work.
+        object.__setattr__(test_comment, '_is_spam', True)
+        self.assertEqual(test_comment.is_good, False)

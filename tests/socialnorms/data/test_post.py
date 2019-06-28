@@ -330,6 +330,48 @@ class PostTestCase(unittest.TestCase):
         self.assertFalse(test_post.label_scores.is_good)
         self.assertEqual(test_post.has_good_label_scores, False)
 
+    def test_is_spam(self):
+        # test when is_spam should be false
+        kwargs = self.post_kwargs.copy()
+        kwargs.update(
+            title='AITA The title must be long enough so that the post'
+                  ' has sufficient content to be good.')
+
+        self.assertEqual(
+            post.Post(**kwargs).is_spam,
+            False)
+
+        # test when is_spam should be true
+        # when is_self is false
+        kwargs = self.post_kwargs.copy()
+        kwargs.update(is_self=False)
+
+        self.assertEqual(
+            post.Post(**kwargs).is_spam,
+            True)
+        # iterate through cached properties and the truth values that
+        # should make is_spam true
+        for attribute, truth_value in [
+                ('has_empty_selftext', True),
+                ('is_deleted', True),
+                ('has_deleted_author', True),
+                ('has_post_type', False),
+                ('is_meta', True),
+                ('has_enough_content', False)
+        ]:
+            kwargs = self.post_kwargs.copy()
+
+            test_post = post.Post(**kwargs)
+
+            # patch test_post with the bad truth value for the cached
+            # property. We'll patch where the cached_property decorator
+            # will look for the cached value, since the attribute itself
+            # is read-only. See socialnorms.data.utils.cached_property
+            # for how the cached properties work.
+            object.__setattr__(test_post, f'_{attribute}', truth_value)
+
+            self.assertEqual(test_post.is_spam, True)
+
     def test_is_good(self):
         # test when is_good should be true
         kwargs = self.post_kwargs.copy()
@@ -342,23 +384,12 @@ class PostTestCase(unittest.TestCase):
             True)
 
         # test when is_good should be false
-        # when is_self is false
-        kwargs = self.post_kwargs.copy()
-        kwargs.update(is_self=False)
-
-        self.assertEqual(
-            post.Post(**kwargs).is_good,
-            False)
+        #
         # iterate through cached properties and the truth values that
         # should make is_good false
         for attribute, truth_value in [
-                ('has_empty_selftext', True),
-                ('is_deleted', True),
-                ('has_deleted_author', True),
-                ('has_post_type', False),
-                ('is_meta', True),
+                ('is_spam', True),
                 ('has_original_text', False),
-                ('has_enough_content', False),
                 ('has_good_label_scores', False)
         ]:
             kwargs = self.post_kwargs.copy()

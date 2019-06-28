@@ -60,9 +60,14 @@ class Post:
        ``True`` if the post's label scores object is good, in other
        words, if the label scores object is considered a good set of
        label scores for a dataset instance.
+    is_spam : bool
+        ``True`` if the post is classified as spam (i.e., has irrelevant
+        or meaningless content) by a set of rules-based filters.
     is_good : bool
         ``True`` if the post is considered a good candidate for creating
-        an instance for the dataset.
+        an instance for the dataset. Some posts have quality content but
+        are not candidates for inclusion due to issues like lack of
+        labels, or an inability to find the original text of the post.
 
     See `Parameters`_ for additional attributes.
 
@@ -300,17 +305,25 @@ class Post:
         return self.label_scores.is_good
 
     @data_utils.cached_property
+    def is_spam(self) -> bool:
+        # N.B. place cheaper predicates earlier so short-circuiting can
+        # avoid evaluating more expensive predicates.
+        return (
+            not self.is_self
+            or self.has_empty_selftext
+            or self.is_deleted
+            or self.has_deleted_author
+            or not self.has_post_type
+            or self.is_meta
+            or not self.has_enough_content
+        )
+
+    @data_utils.cached_property
     def is_good(self) -> bool:
         # N.B. place cheaper predicates earlier so short-circuiting can
         # avoid evaluating more expensive predicates.
         return (
-            self.is_self
-            and not self.has_empty_selftext
-            and not self.is_deleted
-            and not self.has_deleted_author
-            and self.has_post_type
-            and not self.is_meta
+            not self.is_spam
             and self.has_original_text
-            and self.has_enough_content
             and self.has_good_label_scores
         )

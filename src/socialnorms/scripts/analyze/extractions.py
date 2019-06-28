@@ -290,7 +290,7 @@ def extractions(
     # compute various labels from comments
     comment_spam = [
         'spam'
-        if (not comment.is_good) or comment.label is None
+        if comment.is_spam or comment.label is None
         else 'ham'
         for comment, _ in comment_and_annotations
     ]
@@ -331,7 +331,7 @@ def extractions(
     # compute various labels from posts
     post_spam = [
         'spam'
-        if (not post.is_good) or post.post_type is None
+        if post.is_spam or post.post_type is None
         else 'ham'
         for post, _ in post_and_annotations
     ]
@@ -472,7 +472,7 @@ def extractions(
          as comment_spam_misclassifications_file:
         for comment, annotation in comment_and_annotations:
             if annotation['spam'] != (
-                    (not comment.is_good) or comment.label is None
+                    comment.is_spam or comment.label is None
             ):
                 comment_spam_misclassifications_file.write(
                     json.dumps(attr.asdict(comment)) + '\n')
@@ -491,7 +491,7 @@ def extractions(
          as post_spam_misclassifications_file:
         for post, annotation in post_and_annotations:
             if annotation['spam'] != (
-                    (not post.is_good) or post.post_type is None
+                    post.is_spam or post.post_type is None
             ):
                 post_spam_misclassifications_file.write(
                     json.dumps(attr.asdict(post)) + '\n')
