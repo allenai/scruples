@@ -80,6 +80,8 @@ def train_lm(
     -------
     float
         The best accuracy on dev achieved after any epoch.
+    bool
+        ``True`` if the training loss diverged, ``False`` otherwise.
     """
     # Step 1: Manage and construct paths.
 
@@ -388,4 +390,13 @@ def train_lm(
             shutil.copyfile(last_checkpoint_path, best_checkpoint_path)
             best_dev_accuracy = epoch_dev_accuracy
 
-    return best_dev_accuracy
+        # exit early if the training loss has diverged
+        if math.isnan(epoch_train_loss):
+            logger.info('Training loss has diverged. Exiting early.')
+
+            return best_dev_accuracy, True
+
+    logger.info(
+        f'Training complete. Best dev accuracy was {best_dev_accuracy:.4f}')
+
+    return best_dev_accuracy, False

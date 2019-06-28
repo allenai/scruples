@@ -98,7 +98,7 @@ def tune_lm(
         hyper_params = {k: v.tolist() for k, v in hyper_params.items()}
 
         # run the training
-        best_dev_accuracy = baselines.train.train_lm(
+        best_dev_accuracy, diverged = baselines.train.train_lm(
             data_dir=data_dir,
             model_dir=utils.next_unique_path(
                 os.path.join(
@@ -115,7 +115,7 @@ def tune_lm(
             gpu_ids=gpu_ids,
             logger=logger)
 
-        return - best_dev_accuracy
+        return - (best_dev_accuracy if not diverged else -1)
 
     # Step 4: Check if there is a checkpoint.
 
