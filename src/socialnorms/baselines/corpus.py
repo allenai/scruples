@@ -49,7 +49,8 @@ SHALLOW_BASELINES = {
 FINE_TUNE_LM_BASELINES = {
     'bert': (
         bert.BERTClassifier,
-        bert.BERT_CLASSIFIER_HYPER_PARAMETERS,
+        bert.BERT_CLASSIFIER_CONFIG,
+        bert.BERT_CLASSIFIER_HYPER_PARAM_SPACE,
         bert.BERT_CLASSIFIER_TRANSFORM
     )
 }

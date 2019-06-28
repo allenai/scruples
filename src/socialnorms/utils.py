@@ -2,6 +2,7 @@
 
 import collections
 import logging
+import os
 import random
 import string
 from typing import (
@@ -386,3 +387,34 @@ def prob_p1_greater_than_p2(a1, b1, a2, b2, margin):
     res, _ = quad(integrand, margin, 1) / beta(a1, b1)
 
     return res
+
+
+def next_unique_path(path: str):
+    """Return a unique path derived from ``path``.
+
+    If ``path`` does not exist, return ``path``, else find the smallest
+    natural number such that appending an underscore followed by it to
+    ``path`` creates a unique path, then return ``path`` with an
+    underscore and that natural number appended.
+
+    Parameters
+    ----------
+    path : str
+        The path to generate a unique version of.
+
+    Returns
+    -------
+    str
+        ``path`` with ``_{number}`` appended where ``{number}`` is
+        the smallest natural number that makes the path unique.
+    """
+    if not os.path.exists(path):
+        return path
+
+    number = 1
+    new_path = f'{path}_{number}'
+    while os.path.exists(new_path):
+        number += 1
+        new_path = f'{path}_{number}'
+
+    return new_path

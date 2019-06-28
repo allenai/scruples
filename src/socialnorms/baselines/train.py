@@ -5,7 +5,11 @@ import logging
 import math
 import os
 import shutil
-from typing import List, Optional
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional)
 
 from apex.optimizers import (
     FP16_Optimizer,
@@ -31,10 +35,9 @@ def train_lm(
         model_dir: str,
         dataset: str,
         baseline: str,
-        train_batch_size: int,
+        hyper_params: Dict[str, Any],
+        compute_train_batch_size: int,
         predict_batch_size: int,
-        n_epochs: int,
-        n_gradient_accumulation: int,
         mixed_precision: bool,
         gpu_ids: Optional[List[int]],
         logger: logging.Logger = None
@@ -59,14 +62,14 @@ def train_lm(
         ``socialnorms.baselines.$dataset.FINE_TUNE_LM_BASELINES`` where
         ``$dataset`` corresponds to the ``dataset`` argument to this
         function.
-    train_batch_size : int
-        The number of instances to use in a training batch.
+    hyper_params : Dict[str, Any]
+        The dictionary of hyper-parameters for the model.
+    compute_train_batch_size : int
+        The largest batch size that will fit on the hardware during
+        training. Gradient accumulation will be used to make sure the
+        actual size of the batch on the hardware respects this limit.
     predict_batch_size : int
         The number of instances to use in a predicting batch.
-    n_epochs : int
-        The number of epochs for which to train.
-    n_gradient_accumulation : int
-        The number of rounds of gradient accumulation to perform.
     gpu_ids : Optional[List[int]]
         A list of IDs for GPUs to use.
     logger : Optional[logging.Logger], optional (default=None)
@@ -117,10 +120,9 @@ def train_lm(
             'model_dir': model_dir,
             'dataset': dataset,
             'baseline': baseline,
-            'train_batch_size': train_batch_size,
+            'hyper_params': hyper_params,
+            'compute_train_batch_size': compute_train_batch_size,
             'predict_batch_size': predict_batch_size,
-            'n_epochs': n_epochs,
-            'n_gradient_accumulation': n_gradient_accumulation,
             'mixed_precision': mixed_precision,
             'gpu_ids': gpu_ids
         }, config_file)
@@ -145,28 +147,33 @@ def train_lm(
 
         device = torch.device('cpu')
 
-    # Step 5: Fetch the baseline information.
+    # Step 5: Fetch the baseline information and training loop parameters.
 
     if logger is not None:
         logger.info('Retrieving baseline and related parameters.')
 
     if dataset == 'benchmark':
-        Model, hyper_params, make_transform =\
+        Model, baseline_config, _, make_transform =\
             benchmark.FINE_TUNE_LM_BASELINES[baseline]
     elif dataset == 'corpus':
-        Model, hyper_params, make_transform =\
+        Model, baseline_config, _, make_transform =\
             corpus.FINE_TUNE_LM_BASELINES[baseline]
     else:
         raise ValueError(
             f'dataset must be either "benchmark" or "corpus", not'
             f' {dataset}.')
 
+    n_epochs = hyper_params['n_epochs']
+    train_batch_size = hyper_params['train_batch_size']
+    n_gradient_accumulation = math.ceil(
+        train_batch_size / (compute_train_batch_size * len(gpu_ids)))
+
     # Step 6: Load the dataset.
 
     if logger is not None:
         logger.info(f'Loading the dataset from {data_dir}.')
 
-    featurize = make_transform(**hyper_params['transform'])
+    featurize = make_transform(**baseline_config['transform'])
     if dataset == 'benchmark':
         Dataset = SocialnormsBenchmarkDataset
         labelize = None
@@ -207,7 +214,7 @@ def train_lm(
     if logger is not None:
         logger.info('Initializing the model.')
 
-    model = torch.nn.DataParallel(Model(**hyper_params['model']))
+    model = torch.nn.DataParallel(Model(**baseline_config['model']))
 
     if mixed_precision:
         model.half()
@@ -234,22 +241,22 @@ def train_lm(
                 and 'LayerNorm.bias' not in name
                 and 'LayerNorm.weight' not in name
             ],
-            'weight_decay': hyper_params['optimizer']['weight_decay']
+            'weight_decay': hyper_params['weight_decay']
         }
     ]
     if mixed_precision:
         optimizer = FP16_Optimizer(
             FusedAdam(
                 parameter_groups,
-                lr=hyper_params['optimizer']['lr'],
+                lr=hyper_params['lr'],
                 bias_correction=False,
                 max_grad_norm=1.0),
             dynamic_loss_scale=True)
     else:
         optimizer = BertAdam(
             parameter_groups,
-            lr=hyper_params['optimizer']['lr'],
-            warmup=hyper_params['optimizer']['warmup_proportion'],
+            lr=hyper_params['lr'],
+            warmup=hyper_params['warmup_proportion'],
             t_total=n_optimization_steps)
 
     loss = torch.nn.CrossEntropyLoss()
@@ -306,8 +313,8 @@ def train_lm(
                             n_train_batches_per_epoch * epoch
                             + ((i+1) // n_gradient_accumulation)
                         ) / n_optimization_steps,
-                        hyper_params['optimizer']['warmup_proportion']
-                    ) * hyper_params['optimizer']['lr']
+                        hyper_params['warmup_proportion']
+                    ) * hyper_params['lr']
                     for param_group in optimizer.param_groups:
                         param_group['lr'] = new_lr
 

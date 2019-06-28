@@ -10,7 +10,8 @@ SHALLOW_BASELINES = {}
 FINE_TUNE_LM_BASELINES = {
     'bert': (
         bert.BERTRanker,
-        bert.BERT_RANKER_HYPER_PARAMETERS,
+        bert.BERT_RANKER_CONFIG,
+        bert.BERT_RANKER_HYPER_PARAM_SPACE,
         bert.BERT_RANKER_TRANSFORM
     )
 }

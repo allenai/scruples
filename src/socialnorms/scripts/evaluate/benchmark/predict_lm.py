@@ -79,7 +79,7 @@ def predict_lm(
     with open(config_file_path, 'r') as config_file:
         config = json.load(config_file)
 
-    Model, hyper_params, make_transform =\
+    Model, baseline_config, _, make_transform =\
         baselines.benchmark.FINE_TUNE_LM_BASELINES[config['baseline']]
 
     # Step 3: Configure GPUs.
@@ -106,14 +106,14 @@ def predict_lm(
 
     logger.info('Loading the fine-tuned model.')
 
-    model = torch.nn.DataParallel(Model(**hyper_params['model']))
+    model = torch.nn.DataParallel(Model(**baseline_config['model']))
     model.load_state_dict(torch.load(checkpoint_file_path)['model'])
 
     model.to(device)
 
     # Step 5: Create transformations for the dataset.
 
-    featurize = make_transform(**hyper_params['transform'])
+    featurize = make_transform(**baseline_config['transform'])
 
     # Step 6: Make predictions for the splits.
 

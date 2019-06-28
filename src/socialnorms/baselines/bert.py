@@ -4,6 +4,7 @@ from pytorch_pretrained_bert.modeling import (
     BertForMultipleChoice,
     BertForSequenceClassification)
 from pytorch_pretrained_bert.tokenization import BertTokenizer
+import skopt
 import torch
 
 from ..data.labels import Label
@@ -19,17 +20,12 @@ BERTClassifier = BertForSequenceClassification.from_pretrained
 """Predict fixed classes with a fine-tuned BERT model."""
 
 
-BERT_CLASSIFIER_HYPER_PARAMETERS = {
+BERT_CLASSIFIER_CONFIG = {
     'model': {
         # N.B. pretrained_model_name_or_path for the model must be the
         # same as pretrained_bert for the transform
         'pretrained_model_name_or_path': 'bert-large-uncased',
         'num_labels': len(Label)
-    },
-    'optimizer': {
-        'lr': 5e-5,
-        'weight_decay': 0.01,
-        'warmup_proportion': 0.1
     },
     'transform': {
         # N.B. pretrained_bert for the transform must be the same as
@@ -40,6 +36,34 @@ BERT_CLASSIFIER_HYPER_PARAMETERS = {
         'truncation_strategy_text': 'beginning'
     }
 }
+"""Configuration for ``BERTClassifier``."""
+
+
+BERT_CLASSIFIER_HYPER_PARAM_SPACE = [
+    skopt.space.Real(
+        low=1e-8,
+        high=1e-1,
+        prior='log-uniform',
+        name='lr'),
+    skopt.space.Real(
+        low=1e-5,
+        high=1e0,
+        prior='log-uniform',
+        name='weight_decay'),
+    skopt.space.Real(
+        low=0.0,
+        high=0.6,
+        prior='uniform',
+        name='warmup_proportion'),
+    skopt.space.Integer(
+        low=1,
+        high=50,
+        name='n_epochs'),
+    skopt.space.Integer(
+        low=2,
+        high=7,
+        name='log_train_batch_size')
+]
 """The hyper-param search space for ``BERTClassifier``."""
 
 
@@ -75,34 +99,55 @@ BERTRanker = BertForMultipleChoice.from_pretrained
 """Rank choices with a softmax over a fine-tuned BERT model."""
 
 
-BERT_RANKER_HYPER_PARAMETERS = {
+BERT_RANKER_CONFIG = {
     'model': {
         # N.B. pretrained_model_name_or_path for the model must be the
         # same as pretrained_bert for the transform
         'pretrained_model_name_or_path': 'bert-large-uncased',
         'num_choices': 2
     },
-    'optimizer': {
-        'lr': 5e-5,
-        'weight_decay': 0.01,
-        'warmup_proportion': 0.1
-    },
     'transform': {
         # N.B. pretrained_bert for the transform must be the same as
         # pretrained_model_name_or_path for the model
         'pretrained_bert': 'bert-large-uncased',
-        'max_sequence_length': 96,
-        'truncation_strategy': 'beginning'
+        'max_sequence_length': 96
     }
 }
+"""Configuration for ``BERTRanker``."""
+
+
+BERT_RANKER_HYPER_PARAM_SPACE = [
+    skopt.space.Real(
+        low=1e-8,
+        high=1e-1,
+        prior='log-uniform',
+        name='lr'),
+    skopt.space.Real(
+        low=1e-5,
+        high=1e0,
+        prior='log-uniform',
+        name='weight_decay'),
+    skopt.space.Real(
+        low=0.0,
+        high=0.6,
+        prior='uniform',
+        name='warmup_proportion'),
+    skopt.space.Integer(
+        low=1,
+        high=50,
+        name='n_epochs'),
+    skopt.space.Integer(
+        low=2,
+        high=7,
+        name='log_train_batch_size')
+]
 """The hyper-param seach space for ``BERTRanker``."""
 
 
 BERT_RANKER_TRANSFORM = (
     lambda
         pretrained_bert,
-        max_sequence_length,
-        truncation_strategy:
+        max_sequence_length:
     Compose([
         # wrap each action in a tuple for passing it to BertTransform
         lambda actions: tuple((action, None) for action in actions),
@@ -113,10 +158,7 @@ BERT_RANKER_TRANSFORM = (
                     pretrained_bert,
                     do_lower_case=pretrained_bert.endswith('-uncased')),
                 max_sequence_length=max_sequence_length,
-                truncation_strategy=(
-                    truncation_strategy,
-                    truncation_strategy
-                ))),
+                truncation_strategy=('beginning', 'beginning'))),
         # collect the action choices and stack their tensors so the
         # choices can be their own dimension of the batch
         lambda ds: {

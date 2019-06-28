@@ -7,7 +7,7 @@ import click
 from . import (
     predict_lm,
     run_shallow,
-    train_lm)
+    tune_lm)
 
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ def benchmark():
 subcommands = [
     predict_lm.predict_lm,
     run_shallow.run_shallow,
-    train_lm.train_lm
+    tune_lm.tune_lm
 ]
 
 for subcommand in subcommands:

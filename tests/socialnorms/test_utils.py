@@ -2,6 +2,8 @@
 
 import logging
 import math
+import os
+import tempfile
 import unittest
 
 import numpy as np
@@ -439,3 +441,31 @@ class ProbP1GreaterThanP2TestCase(unittest.TestCase):
                             - utils.prob_p1_greater_than_p2(
                                 a1=a1, b1=b1, a2=a2, b2=b2, margin=margin)),
                         0.05)
+
+
+class NextUniquePathTestCase(unittest.TestCase):
+    """Test socialnorms.utils.next_unique_path."""
+
+    def test_when_path_is_already_unique(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = os.path.join(temp_dir, 'foo')
+
+            self.assertEqual(utils.next_unique_path(path), path)
+
+    def test_when_path_is_not_unique(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = os.path.join(temp_dir, 'foo')
+            path1 = os.path.join(temp_dir, 'foo_1')
+            path2 = os.path.join(temp_dir, 'foo_2')
+
+            # when path is not unique
+            with open(path, 'w') as f:
+                f.write('')
+
+            self.assertEqual(utils.next_unique_path(path), path1)
+
+            # when the first modification of path is still not unique
+            with open(path1, 'w') as f:
+                f.write('')
+
+            self.assertEqual(utils.next_unique_path(path), path2)
