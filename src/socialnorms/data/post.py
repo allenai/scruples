@@ -42,6 +42,8 @@ class Post:
         ``True`` if the post's selftext is empty.
     is_deleted : bool
         ``True`` if the post is deleted.
+    has_deleted_author : bool
+        ``True`` if the author of the post is deleted.
     has_post_type : bool
         ``True`` if the post's post type is not ``None``.
     is_meta : bool
@@ -272,6 +274,10 @@ class Post:
         )
 
     @data_utils.cached_property
+    def has_deleted_author(self) -> bool:
+        return self.author == '[deleted]'
+
+    @data_utils.cached_property
     def has_post_type(self) -> bool:
         return self.post_type is not None
 
@@ -301,6 +307,7 @@ class Post:
             self.is_self
             and not self.has_empty_selftext
             and not self.is_deleted
+            and not self.has_deleted_author
             and self.has_post_type
             and not self.is_meta
             and self.has_original_text

@@ -178,6 +178,23 @@ class PostTestCase(unittest.TestCase):
             post.Post(**kwargs).is_deleted,
             False)
 
+    def test_has_deleted_author(self):
+        # test when has_deleted_author should be true
+        kwargs = self.post_kwargs.copy()
+        kwargs.update(author='[deleted]')
+
+        self.assertEqual(
+            post.Post(**kwargs).has_deleted_author,
+            True)
+
+        # test when has_deleted_author should be false
+        kwargs = self.post_kwargs.copy()
+        kwargs.update(author='foo')
+
+        self.assertEqual(
+            post.Post(**kwargs).has_deleted_author,
+            False)
+
     def test_has_post_type(self):
         # test when has_post_type should be true
         # when post_type is AITA
@@ -337,6 +354,7 @@ class PostTestCase(unittest.TestCase):
         for attribute, truth_value in [
                 ('has_empty_selftext', True),
                 ('is_deleted', True),
+                ('has_deleted_author', True),
                 ('has_post_type', False),
                 ('is_meta', True),
                 ('has_original_text', False),
