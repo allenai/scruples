@@ -3,10 +3,22 @@
 import enum
 from typing import (
     List,
-    Optional)
+    Optional,
+    Tuple)
 
 import regex
 
+
+# constants
+
+# N.B. this pattern cannot be included as a class attribute on the Label
+# class because then the class would try and turn it into one of the
+# values in the enumeration.
+_CONTRADICTION_PATTERN = regex.compile(
+    r'\m(?i:but|however|although|yet){e<=1}\M')
+
+
+# classes
 
 @enum.unique
 class Label(enum.Enum):
@@ -38,26 +50,45 @@ class Label(enum.Enum):
     """
     YTA = (0, [
         r'\m(?i:YTAH?)\M',
-        r"(?i:you(?:'re|r| are)? (?:(?:kind|sort) of |really )?(?:an? |the )?(?:asshole|a-?hole)){e<=1}",
-        r"(?i:you (?:(?:kind|sort) of |really )?are (?:an? |the )?(?:asshole|a-?hole)){e<=1}"
+        r"(?e)(?i:"
+          r"you(?:'re|r| are)? "
+          r"(?:(?:kind|sort) of |really |indeed |just )?"
+          r"(?:an? |the )?"
+          r"(?:huge |big |giant )?"
+          r"(?:asshole|a-?hole)"
+        r"){e<=1}",
+        r"(?e)(?i:"
+          r"you "
+          r"(?:(?:kind|sort) of |really |indeed |just )?"
+          r"are (?:an? |the )?"
+          r"(?:huge |big |giant )?"
+          r"(?:asshole|a-?hole)"
+        r"){e<=1}"
     ])
     NTA = (1, [
         r'\m(?i:Y?NTAH?)\M',
-        r'(?i:not (?:really )?(an? |the )?(asshole|a-?hole)\M){e<=1}'
+        r'(?e)(?i:'
+          r'not '
+          r'(?:really )?'
+          r'(an? |the )?'
+          r'(asshole|a-?hole)\M'
+        r'){e<=1}'
     ])
     ESH = (2, [
         r'\m(?i:ESH)\M',
-        r'(?i:every(?:one|body) sucks here){e<=1}'
+        r'(?e)(?i:every(?:one|body) sucks here){e<=1}',
+        r'(?e)(?i:you both suck){e<=1}'
     ])
     NAH = (3, [
         r'\m(?i:NAH?H)\M',
-        r'(?i:no (?:assholes|a-?holes) here){e<=1}'
+        r'(?e)(?i:no (?:assholes|a-?holes) here){e<=1}',
+        r'(?e)(?i:no one is the (?:asshole|a-?hole)){e<=1}'
     ])
     INFO = (4, [
         r'\m(?i:INFO)\M',
-        r'(?i:not enough info){e<=1}',
-        r'(?i:needs? more info){e<=1}',
-        r"(?i:more info(?:'s| is)? required){e<=1}"
+        r'(?e)(?i:not enough info){e<=1}',
+        r'(?e)(?i:needs? more info){e<=1}',
+        r"(?e)(?i:more info(?:'s| is)? required){e<=1}"
     ])
 
     @classmethod
@@ -80,12 +111,45 @@ class Label(enum.Enum):
         Optional[Label]
             The extracted label.
         """
-        found_labels = set()
+        found_labels = {}
         for label in cls:
-            if label.in_(text):
-                found_labels.add(label)
+            # span is either a tuple containing (start_idx, end_idx) or
+            # is None
+            span = label.find(text)
+            if span is not None:
+                found_labels[label] = span
 
-        return found_labels.pop() if len(found_labels) == 1 else None
+        # return the label now if no conflict resolution is required
+
+        if len(found_labels) == 0:
+            return None
+
+        if len(found_labels) == 1:
+            return next(iter(found_labels.keys()))
+
+        # multiple labels were matched, so resolve which label is the
+        # correct one
+        label0_span0, label1_span1 = sorted(
+            found_labels.items(),
+            # sort by the start of each span
+            key=lambda x: x[1][0])[:2]
+        label0, (start0, end0) = label0_span0
+        label1, (start1, end1) = label1_span1
+
+        # if the utterances for the labels overlap, pick the earlier
+        # label
+        if end0 > start1:
+            return label0
+
+        between_text = text[end0:start1]
+        if _CONTRADICTION_PATTERN.search(between_text) is None:
+            # no contradiction / signs of switching opinion, return the
+            # earlier label
+            return label0
+        else:
+            # there's indication of a change of opinion, so return the
+            # later label
+            return label1
 
     def __init__(
             self,
@@ -95,14 +159,15 @@ class Label(enum.Enum):
         self.index = index
         self.patterns = [regex.compile(pattern) for pattern in patterns]
 
-    def in_(
+    def find(
             self,
             text: str
-    ) -> bool:
-        """Return ``True`` if the label can be found in ``text``.
+    ) -> Optional[Tuple[int, int]]:
+        """Return the first span denotating the label in ``text``.
 
-        Return ``True`` if label has any pattern that matches a
-        substring from ``text``.
+        If ``text`` contains a span denoting this label, then return
+        the first one (in order of the starting index of each
+        span). Otherwise, return ``None``.
 
         Parameters
         ----------
@@ -111,7 +176,23 @@ class Label(enum.Enum):
 
         Returns
         -------
-        bool
-            Whether or not the label is in ``text``.
+        Optional[Tuple[int, int]]
+            If ``text`` contains a span denoting this label, a tuple
+            providing the start and end indices for the first such span
+            (in order of the spans' starting indices) otherwise
+            ``None``.
         """
-        return any(pattern.search(text) for pattern in self.patterns)
+        span = None
+        for pattern in self.patterns:
+            match = pattern.search(text)
+            if match is None:
+                continue
+
+            if span is None:
+                span = (match.start(), match.end())
+            elif match.start() < span[0]:
+                span = (match.start(), match.end())
+            else:
+                pass
+
+        return span

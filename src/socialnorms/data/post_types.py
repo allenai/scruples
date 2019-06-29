@@ -35,11 +35,11 @@ class PostType(enum.Enum):
         bound to the ``PostType`` instance as an attribute.
     """
     AITA = (0, [
-        r'\m(?i:AITA)\M',
+        r'\m(?i:AITAH?)\M',
         r'(?i:Am I the asshole){e<=2}'
     ])
     WIBTA = (1, [
-        r'\m(?i:WIBTA)\M',
+        r'\m(?i:WIBTAH?)\M',
         r'(?i:Would I be the asshole){e<=2}'
     ])
     META = (2, [
