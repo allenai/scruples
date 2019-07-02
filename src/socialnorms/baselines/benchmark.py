@@ -1,9 +1,20 @@
 """Baseline configuration for the socialnorms benchmark."""
 
-from . import bert
+from . import (
+    bert,
+    labels)
 
 
-SHALLOW_BASELINES = {}
+SHALLOW_BASELINES = {
+    'prior': (
+        labels.PriorBaseline,
+        labels.PRIOR_HYPER_PARAMETERS
+    ),
+    'stratified': (
+        labels.StratifiedBaseline,
+        labels.STRATIFIED_HYPER_PARAMETERS
+    )
+}
 """Shallow baseline models for the socialnorms benchmark."""
 
 
