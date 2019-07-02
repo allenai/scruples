@@ -2,7 +2,8 @@
 
 from . import (
     bert,
-    labels)
+    labels,
+    style)
 
 
 SHALLOW_BASELINES = {
@@ -13,6 +14,22 @@ SHALLOW_BASELINES = {
     'stratified': (
         labels.StratifiedBaseline,
         labels.STRATIFIED_HYPER_PARAMETERS
+    ),
+    'fewestwords': (
+        style.FewestWordsBaseline,
+        style.FEWEST_WORDS_HYPER_PARAMETERS
+    ),
+    'mostwords': (
+        style.MostWordsBaseline,
+        style.MOST_WORDS_HYPER_PARAMETERS
+    ),
+    'fewestcharacters': (
+        style.FewestCharactersBaseline,
+        style.FEWEST_CHARACTERS_HYPER_PARAMETERS
+    ),
+    'mostcharacters': (
+        style.MostCharactersBaseline,
+        style.MOST_CHARACTERS_HYPER_PARAMETERS
     )
 }
 """Shallow baseline models for the socialnorms benchmark."""

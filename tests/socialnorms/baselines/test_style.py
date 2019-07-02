@@ -10,6 +10,244 @@ from skopt import BayesSearchCV
 from socialnorms.baselines import style
 
 
+class LengthRankerTestCase(unittest.TestCase):
+    """Test socialnorms.baselines.style.LengthRanker."""
+
+    def test_fit(self):
+        classifier = style.LengthRanker()
+
+        # test that fit takes ``X`` and ``y`` arguments
+        classifier.fit(X=[['foo', 'bar'], ['baz', 'quux']], y=[0, 1])
+
+        # test that fit sets classes_ correctly
+        self.assertEqual(classifier.classes_, [0, 1])
+
+    def test_predict(self):
+        # test fewest words
+        #   regular case
+        self.assertEqual(
+            style.LengthRanker(
+                choose='shortest', length='words'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict(
+                [['foo bar', 'baz'], ['foo', 'bar baz'], ['bar', 'foo baz']]
+            ).tolist(),
+            [1, 0, 0])
+        #   where character lengths disagree with word lengths
+        self.assertEqual(
+            style.LengthRanker(
+                choose='shortest', length='words'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict(
+                [['a b', 'cccc'], ['d', 'e f'], ['aaaaaa', 'b cc']]
+            ).tolist(),
+            [1, 0, 0])
+        # test most words
+        #   regular case
+        self.assertEqual(
+            style.LengthRanker(
+                choose='longest', length='words'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict(
+                [['foo bar', 'baz'], ['foo', 'bar baz'], ['bar', 'foo baz']]
+            ).tolist(),
+            [0, 1, 1])
+        #   where character lengths disagree with word lengths
+        self.assertEqual(
+            style.LengthRanker(
+                choose='longest', length='words'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict(
+                [['a b', 'cccc'], ['d', 'e f'], ['aaaaaa', 'b cc']]
+            ).tolist(),
+            [0, 1, 1])
+        # test fewest characters
+        #   regular case
+        self.assertEqual(
+            style.LengthRanker(
+                choose='shortest', length='characters'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict(
+                [['aaa', 'a'], ['b', 'bbb'], ['c', 'ccc']]
+            ).tolist(),
+            [1, 0, 0])
+        #   where character lengths disagree with word lengths
+        self.assertEqual(
+            style.LengthRanker(
+                choose='shortest', length='characters'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict(
+                [['a b', 'cccc'], ['d', 'e f'], ['aaaaaa', 'b cc']]
+            ).tolist(),
+            [0, 0, 1])
+        # test most characters
+        #   regular case
+        self.assertEqual(
+            style.LengthRanker(
+                choose='longest', length='characters'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict(
+                [['aaa', 'a'], ['b', 'bbb'], ['c', 'ccc']]
+            ).tolist(),
+            [0, 1, 1])
+        #   where character lengths disagree with word lengths
+        self.assertEqual(
+            style.LengthRanker(
+                choose='longest', length='characters'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict(
+                [['a b', 'cccc'], ['d', 'e f'], ['aaaaaa', 'b cc']]
+            ).tolist(),
+            [1, 1, 0])
+
+    def test_predict_with_empty_string_options(self):
+        # test fewest words
+        self.assertEqual(
+            style.LengthRanker(
+                choose='shortest', length='words'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict(
+                [['', 'aa'], ['aa', '']]
+            ).tolist(),
+            [0, 1])
+        # test most words
+        self.assertEqual(
+            style.LengthRanker(
+                choose='longest', length='words'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict(
+                [['', 'aa'], ['aa', '']]
+            ).tolist(),
+            [1, 0])
+        # test fewest characters
+        self.assertEqual(
+            style.LengthRanker(
+                choose='shortest', length='characters'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict(
+                [['', 'aa'], ['aa', '']]
+            ).tolist(),
+            [0, 1])
+        # test most characters
+        self.assertEqual(
+            style.LengthRanker(
+                choose='longest', length='characters'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict(
+                [['', 'aa'], ['aa', '']]
+            ).tolist(),
+            [1, 0])
+
+    def test_predict_with_ties(self):
+        predictions = style.LengthRanker(
+            choose='shortest', length='characters'
+        ).fit(
+            [['word', 'word', 'word']], y=[0]
+        ).predict([['', '', 'aaaa'], ['aaaa', 'aa', 'aa']]
+        ).tolist()
+
+        self.assertIn(predictions[0], [0, 1])
+        self.assertIn(predictions[1], [1, 2])
+
+    def test_predict_proba(self):
+        # test fewest words
+        #   regular case
+        self.assertEqual(
+            style.LengthRanker(
+                choose='shortest', length='words'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict_proba(
+                [['foo bar', 'baz'], ['foo', 'bar baz'], ['bar', 'foo baz']]
+            ).tolist(),
+            [[0.0, 1.0], [1.0, 0.0], [1.0, 0.0]])
+        #   where character lengths disagree with word lengths
+        self.assertEqual(
+            style.LengthRanker(
+                choose='shortest', length='words'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict_proba(
+                [['a b', 'cccc'], ['d', 'e f'], ['aaaaaa', 'b cc']]
+            ).tolist(),
+            [[0.0, 1.0], [1.0, 0.0], [1.0, 0.0]])
+        # test most words
+        #   regular case
+        self.assertEqual(
+            style.LengthRanker(
+                choose='longest', length='words'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict_proba(
+                [['foo bar', 'baz'], ['foo', 'bar baz'], ['bar', 'foo baz']]
+            ).tolist(),
+            [[1.0, 0.0], [0.0, 1.0], [0.0, 1.0]])
+        #   where character lengths disagree with word lengths
+        self.assertEqual(
+            style.LengthRanker(
+                choose='longest', length='words'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict_proba(
+                [['a b', 'cccc'], ['d', 'e f'], ['aaaaaa', 'b cc']]
+            ).tolist(),
+            [[1.0, 0.0], [0.0, 1.0], [0.0, 1.0]])
+        # test fewest characters
+        #   regular case
+        self.assertEqual(
+            style.LengthRanker(
+                choose='shortest', length='characters'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict_proba(
+                [['aaa', 'a'], ['b', 'bbb'], ['c', 'ccc']]
+            ).tolist(),
+            [[0.0, 1.0], [1.0, 0.0], [1.0, 0.0]])
+        #   where character lengths disagree with word lengths
+        self.assertEqual(
+            style.LengthRanker(
+                choose='shortest', length='characters'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict_proba(
+                [['a b', 'cccc'], ['d', 'e f'], ['aaaaaa', 'b cc']]
+            ).tolist(),
+            [[1.0, 0.0], [1.0, 0.0], [0.0, 1.0]])
+        # test most characters
+        #   regular case
+        self.assertEqual(
+            style.LengthRanker(
+                choose='longest', length='characters'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict_proba(
+                [['aaa', 'a'], ['b', 'bbb'], ['c', 'ccc']]
+            ).tolist(),
+            [[1.0, 0.0], [0.0, 1.0], [0.0, 1.0]])
+        #   where character lengths disagree with word lengths
+        self.assertEqual(
+            style.LengthRanker(
+                choose='longest', length='characters'
+            ).fit(
+                [['word', 'word']], y=[0]
+            ).predict_proba(
+                [['a b', 'cccc'], ['d', 'e f'], ['aaaaaa', 'b cc']]
+            ).tolist(),
+            [[0.0, 1.0], [0.0, 1.0], [1.0, 0.0]])
+
+
 class StyleFeaturizerTestCase(unittest.TestCase):
     """Test socialnorms.baselines.style.StyleFeaturizer."""
 
@@ -310,3 +548,91 @@ class StylisticXGBoostBaselineTestCase(unittest.TestCase):
                 y_true=self.dev_easy['label'],
                 y_pred=predictions),
             1.)
+
+
+class FewestWordsBaselineTestCase(unittest.TestCase):
+    """Test socialnorms.baselines.style.FewestWordsBaseline."""
+
+    FEATURES = [['', 'aa aa'], ['aa bb', 'cc']]
+    LABELS = [0, 1]
+    PROBABILITIES = [[1.0, 0.0], [0.0, 1.0]]
+
+    def test_predicts_correctly(self):
+        baseline = style.FewestWordsBaseline
+        baseline.fit(X=self.FEATURES, y=[0 for _ in self.FEATURES])
+        predictions = baseline.predict(self.FEATURES)
+
+        self.assertEqual(predictions.tolist(), self.LABELS)
+
+    def test_predicts_probabilities(self):
+        baseline = style.FewestWordsBaseline
+        baseline.fit(X=self.FEATURES, y=[0 for _ in self.FEATURES])
+        probabilities = baseline.predict_proba(self.FEATURES)
+
+        self.assertEqual(probabilities.tolist(), self.PROBABILITIES)
+
+
+class MostWordsBaselineTestCase(unittest.TestCase):
+    """Test socialnorms.baselines.style.MostWordsBaseline."""
+
+    FEATURES = [['', 'aa aa'], ['aa bb', 'cc']]
+    LABELS = [1, 0]
+    PROBABILITIES = [[0.0, 1.0], [1.0, 0.0]]
+
+    def test_predicts_correctly(self):
+        baseline = style.MostWordsBaseline
+        baseline.fit(X=self.FEATURES, y=[0 for _ in self.FEATURES])
+        predictions = baseline.predict(self.FEATURES)
+
+        self.assertEqual(predictions.tolist(), self.LABELS)
+
+    def test_predicts_probabilities(self):
+        baseline = style.MostWordsBaseline
+        baseline.fit(X=self.FEATURES, y=[0 for _ in self.FEATURES])
+        probabilities = baseline.predict_proba(self.FEATURES)
+
+        self.assertEqual(probabilities.tolist(), self.PROBABILITIES)
+
+
+class FewestCharactersBaselineTestCase(unittest.TestCase):
+    """Test socialnorms.baselines.style.FewestCharactersBaseline."""
+
+    FEATURES = [['', 'aa aa'], ['aa bb', 'cc']]
+    LABELS = [0, 1]
+    PROBABILITIES = [[1.0, 0.0], [0.0, 1.0]]
+
+    def test_predicts_correctly(self):
+        baseline = style.FewestCharactersBaseline
+        baseline.fit(X=self.FEATURES, y=[0 for _ in self.FEATURES])
+        predictions = baseline.predict(self.FEATURES)
+
+        self.assertEqual(predictions.tolist(), self.LABELS)
+
+    def test_predicts_probabilities(self):
+        baseline = style.FewestCharactersBaseline
+        baseline.fit(X=self.FEATURES, y=[0 for _ in self.FEATURES])
+        probabilities = baseline.predict_proba(self.FEATURES)
+
+        self.assertEqual(probabilities.tolist(), self.PROBABILITIES)
+
+
+class MostCharactersBaselineTestCase(unittest.TestCase):
+    """Test socialnorms.baselines.style.MostCharactersBaseline."""
+
+    FEATURES = [['', 'aa aa'], ['aa bb', 'cc']]
+    LABELS = [1, 0]
+    PROBABILITIES = [[0.0, 1.0], [1.0, 0.0]]
+
+    def test_predicts_correctly(self):
+        baseline = style.MostCharactersBaseline
+        baseline.fit(X=self.FEATURES, y=[0 for _ in self.FEATURES])
+        predictions = baseline.predict(self.FEATURES)
+
+        self.assertEqual(predictions.tolist(), self.LABELS)
+
+    def test_predicts_probabilities(self):
+        baseline = style.MostCharactersBaseline
+        baseline.fit(X=self.FEATURES, y=[0 for _ in self.FEATURES])
+        probabilities = baseline.predict_proba(self.FEATURES)
+
+        self.assertEqual(probabilities.tolist(), self.PROBABILITIES)

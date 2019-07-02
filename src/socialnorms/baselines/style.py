@@ -6,16 +6,140 @@ from typing import Any, Iterable
 import numpy as np
 from sklearn.base import (
     BaseEstimator,
+    ClassifierMixin,
     TransformerMixin)
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, check_X_y
 import spacy
 from spacy.parts_of_speech import IDS as POS_TAGS
 from xgboost import XGBClassifier
 
+from ..utils import count_words
+
 
 # classes
+
+class LengthRanker(BaseEstimator, ClassifierMixin):
+    """Choose an answer based on its length.
+
+    Attributes
+    ----------
+    classes_ : List[int]
+        The possible classes for the ranker (fitted from the data).
+
+    See `Parameters`_ for more attributes.
+
+    Parameters
+    ----------
+    choose : str, optional (default='shortest')
+        Which answer to choose (based on length). Must either be
+        ``'shortest'`` or ``'longest'``. Defaults to ``'shortest'``.
+    length : str, optional (default='words')
+        The way in which to measure length. Must either be ``'words'``
+        or ``'characters'``. Defaults to ``'words'``.
+    """
+    def __init__(
+            self,
+            choose: str = 'shortest',
+            length: str = 'words'
+    ) -> None:
+        self.choose = choose
+        self.length = length
+
+    def fit(
+            self,
+            X: np.ndarray,
+            y: np.ndarray
+    ) -> 'LengthRanker':
+        """Fit the instance to ``X`` and ``y``.
+
+        Parameters
+        ----------
+        X : np.ndarray
+            An n x k array of strings where n is the number of instances
+            and k is the number of choices.
+        y : np.ndarray
+            A length n array of integer labels, each giving the
+            (0-based) index of the correct choice.
+
+        Returns
+        -------
+        self : object
+            The instance.
+        """
+        X, y = check_X_y(X, y)
+
+        if self.choose not in ['shortest', 'longest']:
+            raise ValueError(
+                'The choose argument must be either "shortest" or "longest".')
+
+        if self.length not in ['characters', 'words']:
+            raise ValueError(
+                'The length argument must be either "characters" or "words".')
+
+        self.classes_ = list(range(X.shape[1]))
+
+        return self
+
+    def predict(
+            self,
+            X: np.ndarray
+    ) -> np.ndarray:
+        """Predict the correct answer based on length.
+
+        Parameters
+        ----------
+        X : np.ndarray
+            An n x k array of strings where n is the number of instances
+            and k is the number of choices.
+
+        Returns
+        -------
+        np.ndarray[int]
+            The predicted labels.
+        """
+        if self.length == 'words':
+            lengths = np.array([[count_words(x) for x in xs] for xs in X])
+        elif self.length == 'characters':
+            lengths = np.array([[len(x) for x in xs] for xs in X])
+        else:
+            raise ValueError('length must either be "words" or "characters".')
+
+        if self.choose == 'longest':
+            labels = np.argmax(lengths, axis=1)
+        elif self.choose == 'shortest':
+            labels = np.argmax(-lengths, axis=1)
+        else:
+            raise ValueError('choose must be either "shortest" or "longest".')
+
+        return labels
+
+    def predict_proba(
+            self,
+            X: np.ndarray
+    ) -> np.ndarray:
+        """Predict probabilities for the answers based on length.
+
+        All probability mass is placed on the chosen answer.
+
+        Parameters
+        ----------
+        X : np.ndarray
+            An n x k array of strings where n is the number of instances
+            and k is the number of choices.
+
+        Returns
+        -------
+        np.ndarray
+            An array of arrays giving the predicted probabilities for
+            each label.
+        """
+        return np.array([
+            [1. if i == j else 0. for j in range(len(self.classes_))]
+            for i in self.predict(X=X)
+        ])
+
 
 class StyleFeaturizer(BaseEstimator, TransformerMixin):
     """Convert text to a suite a stylistic features.
@@ -165,7 +289,7 @@ class StyleFeaturizer(BaseEstimator, TransformerMixin):
         return np.array(style_features)
 
 
-# the stylistic features baseline
+# the stylistic classifier baseline
 
 StylisticXGBoostBaseline = Pipeline([
     (
@@ -213,3 +337,38 @@ STYLISTICXGBOOST_HYPER_PARAMETERS = {
     'classifier__base_score': (0., 1., 'uniform')
 }
 """The hyper-param search space for ``StylisticXGBoostBaseline``."""
+
+
+# the length-based rankers
+
+FewestWordsBaseline = Pipeline([
+    ('classifier', LengthRanker(choose='shortest', length='words'))
+])
+"""Predict the answer with the fewest words."""
+
+FEWEST_WORDS_HYPER_PARAMETERS = {}
+"""The hyper-param search space for ``FewestWordsBaseline``."""
+
+MostWordsBaseline = Pipeline([
+    ('classifier', LengthRanker(choose='longest', length='words'))
+])
+"""Predict the answer with the most words."""
+
+MOST_WORDS_HYPER_PARAMETERS = {}
+"""The hyper-param search space for ``MostWordsBaseline``."""
+
+FewestCharactersBaseline = Pipeline([
+    ('classifier', LengthRanker(choose='shortest', length='characters'))
+])
+"""Predict the answer with the fewest characters."""
+
+FEWEST_CHARACTERS_HYPER_PARAMETERS = {}
+"""The hyper-param search space for ``FewestCharactersBaseline``."""
+
+MostCharactersBaseline = Pipeline([
+    ('classifier', LengthRanker(choose='longest', length='characters'))
+])
+"""Predict the answer with the most characters."""
+
+MOST_CHARACTERS_HYPER_PARAMETERS = {}
+"""The hyper-param search space for ``MostCharactersBaseline``."""
