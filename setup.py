@@ -39,6 +39,7 @@ setup(
         'apex >= 0.1',
         'attrs >= 19.1.0',
         'autograd >= 1.2',
+        'dill >= 0.2.9',
         'ftfy >= 5.5.1',
         'networkx >= 2.3',
         'numpy >= 1.16.2',
