@@ -1,0 +1,38 @@
+{
+  "AutoApprovalDelayInSeconds": 7200,
+  "AssignmentDurationInSeconds": 600,
+  "Reward": "0.60",
+  "Title": "What Would Be Worse? (WARNING: adult content / situations)",
+  "Keywords": "artificial intelligence common sense commonsense ethics",
+  "Description": "Pick the action that would be worse for someone to do.",
+  "QualificationRequirements": [
+    {
+      "QualificationTypeId": "00000000000000000040",
+      "Comparator": "GreaterThanOrEqualTo",
+      "IntegerValues": [
+        5000
+      ],
+      "RequiredToPreview": false
+    },
+    {
+      "QualificationTypeId": "00000000000000000071",
+      "Comparator": "In",
+      "LocaleValues": [{"Country": "US"}, {"Country": "CA"}],
+      "RequiredToPreview": false
+    },
+    {
+      "QualificationTypeId": "000000000000000000L0",
+      "Comparator": "GreaterThanOrEqualTo",
+      "IntegerValues": [
+        99
+      ],
+      "RequiredToPreview": false
+    },
+    {
+      "QualificationTypeId": "00000000000000000060",
+      "Comparator": "EqualTo",
+      "IntegerValues": [1],
+      "RequiredToPreview": true
+    }
+  ]
+}
