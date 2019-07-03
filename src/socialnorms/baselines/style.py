@@ -9,6 +9,7 @@ from sklearn.base import (
     ClassifierMixin,
     TransformerMixin)
 from sklearn.compose import ColumnTransformer
+from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import check_is_fitted, check_X_y
 import spacy
@@ -16,6 +17,7 @@ from spacy.parts_of_speech import IDS as POS_TAGS
 from xgboost import XGBClassifier
 
 from ..utils import count_words
+from . import utils
 
 
 # classes
@@ -182,7 +184,11 @@ class StyleFeaturizer(BaseEstimator, TransformerMixin):
         for idx, pos_tag in enumerate(POS_TAGS.keys())
     }
 
-    def fit(self, X: Iterable[str], y: Any = None):
+    def fit(
+            self,
+            X: Iterable[str],
+            y: Any = None
+    ) -> 'StyleFeaturizer':
         """Fit the instance to ``X``.
 
         Fitting currently does nothing, but still must be called before
@@ -286,7 +292,7 @@ class StyleFeaturizer(BaseEstimator, TransformerMixin):
                 *avg_pos_tag_counts
             ])
 
-        return np.array(style_features)
+        return np.nan_to_num(np.array(style_features))
 
 
 # the stylistic classifier baseline
@@ -372,3 +378,33 @@ MostCharactersBaseline = Pipeline([
 
 MOST_CHARACTERS_HYPER_PARAMETERS = {}
 """The hyper-param search space for ``MostCharactersBaseline``."""
+
+
+# stylistic linear ranker
+
+StyleRankerBaseline = Pipeline([
+    (
+        'featurizer',
+        utils.BenchmarkTransformer(
+            transformer=StyleFeaturizer())
+    ),
+    (
+        'classifier',
+        LogisticRegression(
+            dual=False,
+            tol=1e-4,
+            fit_intercept=False,
+            intercept_scaling=1.,
+            solver='saga',
+            max_iter=100,
+            warm_start=False)
+    )
+])
+"""Rank using a linear model on style features."""
+
+STYLE_RANKER_HYPER_PARAMETERS = {
+    'classifier__penalty': ['l1', 'l2'],
+    'classifier__C': (1e-6, 1e2, 'log-uniform'),
+    'classifier__class_weight': ['balanced', None],
+}
+"""The hyper-param search space for ``StyleRankerBaseline``."""

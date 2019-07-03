@@ -3,6 +3,7 @@
 from . import (
     bert,
     labels,
+    linear,
     style)
 
 
@@ -30,6 +31,14 @@ SHALLOW_BASELINES = {
     'mostcharacters': (
         style.MostCharactersBaseline,
         style.MOST_CHARACTERS_HYPER_PARAMETERS
+    ),
+    'logisticranker': (
+        linear.LogisticRankerBaseline,
+        linear.LOGISTIC_RANKER_HYPER_PARAMETERS
+    ),
+    'stylistic': (
+        style.StyleRankerBaseline,
+        style.STYLE_RANKER_HYPER_PARAMETERS
     )
 }
 """Shallow baseline models for the socialnorms benchmark."""

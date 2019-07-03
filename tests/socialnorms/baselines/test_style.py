@@ -636,3 +636,81 @@ class MostCharactersBaselineTestCase(unittest.TestCase):
         probabilities = baseline.predict_proba(self.FEATURES)
 
         self.assertEqual(probabilities.tolist(), self.PROBABILITIES)
+
+
+class StyleRankerBaselineTestCase(unittest.TestCase):
+    """Test the style ranking baseline."""
+    # The stylistic features aren't powerful enough to solve
+    # benchmark-easy (because the style is shared across the labels)
+    # so we have to test this baseline differently from the others.
+
+    def setUp(self):
+        self.train_easy = pd.DataFrame({
+            'action0': 5 * [
+                "I'm short!",
+                'I am a longer utterance than the short ones.',
+                'Also short?!',
+                '!!',
+                'This sentence is longer than the short sentences.',
+            ],
+            'action1': 5 * [
+                'This sentence is long long long long long.',
+                'super short',
+                'The long sentences represent lower ranked actions.',
+                'A long sentence that has few punctuation marks other'
+                ' than periods.',
+                '??',
+            ],
+            'label': 5 * [0, 1, 0, 0, 1]
+        })
+        self.dev_easy = pd.DataFrame({
+            'action0': [
+                'Short and sweet.',
+                'Sentences should never in a million seasons conclude'
+                ' before a multitude of words have been spoken.',
+                '!?!'
+            ],
+            'action1': [
+                'This sentence is the kind of long sentence that gets'
+                ' ranked lower',
+                'Hm?',
+                'Another long sentence for the style ranker development set.'
+            ],
+            'label': [0, 1, 0]
+        })
+
+    @pytest.mark.slow
+    def test_it_solves_the_easy_dataset_when_untuned(self):
+        baseline = style.StyleRankerBaseline
+        baseline.fit(
+            self.train_easy[['action0', 'action1']],
+            self.train_easy['label'])
+        predictions = baseline.predict(self.dev_easy[['action0', 'action1']])
+
+        # check that the accuracy is 100%
+        self.assertEqual(
+            metrics.accuracy_score(
+                y_true=self.dev_easy['label'],
+                y_pred=predictions),
+            1.)
+
+    @pytest.mark.slow
+    def test_it_solves_the_easy_dataset_when_tuned(self):
+        baseline = BayesSearchCV(
+            style.StyleRankerBaseline,
+            style.STYLE_RANKER_HYPER_PARAMETERS,
+            n_iter=16,
+            n_points=2,
+            cv=4,
+            n_jobs=1)
+        baseline.fit(
+            self.train_easy[['action0', 'action1']],
+            self.train_easy['label'])
+        predictions = baseline.predict(self.dev_easy[['action0', 'action1']])
+
+        # check that the accuracy is 100%
+        self.assertEqual(
+            metrics.accuracy_score(
+                y_true=self.dev_easy['label'],
+                y_pred=predictions),
+            1.)
