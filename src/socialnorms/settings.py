@@ -9,7 +9,7 @@ AUTO_MODERATOR_NAME = 'AutoModerator'
 
 # dataset parameters
 
-# corpus split filenames
+# splits
 
 SPLITS = [
     {
@@ -40,11 +40,24 @@ used in the other splits should go to that split.
 # general. So, the 'size' attribute doesn't necessarily give the size of
 # the benchmark splits.
 
+# corpus settings
+
 CORPUS_FILENAME_TEMPLATE = '{split}.socialnorms-corpus.jsonl'
 """A template string for the corpus's split filenames."""
 
+# benchmark settings
+
 BENCHMARK_FILENAME_TEMPLATE = '{split}.socialnorms-benchmark.jsonl'
 """A template string for the benchmark's split filenames."""
+
+N_ANNOTATORS_FOR_GOLD_LABELS = 3
+"""The number of annotators to use for creating the gold labels."""
+
+N_ANNOTATORS_FOR_HUMAN_PERFORMANCE = 1
+"""The number of annotators to use for evaluating human performance."""
+
+N_INSTANCES_PER_HIT = 20
+"""The number of instances annotated in a single HIT."""
 
 
 # output and logging

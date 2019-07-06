@@ -16,8 +16,8 @@ import networkx as nx
 import numpy as np
 import tqdm
 
-from ... import settings, utils
-from ...data.action import Action
+from .... import settings, utils
+from ....data.action import Action
 
 
 logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
          ' a maximum matching is computed and those edges are added to'
          ' the benchmark. Then, those edges are removed from the action'
          ' graph for the next round.')
-def benchmark(
+def proposals(
         corpus_dir: str,
         benchmark_dir: str,
         splits: List[str],
@@ -61,8 +61,8 @@ def benchmark(
     Read in the socialnorms corpus from CORPUS_DIR and then for each
     split passed in the final argument:
 
-      1. Create a graph from all of the actions where if the actions have
-         normativity scores p1 and p2, then each edge has weight:
+      1. Create a graph from all of the actions where if the actions
+         have normativity scores p1 and p2, then each edge has weight:
 
              max { P(p1 - p2 > margin), P(p2 - p1 > margin) }
 
@@ -186,7 +186,8 @@ def benchmark(
             # Step 5: Write the benchmark to disk.
             benchmark_split_path = os.path.join(
                 benchmark_dir,
-                settings.BENCHMARK_FILENAME_TEMPLATE.format(split=split['name']))
+                settings.BENCHMARK_FILENAME_TEMPLATE.format(
+                    split=split['name']))
             with open(benchmark_split_path, 'a') as benchmark_split_file:
                 for match in tqdm.tqdm(matching, **settings.TQDM_KWARGS):
                     id1, id2 = graph.edges[match]['direction']
@@ -210,7 +211,7 @@ def benchmark(
                             }
                             for id_, action in shuffled_actions
                         ],
-                        'label': [
+                        'raw_label': [
                             id_ == id1
                             for id_, _ in shuffled_actions
                         ].index(True)
