@@ -28,7 +28,7 @@ COMPRESSION_LEVEL = 9
     type=click.Path(exists=True, file_okay=False, dir_okay=True))
 @click.argument(
     'models_dir',
-    type=click.Path(exists=False, file_okay=False, dir_okay=True))
+    type=click.Path(file_okay=False, dir_okay=True))
 @click.option(
     '--baseline',
     type=click.Choice(baselines.benchmark.FINE_TUNE_LM_BASELINES.keys()),
@@ -72,7 +72,7 @@ def tune_lm(
     """
     # Step 1: Manage and construct paths.
 
-    os.makedirs(models_dir)
+    os.makedirs(models_dir, exist_ok=True)
 
     best_model_hyper_parameters_path = os.path.join(
         models_dir, 'best-model-hyper-parameters.jsonl')
