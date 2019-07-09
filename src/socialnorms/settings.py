@@ -47,6 +47,9 @@ CORPUS_FILENAME_TEMPLATE = '{split}.socialnorms-corpus.jsonl'
 
 # benchmark settings
 
+PROPOSALS_FILENAME_TEMPLATE = '{split}.socialnorms-proposals.jsonl'
+"""A template string for the benchmark proposals' split filenames."""
+
 BENCHMARK_FILENAME_TEMPLATE = '{split}.socialnorms-benchmark.jsonl'
 """A template string for the benchmark's split filenames."""
 

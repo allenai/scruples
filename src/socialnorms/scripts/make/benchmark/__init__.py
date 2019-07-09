@@ -6,7 +6,6 @@ import click
 
 from . import (
     dataset,
-    prepared_data,
     proposals)
 
 
@@ -23,7 +22,6 @@ def benchmark():
 
 subcommands = [
     dataset.dataset,
-    prepared_data.prepared_data,
     proposals.proposals
 ]
 
