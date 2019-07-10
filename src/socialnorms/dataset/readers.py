@@ -230,7 +230,7 @@ class SocialnormsBenchmark:
                         'id': row['id'],
                         'action0': row['actions'][0]['description'],
                         'action1': row['actions'][1]['description'],
-                        'label': row['label']
+                        'label': row['gold_label']
                     })
             split_data = pd.DataFrame(rows)
 
@@ -323,7 +323,7 @@ class SocialnormsBenchmarkDataset(Dataset):
                     row['actions'][0]['description'],
                     row['actions'][1]['description']
                 ))
-                labels.append(row.get('label'))
+                labels.append(row.get('gold_label'))
 
         return ids, features, labels
 
