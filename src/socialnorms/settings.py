@@ -53,10 +53,10 @@ PROPOSALS_FILENAME_TEMPLATE = '{split}.socialnorms-proposals.jsonl'
 BENCHMARK_FILENAME_TEMPLATE = '{split}.socialnorms-benchmark.jsonl'
 """A template string for the benchmark's split filenames."""
 
-N_ANNOTATORS_FOR_GOLD_LABELS = 3
+N_ANNOTATORS_FOR_GOLD_LABELS = 5
 """The number of annotators to use for creating the gold labels."""
 
-N_ANNOTATORS_FOR_HUMAN_PERFORMANCE = 1
+N_ANNOTATORS_FOR_HUMAN_PERFORMANCE = 5
 """The number of annotators to use for evaluating human performance."""
 
 N_INSTANCES_PER_HIT = 20
