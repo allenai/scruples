@@ -1,4 +1,4 @@
-"""Tests for socialnorms.baselines.utils."""
+"""Tests for scruples.baselines.utils."""
 
 import unittest
 from unittest.mock import Mock
@@ -6,7 +6,7 @@ from unittest.mock import Mock
 import numpy as np
 import pandas as pd
 
-from socialnorms.baselines import utils
+from scruples.baselines import utils
 
 
 class ConcatTitleAndTextTestCase(unittest.TestCase):

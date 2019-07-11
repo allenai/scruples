@@ -1,4 +1,4 @@
-"""Tests for socialnorms.dataset.transforms."""
+"""Tests for scruples.dataset.transforms."""
 
 import unittest
 from unittest.mock import Mock
@@ -6,11 +6,11 @@ from unittest.mock import Mock
 import pytest
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 
-from socialnorms.dataset import transforms
+from scruples.dataset import transforms
 
 
 class BertTransformTestCase(unittest.TestCase):
-    """Test socialnorms.dataset.transforms.BertTransform."""
+    """Test scruples.dataset.transforms.BertTransform."""
 
     @pytest.mark.slow
     def test_it_transforms_text_correctly(self):
@@ -300,7 +300,7 @@ class BertTransformTestCase(unittest.TestCase):
 
 
 class ComposeTestCase(unittest.TestCase):
-    """Test socialnorms.dataset.transforms.Compose."""
+    """Test scruples.dataset.transforms.Compose."""
 
     def test_empty_list_is_identity(self):
         transform = transforms.Compose([])
@@ -336,7 +336,7 @@ class ComposeTestCase(unittest.TestCase):
 
 
 class MapTestCase(unittest.TestCase):
-    """Test socialnorms.dataset.transforms.Map."""
+    """Test scruples.dataset.transforms.Map."""
 
     def test_mapping_the_empty_list(self):
         transform = transforms.Map(lambda x: x**2)

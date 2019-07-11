@@ -1,8 +1,8 @@
-"""Tests for socialnorms.baselines.linear."""
+"""Tests for scruples.baselines.linear."""
 
 import unittest
 
-from socialnorms.baselines import linear
+from scruples.baselines import linear
 from .utils import BaselineTestMixin
 
 

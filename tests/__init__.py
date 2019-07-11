@@ -1,1 +1,1 @@
-"""Tests for the socialnorms repository."""
+"""Tests for the scruples repository."""

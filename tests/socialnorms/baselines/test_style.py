@@ -1,4 +1,4 @@
-"""Tests for socialnorms.baselines.style."""
+"""Tests for scruples.baselines.style."""
 
 import unittest
 
@@ -7,11 +7,11 @@ import pytest
 from sklearn  import metrics
 from skopt import BayesSearchCV
 
-from socialnorms.baselines import style
+from scruples.baselines import style
 
 
 class LengthRankerTestCase(unittest.TestCase):
-    """Test socialnorms.baselines.style.LengthRanker."""
+    """Test scruples.baselines.style.LengthRanker."""
 
     def test_fit(self):
         classifier = style.LengthRanker()
@@ -249,7 +249,7 @@ class LengthRankerTestCase(unittest.TestCase):
 
 
 class StyleFeaturizerTestCase(unittest.TestCase):
-    """Test socialnorms.baselines.style.StyleFeaturizer."""
+    """Test scruples.baselines.style.StyleFeaturizer."""
 
     DOCS_AND_FEATURES = {
         'empty_string': (
@@ -551,7 +551,7 @@ class StylisticXGBoostBaselineTestCase(unittest.TestCase):
 
 
 class FewestWordsBaselineTestCase(unittest.TestCase):
-    """Test socialnorms.baselines.style.FewestWordsBaseline."""
+    """Test scruples.baselines.style.FewestWordsBaseline."""
 
     FEATURES = [['', 'aa aa'], ['aa bb', 'cc']]
     LABELS = [0, 1]
@@ -573,7 +573,7 @@ class FewestWordsBaselineTestCase(unittest.TestCase):
 
 
 class MostWordsBaselineTestCase(unittest.TestCase):
-    """Test socialnorms.baselines.style.MostWordsBaseline."""
+    """Test scruples.baselines.style.MostWordsBaseline."""
 
     FEATURES = [['', 'aa aa'], ['aa bb', 'cc']]
     LABELS = [1, 0]
@@ -595,7 +595,7 @@ class MostWordsBaselineTestCase(unittest.TestCase):
 
 
 class FewestCharactersBaselineTestCase(unittest.TestCase):
-    """Test socialnorms.baselines.style.FewestCharactersBaseline."""
+    """Test scruples.baselines.style.FewestCharactersBaseline."""
 
     FEATURES = [['', 'aa aa'], ['aa bb', 'cc']]
     LABELS = [0, 1]
@@ -617,7 +617,7 @@ class FewestCharactersBaselineTestCase(unittest.TestCase):
 
 
 class MostCharactersBaselineTestCase(unittest.TestCase):
-    """Test socialnorms.baselines.style.MostCharactersBaseline."""
+    """Test scruples.baselines.style.MostCharactersBaseline."""
 
     FEATURES = [['', 'aa aa'], ['aa bb', 'cc']]
     LABELS = [1, 0]

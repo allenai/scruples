@@ -1,13 +1,13 @@
-"""Tests for socialnorms.extraction.normalizers."""
+"""Tests for scruples.extraction.normalizers."""
 
 import unittest
 from unittest import mock
 
-from socialnorms.extraction import normalizers
+from scruples.extraction import normalizers
 
 
 class ComposedNormalizerTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.normalizers.ComposedNormalizer."""
+    """Test scruples.extraction.normalizers.ComposedNormalizer."""
 
     def test_requires_normalizers_argument(self):
         with self.assertRaises(TypeError):
@@ -37,11 +37,11 @@ class ComposedNormalizerTestCase(unittest.TestCase):
 
 
 class FixTextNormalizerTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.normalizers.FixTextNormalizer."""
+    """Test scruples.extraction.normalizers.FixTextNormalizer."""
 
     def test_calls_fix_text(self):
         with mock.patch(
-                'socialnorms.extraction.normalizers.ftfy.fix_text',
+                'scruples.extraction.normalizers.ftfy.fix_text',
                 return_value='mocked'
         ):
             self.assertEqual(
@@ -50,7 +50,7 @@ class FixTextNormalizerTestCase(unittest.TestCase):
 
 
 class GonnaGottaWannaNormalizerTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.normalizers.GonnaGottaWannaNormalizer."""
+    """Test scruples.extraction.normalizers.GonnaGottaWannaNormalizer."""
 
     def test_leaves_normal_text_alone(self):
         f = normalizers.GonnaGottaWannaNormalizer()
@@ -120,7 +120,7 @@ class GonnaGottaWannaNormalizerTestCase(unittest.TestCase):
 
 
 class RemoveAgeGenderMarkersNormalizerTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.normalizers.RemoveAgeGenderMarkersNormalizer."""
+    """Test scruples.extraction.normalizers.RemoveAgeGenderMarkersNormalizer."""
 
     def test_leaves_normal_text_alone(self):
         f = normalizers.RemoveAgeGenderMarkersNormalizer()
@@ -212,7 +212,7 @@ class RemoveAgeGenderMarkersNormalizerTestCase(unittest.TestCase):
 
 
 class StripWhitespaceAndPunctuationNormalizerTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.normalizers.StripWhitespaceAndPunctuationNormalizer."""
+    """Test scruples.extraction.normalizers.StripWhitespaceAndPunctuationNormalizer."""
 
     def test_leaves_normal_text_alone(self):
         f = normalizers.StripWhitespaceAndPunctuationNormalizer()
@@ -333,7 +333,7 @@ class StripWhitespaceAndPunctuationNormalizerTestCase(unittest.TestCase):
 
 
 class StripMatchedPunctuationNormalizerTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.normalizers.StripMatchedPunctuationNormalizer."""
+    """Test scruples.extraction.normalizers.StripMatchedPunctuationNormalizer."""
 
     def test_leaves_normal_text_alone(self):
         f = normalizers.StripMatchedPunctuationNormalizer()
@@ -434,7 +434,7 @@ class StripMatchedPunctuationNormalizerTestCase(unittest.TestCase):
 
 
 class StripLeadingAndTrailingParentheticalsNormalizerTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.normalizers.StripLeadingAndTrailingParentheticalsNormalizer."""
+    """Test scruples.extraction.normalizers.StripLeadingAndTrailingParentheticalsNormalizer."""
 
     def test_leaves_normal_text_alone(self):
         f = normalizers.StripLeadingAndTrailingParentheticalsNormalizer()
@@ -529,7 +529,7 @@ class StripLeadingAndTrailingParentheticalsNormalizerTestCase(unittest.TestCase)
 
 
 class RemovePostTypeNormalizerTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.normalizers.RemovePostTypeNormalizer."""
+    """Test scruples.extraction.normalizers.RemovePostTypeNormalizer."""
 
     def test_leaves_normal_text_alone(self):
         f = normalizers.RemovePostTypeNormalizer()
@@ -571,7 +571,7 @@ class RemovePostTypeNormalizerTestCase(unittest.TestCase):
 
 
 class RemoveExpandedPostTypeNormalizerTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.normalizers.RemoveExpandedPostTypeNormalizer."""
+    """Test scruples.extraction.normalizers.RemoveExpandedPostTypeNormalizer."""
 
     def test_leaves_normal_text_alone(self):
         f = normalizers.RemoveExpandedPostTypeNormalizer()
@@ -696,7 +696,7 @@ class RemoveExpandedPostTypeNormalizerTestCase(unittest.TestCase):
 
 
 class WhitespaceNormalizerTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.normalizers.WhitespaceNormalizer."""
+    """Test scruples.extraction.normalizers.WhitespaceNormalizer."""
 
     def test_leaves_normal_text_alone(self):
         f = normalizers.WhitespaceNormalizer()
@@ -785,7 +785,7 @@ class WhitespaceNormalizerTestCase(unittest.TestCase):
 
 
 class CapitalizationNormalizerTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.normalizers.CapitalizationNormalizer."""
+    """Test scruples.extraction.normalizers.CapitalizationNormalizer."""
 
     def test_leaves_normal_text_alone(self):
         f = normalizers.CapitalizationNormalizer()

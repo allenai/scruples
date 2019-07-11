@@ -1,16 +1,16 @@
-"""Tests for socialnorms.data.comment."""
+"""Tests for scruples.data.comment."""
 
 import json
 import pkg_resources
 import unittest
 
-from socialnorms.data import comment
-from socialnorms.data import labels
+from scruples.data import comment
+from scruples.data import labels
 from ... import settings
 
 
 class CommentTestCase(unittest.TestCase):
-    """Test socialnorms.data.comment.Comment."""
+    """Test scruples.data.comment.Comment."""
 
     def setUp(self):
         with pkg_resources.resource_stream(
@@ -178,7 +178,7 @@ class CommentTestCase(unittest.TestCase):
         # patch test_comment with True for is_spam. We'll patch where
         # the cached_property decorator will look for the cached value,
         # since the attribute itself is read-only. See
-        # socialnorms.data.utils.cached_property for how the cached
+        # scruples.data.utils.cached_property for how the cached
         # properties work.
         object.__setattr__(test_comment, '_is_spam', True)
         self.assertEqual(test_comment.is_good, False)

@@ -1,4 +1,4 @@
-"""Tests for socialnorms.utils."""
+"""Tests for scruples.utils."""
 
 import logging
 import math
@@ -10,11 +10,11 @@ import numpy as np
 import pytest
 from scipy import stats
 
-from socialnorms import utils
+from scruples import utils
 
 
 class ConfigureLoggingTestCase(unittest.TestCase):
-    """Test socialnorms.utils.configure_logging."""
+    """Test scruples.utils.configure_logging."""
 
     def test_attaches_log_handler(self):
         n_handlers_before = len(logging.root.handlers)
@@ -51,7 +51,7 @@ class ConfigureLoggingTestCase(unittest.TestCase):
 
 
 class CountWordsTestCase(unittest.TestCase):
-    """Test socialnorms.utils.count_words."""
+    """Test scruples.utils.count_words."""
 
     def test_the_empty_string(self):
         self.assertEqual(utils.count_words(''), 0)
@@ -102,7 +102,7 @@ class CountWordsTestCase(unittest.TestCase):
 
 
 class XentropyTestCase(unittest.TestCase):
-    """Test socialnorms.utils.xentropy."""
+    """Test scruples.utils.xentropy."""
 
     UNIFORM_1 = [1.]
     UNIFORM_2 = [0.5, 0.5]
@@ -200,7 +200,7 @@ class XentropyTestCase(unittest.TestCase):
 
 
 class MakeIdTestCase(unittest.TestCase):
-    """Test socialnorms.utils.make_id."""
+    """Test scruples.utils.make_id."""
 
     def test_ids_are_uniq_with_high_probability(self):
         N_SAMPLES = 100000
@@ -216,7 +216,7 @@ class MakeIdTestCase(unittest.TestCase):
 
 
 class MakeConfusionMatrixStrTestCase(unittest.TestCase):
-    """Test socialnorms.utils.make_confusion_matrix_str."""
+    """Test scruples.utils.make_confusion_matrix_str."""
 
     def test_without_labels_argument(self):
         # test off diagonal entries are correct
@@ -326,7 +326,7 @@ class MakeConfusionMatrixStrTestCase(unittest.TestCase):
 
 
 class MakeLabelDistributionStrTestCase(unittest.TestCase):
-    """Test socialnorms.utils.make_label_distribution_str."""
+    """Test scruples.utils.make_label_distribution_str."""
 
     def test_without_labels_argument(self):
         # test only one label
@@ -378,7 +378,7 @@ class MakeLabelDistributionStrTestCase(unittest.TestCase):
 
 
 class NextUniquePathTestCase(unittest.TestCase):
-    """Test socialnorms.utils.next_unique_path."""
+    """Test scruples.utils.next_unique_path."""
 
     def test_when_path_is_already_unique(self):
         with tempfile.TemporaryDirectory() as temp_dir:

@@ -1,4 +1,4 @@
-"""Scripts for socialnorms."""
+"""Scripts for scruples."""
 
 import logging
 
@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
     '--verbose',
     is_flag=True,
     help='Set the log level to DEBUG.')
-def socialnorms(verbose: bool) -> None:
-    """The command line interface for socialnorms."""
+def scruples(verbose: bool) -> None:
+    """The command line interface for scruples."""
     utils.configure_logging(verbose=verbose)
 
 
@@ -35,4 +35,4 @@ subcommands = [
 ]
 
 for subcommand in subcommands:
-    socialnorms.add_command(subcommand)
+    scruples.add_command(subcommand)

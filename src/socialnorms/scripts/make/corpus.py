@@ -1,7 +1,7 @@
-"""Make the socialnorms corpus from raw reddit data.
+"""Make the scruples corpus from raw reddit data.
 
 This script takes in posts and comments from the reddit API and creates
-the socialnorms dataset.
+the scruples dataset.
 """
 
 import collections
@@ -40,10 +40,10 @@ def corpus(
         posts_path: str,
         corpus_dir: str
 ) -> None:
-    """Create the socialnorms corpus and write it to CORPUS_DIR.
+    """Create the scruples corpus and write it to CORPUS_DIR.
 
     Read in the reddit posts from POSTS_PATH and comments from
-    COMMENTS_PATH, create the socialnorms corpus, and write it to
+    COMMENTS_PATH, create the scruples corpus, and write it to
     CORPUS_DIR.
     """
     # Create the output directory.

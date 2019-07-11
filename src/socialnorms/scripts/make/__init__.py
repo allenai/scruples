@@ -1,4 +1,4 @@
-"""Scripts for making the different components of socialnorms."""
+"""Scripts for making the different components of scruples."""
 
 import logging
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 @click.group()
 def make():
-    """Make different components of socialnorms."""
+    """Make different components of scruples."""
     pass
 
 

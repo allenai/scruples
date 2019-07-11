@@ -1,12 +1,12 @@
-"""Tests for socialnorms.data.labels."""
+"""Tests for scruples.data.labels."""
 
 import unittest
 
-from socialnorms.data import labels
+from scruples.data import labels
 
 
 class LabelTestCase(unittest.TestCase):
-    """Test socialnorms.data.labels.Label."""
+    """Test scruples.data.labels.Label."""
 
     LABEL_TO_PHRASES = {
         labels.Label.AUTHOR: [

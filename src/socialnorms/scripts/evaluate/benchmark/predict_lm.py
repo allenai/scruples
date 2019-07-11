@@ -14,7 +14,7 @@ import tqdm
 
 from .... import settings, baselines
 from ....baselines.metrics import METRICS
-from ....dataset.readers import SocialnormsBenchmarkDataset
+from ....dataset.readers import ScruplesBenchmarkDataset
 
 
 logger = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
     'results_dir',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
 @click.argument(
-    'splits', type=click.Choice(SocialnormsBenchmarkDataset.SPLITS), nargs=-1)
+    'splits', type=click.Choice(ScruplesBenchmarkDataset.SPLITS), nargs=-1)
 @click.option(
     '--predict-batch-size', type=int, default=64,
     help='The batch size for prediction.')
@@ -122,7 +122,7 @@ def predict_lm(
 
         logger.info(f'Loading the dataset from {data_dir}.')
 
-        dataset = SocialnormsBenchmarkDataset(
+        dataset = ScruplesBenchmarkDataset(
             data_dir=data_dir,
             split=split,
             transform=featurize)

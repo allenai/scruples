@@ -1,4 +1,4 @@
-"""Run shallow baseline models on the socialnorms corpus."""
+"""Run shallow baseline models on the scruples corpus."""
 
 import collections
 import json
@@ -14,7 +14,7 @@ import tqdm
 
 from .... import settings, baselines
 from ....baselines.metrics import METRICS
-from ....dataset.readers import SocialnormsCorpus
+from ....dataset.readers import ScruplesCorpus
 
 
 logger = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
     'results_dir',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
 @click.argument(
-    'splits', type=click.Choice(SocialnormsCorpus.SPLITS), nargs=-1)
+    'splits', type=click.Choice(ScruplesCorpus.SPLITS), nargs=-1)
 @click.option(
     '--metric',
     type=click.Choice(METRICS.keys()),
@@ -64,9 +64,9 @@ def run_shallow(
         n_folds: int,
         n_jobs: int
 ) -> None:
-    """Evaluate shallow baselines on the socialnorms corpus.
+    """Evaluate shallow baselines on the scruples corpus.
 
-    Train shallow baseline models on the socialnorms corpus, reading the
+    Train shallow baseline models on the scruples corpus, reading the
     dataset from DATA_DIR, and writing trained models, logs, and other
     results to RESULTS_DIR. Performance is reported for each split
     provided as an argument.
@@ -94,7 +94,7 @@ def run_shallow(
 
     logger.info(f'Loading data from {data_dir}.')
 
-    dataset = SocialnormsCorpus(data_dir=data_dir)
+    dataset = ScruplesCorpus(data_dir=data_dir)
 
     # Step 3: Run the baselines.
 

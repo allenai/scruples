@@ -1,7 +1,7 @@
-"""Create candidate instances for the socialnorms benchmark.
+"""Create candidate instances for the scruples benchmark.
 
-This script takes in the socialnorms corpus and creates candidate
-instances for the socialnorms benchmark of ranked action pairs. The
+This script takes in the scruples corpus and creates candidate
+instances for the scruples benchmark of ranked action pairs. The
 proposals then must be annotated using Mechanical Turk.
 """
 
@@ -41,7 +41,7 @@ def proposals(
 ) -> None:
     """Propose and write instances for the benchmark to PROPOSALS_DIR.
 
-    Read in the socialnorms corpus from CORPUS_DIR and then for each
+    Read in the scruples corpus from CORPUS_DIR and then for each
     split in the corpus, randomly pair actions together and write them
     to PROPOSALS_DIR in a format ready for being annotated on Mechanical
     Turk.

@@ -1,12 +1,12 @@
-"""Tests for socialnorms.data.post_types."""
+"""Tests for scruples.data.post_types."""
 
 import unittest
 
-from socialnorms.data import post_types
+from scruples.data import post_types
 
 
 class PostTypeTestCase(unittest.TestCase):
-    """Test socialnorms.data.post_types.PostType."""
+    """Test scruples.data.post_types.PostType."""
 
     POST_TYPE_TO_PHRASES = {
         post_types.PostType.HISTORICAL: [

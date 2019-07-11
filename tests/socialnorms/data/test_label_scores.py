@@ -1,13 +1,13 @@
-"""Tests for socialnorms.data.label_scores."""
+"""Tests for scruples.data.label_scores."""
 
 import unittest
 
-from socialnorms.data import label_scores
-from socialnorms.data import labels
+from scruples.data import label_scores
+from scruples.data import labels
 
 
 class LabelScoresTestCase(unittest.TestCase):
-    """Test socialnorms.data.label_scores.LabelScores."""
+    """Test scruples.data.label_scores.LabelScores."""
 
     def test_best_label(self):
         # test that the best label is the one with the highest score

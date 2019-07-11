@@ -1,1 +1,1 @@
-"""Tests for the ``socialnorms`` package."""
+"""Tests for the ``scruples`` package."""

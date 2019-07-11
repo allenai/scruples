@@ -1,4 +1,4 @@
-"""Analyze predictions on socialnorms."""
+"""Analyze predictions on scruples."""
 
 import json
 import logging
@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 # constants
 
 REPORT_TEMPLATE =\
-"""Social Norms Classification Performance Report
-==============================================
-Analysis of classification performance on socialnorms.
+"""Scruples Classification Performance Report
+=============================================
+Analysis of classification performance on scruples.
 
 
 Main Metrics

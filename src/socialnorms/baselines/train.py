@@ -1,4 +1,4 @@
-"""Fine-tune pre-trained LMs on the socialnorms datasets."""
+"""Fine-tune pre-trained LMs on the scruples datasets."""
 
 import json
 import logging
@@ -26,8 +26,8 @@ from . import benchmark, corpus
 from .. import settings
 from ..data.labels import Label
 from ..dataset.readers import (
-    SocialnormsBenchmarkDataset,
-    SocialnormsCorpusDataset)
+    ScruplesBenchmarkDataset,
+    ScruplesCorpusDataset)
 
 
 def train_lm(
@@ -42,7 +42,7 @@ def train_lm(
         gpu_ids: Optional[List[int]],
         logger: logging.Logger = None
 ) -> None:
-    """Fine-tune a pre-trained LM baseline on a socialnorms dataset.
+    """Fine-tune a pre-trained LM baseline on a scruples dataset.
 
     Fine-tune ``baseline`` on ``dataset``, writing all results and
     artifacts to ``model_dir``. Return the best accuracy achieved on dev
@@ -59,7 +59,7 @@ def train_lm(
         "benchmark" or "corpus".
     baseline : str
         The pre-trained LM to fine-tune. Should be one of the keys for
-        ``socialnorms.baselines.$dataset.FINE_TUNE_LM_BASELINES`` where
+        ``scruples.baselines.$dataset.FINE_TUNE_LM_BASELINES`` where
         ``$dataset`` corresponds to the ``dataset`` argument to this
         function.
     hyper_params : Dict[str, Any]
@@ -177,10 +177,10 @@ def train_lm(
 
     featurize = make_transform(**baseline_config['transform'])
     if dataset == 'benchmark':
-        Dataset = SocialnormsBenchmarkDataset
+        Dataset = ScruplesBenchmarkDataset
         labelize = None
     elif dataset == 'corpus':
-        Dataset = SocialnormsCorpusDataset
+        Dataset = ScruplesCorpusDataset
         labelize = lambda s: getattr(Label, s).index
     else:
         raise ValueError(

@@ -1,4 +1,4 @@
-"""Dataset readers for socialnorms."""
+"""Dataset readers for scruples."""
 
 import json
 import os
@@ -17,8 +17,8 @@ from .. import settings
 
 # main classes
 
-class SocialnormsCorpus:
-    """A class for reading the socialnorms corpus for sklearn.
+class ScruplesCorpus:
+    """A class for reading the scruples corpus for sklearn.
 
     Attributes
     ----------
@@ -76,8 +76,8 @@ class SocialnormsCorpus:
             setattr(self, split, ids_features_and_labels)
 
 
-class SocialnormsCorpusDataset(Dataset):
-    """A PyTorch ``Dataset`` class for the socialnorms corpus.
+class ScruplesCorpusDataset(Dataset):
+    """A PyTorch ``Dataset`` class for the scruples corpus.
 
     Iterating through this dataset returns ``(id, feature, label)``
     triples.
@@ -90,7 +90,7 @@ class SocialnormsCorpusDataset(Dataset):
     Parameters
     ----------
     data_dir : str, required
-        The directory containing the socialnorms corpus.
+        The directory containing the scruples corpus.
     split : str, required
         The split to read into the class. Must be one of ``"train"``,
         ``"dev"``, or ``"test"``.
@@ -174,8 +174,8 @@ class SocialnormsCorpusDataset(Dataset):
         return id_, feature, label
 
 
-class SocialnormsBenchmark:
-    """A class for reading the socialnorms benchmark for sklearn.
+class ScruplesBenchmark:
+    """A class for reading the scruples benchmark for sklearn.
 
     Attributes
     ----------
@@ -243,8 +243,8 @@ class SocialnormsBenchmark:
             setattr(self, split, ids_features_and_labels)
 
 
-class SocialnormsBenchmarkDataset(Dataset):
-    """A PyTorch ``Dataset`` class for the socialnorms benchmark.
+class ScruplesBenchmarkDataset(Dataset):
+    """A PyTorch ``Dataset`` class for the scruples benchmark.
 
     Iterating through this dataset returns ``(id, feature, label)``
     triples.
@@ -257,7 +257,7 @@ class SocialnormsBenchmarkDataset(Dataset):
     Parameters
     ----------
     data_dir : str, required
-        The directory containing the socialnorms benchmark.
+        The directory containing the scruples benchmark.
     split : str, required
         The split to read into the class. Must be one of ``"train"``,
         ``"dev"``, or ``"test"``.

@@ -1,1 +1,1 @@
-"""Tests for ``socialnorms.data``."""
+"""Tests for ``scruples.data``."""

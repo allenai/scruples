@@ -8,8 +8,8 @@ import pytest
 from sklearn import metrics
 from skopt import BayesSearchCV
 
-from socialnorms import settings as socialnorms_settings
-from socialnorms.dataset import readers
+from scruples import settings as scruples_settings
+from scruples.dataset import readers
 from ... import settings, utils
 
 
@@ -79,15 +79,15 @@ class BaselineTestMixin:
         # copy the dataset fixture from the package to disk
 
         if self.DATASET == 'benchmark':
-            Reader = readers.SocialnormsBenchmark
+            Reader = readers.ScruplesBenchmark
             fixture_path = settings.BENCHMARK_EASY_DIR
             split_filename_template =\
-                socialnorms_settings.BENCHMARK_FILENAME_TEMPLATE
+                scruples_settings.BENCHMARK_FILENAME_TEMPLATE
         elif self.DATASET == 'corpus':
-            Reader = readers.SocialnormsCorpus
+            Reader = readers.ScruplesCorpus
             fixture_path = settings.CORPUS_EASY_DIR
             split_filename_template =\
-                socialnorms_settings.CORPUS_FILENAME_TEMPLATE
+                scruples_settings.CORPUS_FILENAME_TEMPLATE
 
         self.temp_dir = tempfile.TemporaryDirectory()
 
@@ -106,7 +106,7 @@ class BaselineTestMixin:
         self.temp_dir.cleanup()
 
     @pytest.mark.slow
-    def test_it_solves_socialnorms_easy_when_untuned(self):
+    def test_it_solves_scruples_easy_when_untuned(self):
         baseline = self.BASELINE_MODEL
 
         # train the model
@@ -125,7 +125,7 @@ class BaselineTestMixin:
             1.)
 
     @pytest.mark.slow
-    def test_it_solves_socialnorms_easy_when_tuned(self):
+    def test_it_solves_scruples_easy_when_tuned(self):
         baseline = BayesSearchCV(
             self.BASELINE_MODEL,
             self.BASELINE_HYPER_PARAMETERS,

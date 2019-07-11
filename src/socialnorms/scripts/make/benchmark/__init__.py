@@ -1,4 +1,4 @@
-"""Scripts for making the socialnorms benchmark."""
+"""Scripts for making the scruples benchmark."""
 
 import logging
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 @click.group()
 def benchmark():
-    """Make different components of the socialnorms benchmark."""
+    """Make different components of the scruples benchmark."""
     pass
 
 

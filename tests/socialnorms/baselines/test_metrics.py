@@ -1,1 +1,1 @@
-"""Tests for socialnorms.baselines.metrics."""
+"""Tests for scruples.baselines.metrics."""

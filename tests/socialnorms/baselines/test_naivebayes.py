@@ -1,8 +1,8 @@
-"""Tests for socialnorms.baselines.naivebayes."""
+"""Tests for scruples.baselines.naivebayes."""
 
 import unittest
 
-from socialnorms.baselines import naivebayes
+from scruples.baselines import naivebayes
 from .utils import BaselineTestMixin
 
 

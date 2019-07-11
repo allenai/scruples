@@ -1,4 +1,4 @@
-"""Scripts for evaluating models on socialnorms."""
+"""Scripts for evaluating models on scruples."""
 
 import logging
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 @click.group()
 def evaluate():
-    """Evaluate models on socialnorms."""
+    """Evaluate models on scruples."""
     pass
 
 

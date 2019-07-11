@@ -26,9 +26,9 @@ logger = logging.getLogger(__name__)
 # constants
 
 REPORT_TEMPLATE =\
-"""Social Norms Extraction Performance Report
-==========================================
-Evaluation of extraction performance for socialnorms.
+"""Scruples Extraction Performance Report
+=========================================
+Evaluation of extraction performance for scruples.
 
 The annotations are taken as the ground truth, while the extracted
 labels are taken as predictions.

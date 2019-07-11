@@ -33,7 +33,7 @@ used in the other splits should go to that split.
 # N.B. This variable is the single-source-of-truth for the splits, their
 # names and their sizes (in terms of the number of posts used to create
 # them). If this variable is modified, make sure to update the doc
-# strings for ``SocialnormsCorpus``, ``SocialnormsCorpusDataset``.
+# strings for ``ScruplesCorpus``, ``ScruplesCorpusDataset``.
 #
 # Note that the benchmark splits will have a different number of
 # instances than the number of posts used to create them, in
@@ -42,15 +42,15 @@ used in the other splits should go to that split.
 
 # corpus settings
 
-CORPUS_FILENAME_TEMPLATE = '{split}.socialnorms-corpus.jsonl'
+CORPUS_FILENAME_TEMPLATE = '{split}.scruples-corpus.jsonl'
 """A template string for the corpus's split filenames."""
 
 # benchmark settings
 
-PROPOSALS_FILENAME_TEMPLATE = '{split}.socialnorms-proposals.jsonl'
+PROPOSALS_FILENAME_TEMPLATE = '{split}.scruples-proposals.jsonl'
 """A template string for the benchmark proposals' split filenames."""
 
-BENCHMARK_FILENAME_TEMPLATE = '{split}.socialnorms-benchmark.jsonl'
+BENCHMARK_FILENAME_TEMPLATE = '{split}.scruples-benchmark.jsonl'
 """A template string for the benchmark's split filenames."""
 
 N_ANNOTATORS_FOR_GOLD_LABELS = 5

@@ -1,1 +1,1 @@
-"""Tests for ``socialnorms.extraction``."""
+"""Tests for ``scruples.extraction``."""

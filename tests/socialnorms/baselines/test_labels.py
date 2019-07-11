@@ -1,14 +1,14 @@
-"""Tests for socialnorms.baselines.labels."""
+"""Tests for scruples.baselines.labels."""
 
 import unittest
 
 import numpy as np
 
-from socialnorms.baselines import labels
+from scruples.baselines import labels
 
 
 class PriorBaselineTestCase(unittest.TestCase):
-    """Test socialnorms.baselines.labels.PriorBaseline."""
+    """Test scruples.baselines.labels.PriorBaseline."""
 
     FEATURES = [
         [0, 1],
@@ -39,7 +39,7 @@ class PriorBaselineTestCase(unittest.TestCase):
 
 
 class StratifiedBaselineTestCase(unittest.TestCase):
-    """Test socialnorms.baselines.labels.StratifiedBaseline."""
+    """Test scruples.baselines.labels.StratifiedBaseline."""
 
     FEATURES = [
         [0, 1],

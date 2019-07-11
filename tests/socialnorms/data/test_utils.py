@@ -1,10 +1,10 @@
-"""Tests for socialnorms.data.utils."""
+"""Tests for scruples.data.utils."""
 
 import unittest
 
 import attr
 
-from socialnorms.data import utils
+from scruples.data import utils
 
 
 class InstantiateAttrsWithExtraKwargsTestCase(unittest.TestCase):

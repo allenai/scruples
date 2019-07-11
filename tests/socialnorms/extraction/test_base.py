@@ -1,12 +1,12 @@
-"""Tests for socialnorms.extraction.base."""
+"""Tests for scruples.extraction.base."""
 
 import unittest
 
-from socialnorms.extraction import base
+from scruples.extraction import base
 
 
 class LoggedCallableTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.base.LoggedCallable."""
+    """Test scruples.extraction.base.LoggedCallable."""
 
     # classes for testing LoggedCallable
 
@@ -143,7 +143,7 @@ class LoggedCallableTestCase(unittest.TestCase):
 
 
 class CaseTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.base.Case."""
+    """Test scruples.extraction.base.Case."""
 
     class SomeToNoneCase(base.Case):
         def match(self, x):

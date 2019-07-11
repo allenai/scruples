@@ -1,12 +1,12 @@
-"""Tests for socialnorms.extraction.transformers."""
+"""Tests for scruples.extraction.transformers."""
 
 import unittest
 
-from socialnorms.extraction import transformers
+from scruples.extraction import transformers
 
 
 class GerundifyingTransformerTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.transformers.GerundifyingTransformer."""
+    """Test scruples.extraction.transformers.GerundifyingTransformer."""
 
     def test_leaves_gerund_phrases_alone(self):
         f = transformers.GerundifyingTransformer()

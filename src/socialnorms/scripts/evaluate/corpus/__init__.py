@@ -1,4 +1,4 @@
-"""Scripts for evaluating models on the socialnorms corpus."""
+"""Scripts for evaluating models on the scruples corpus."""
 
 import logging
 
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 @click.group()
 def corpus():
-    """Evaluate baseline models on the socialnorms corpus."""
+    """Evaluate baseline models on the scruples corpus."""
     pass
 
 

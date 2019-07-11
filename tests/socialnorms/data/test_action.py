@@ -1,4 +1,4 @@
-"""Tests for socialnorms.data.action."""
+"""Tests for scruples.data.action."""
 
 import json
 import math
@@ -7,12 +7,12 @@ import unittest
 
 import pytest
 
-from socialnorms.data import action
+from scruples.data import action
 from ... import settings
 
 
 class GerundPhraseCaseTestCase(unittest.TestCase):
-    """Test socialnorms.data.action.GerundPhraseCase."""
+    """Test scruples.data.action.GerundPhraseCase."""
 
     def test_handles_gerund_phrases_correctly(self):
         # gerund phrase
@@ -73,7 +73,7 @@ class GerundPhraseCaseTestCase(unittest.TestCase):
 
 
 class PrepositionalPhraseCaseTestCase(unittest.TestCase):
-    """Test socialnorms.data.action.PrepositionalPhraseCase."""
+    """Test scruples.data.action.PrepositionalPhraseCase."""
 
     def test_handles_prepositional_phrases_correctly(self):
         self.assertEqual(
@@ -99,7 +99,7 @@ class PrepositionalPhraseCaseTestCase(unittest.TestCase):
 
 
 class IPhraseCaseTestCase(unittest.TestCase):
-    """Test socialnorms.data.action.IPhraseCase."""
+    """Test scruples.data.action.IPhraseCase."""
 
     def test_handles_I_phrases_correctly(self):
         self.assertEqual(
@@ -128,7 +128,7 @@ class IPhraseCaseTestCase(unittest.TestCase):
 
 
 class InfinitivePhraseCase(unittest.TestCase):
-    """Test socialnorms.InfinitivePhraseCase."""
+    """Test scruples.InfinitivePhraseCase."""
 
     def test_handles_infinitives_correctly(self):
         self.assertEqual(
@@ -151,7 +151,7 @@ class InfinitivePhraseCase(unittest.TestCase):
 
 
 class ActionTestCase(unittest.TestCase):
-    """Test socialnorms.data.action.Action."""
+    """Test scruples.data.action.Action."""
 
     # test computed properties
 

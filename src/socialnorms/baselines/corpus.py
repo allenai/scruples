@@ -1,4 +1,4 @@
-"""Baseline configuration for the socialnorms corpus."""
+"""Baseline configuration for the scruples corpus."""
 
 from . import (
     bert,
@@ -43,7 +43,7 @@ SHALLOW_BASELINES = {
         trees.RANDOM_FOREST_HYPER_PARAMETERS
     )
 }
-"""Shallow baseline models for the socialnorms corpus."""
+"""Shallow baseline models for the scruples corpus."""
 
 
 FINE_TUNE_LM_BASELINES = {
@@ -54,4 +54,4 @@ FINE_TUNE_LM_BASELINES = {
         bert.BERT_CLASSIFIER_TRANSFORM
     )
 }
-"""Fine-tuned language model baselines for the socialnorms corpus."""
+"""Fine-tuned language model baselines for the scruples corpus."""

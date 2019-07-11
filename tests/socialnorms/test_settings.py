@@ -1,1 +1,1 @@
-"""Tests for socialnorms.settings."""
+"""Tests for scruples.settings."""

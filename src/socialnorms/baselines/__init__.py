@@ -1,4 +1,4 @@
-"""Baselines for socialnorms."""
+"""Baselines for scruples."""
 
 from . import (
     bert,

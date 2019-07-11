@@ -1,4 +1,4 @@
-"""Tests for socialnorms.dataset.readers."""
+"""Tests for scruples.dataset.readers."""
 
 import os
 import tempfile
@@ -7,20 +7,20 @@ from unittest.mock import Mock
 
 import pandas as pd
 
-import socialnorms.settings as socialnorms_settings
-from socialnorms.dataset import readers
+import scruples.settings as scruples_settings
+from scruples.dataset import readers
 from ... import settings, utils
 
 
-class SocialnormsCorpusTestCase(unittest.TestCase):
-    """Test socialnorms.dataset.readers.SocialnormsCorpus."""
+class ScruplesCorpusTestCase(unittest.TestCase):
+    """Test scruples.dataset.readers.ScruplesCorpus."""
 
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
         # copy the corpus-easy fixture to the temporary directory
-        for split in readers.SocialnormsCorpus.SPLITS:
+        for split in readers.ScruplesCorpus.SPLITS:
             split_filename =\
-                socialnorms_settings.CORPUS_FILENAME_TEMPLATE.format(
+                scruples_settings.CORPUS_FILENAME_TEMPLATE.format(
                     split=split)
             utils.copy_pkg_resource_to_disk(
                 pkg='tests',
@@ -32,12 +32,12 @@ class SocialnormsCorpusTestCase(unittest.TestCase):
 
     def test_corpus_has_correct_splits(self):
         self.assertEqual(
-            set(readers.SocialnormsCorpus.SPLITS),
+            set(readers.ScruplesCorpus.SPLITS),
             set(['train', 'dev', 'test']))
 
     def test_reads_in_splits(self):
         # read the dataset
-        corpus = readers.SocialnormsCorpus(data_dir=self.temp_dir.name)
+        corpus = readers.ScruplesCorpus(data_dir=self.temp_dir.name)
 
         # train
         train_ids, train_features, train_labels = corpus.train
@@ -82,15 +82,15 @@ class SocialnormsCorpusTestCase(unittest.TestCase):
         self.assertEqual(test_labels.tolist()[0], 'OTHER')
 
 
-class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
-    """Test socialnorms.dataset.readers.SocialnormsCorpusDataset."""
+class ScruplesCorpusDatasetTestCase(unittest.TestCase):
+    """Test scruples.dataset.readers.ScruplesCorpusDataset."""
 
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
         # copy the corpus-easy dataset to the temporary directory
-        for split in readers.SocialnormsCorpusDataset.SPLITS:
+        for split in readers.ScruplesCorpusDataset.SPLITS:
             split_filename =\
-                socialnorms_settings.CORPUS_FILENAME_TEMPLATE.format(
+                scruples_settings.CORPUS_FILENAME_TEMPLATE.format(
                     split=split)
             utils.copy_pkg_resource_to_disk(
                 pkg='tests',
@@ -102,7 +102,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
 
     def test_corpus_has_correct_splits(self):
         self.assertEqual(
-            set(readers.SocialnormsCorpusDataset.SPLITS),
+            set(readers.ScruplesCorpusDataset.SPLITS),
             set(['train', 'dev', 'test']))
 
     def test_init_raises_error_if_bad_split_provided(self):
@@ -110,7 +110,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
                 ValueError,
                 r'split must be one of train, dev, test\.'
         ):
-          readers.SocialnormsCorpusDataset(
+          readers.ScruplesCorpusDataset(
               data_dir=self.temp_dir.name,
               split='val',
               transform=None,
@@ -118,7 +118,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
 
     def test_len(self):
         # test len on train
-        train = readers.SocialnormsCorpusDataset(
+        train = readers.ScruplesCorpusDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
@@ -126,7 +126,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
         self.assertEqual(len(train), 20)
 
         # test len on dev
-        dev = readers.SocialnormsCorpusDataset(
+        dev = readers.ScruplesCorpusDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
@@ -134,7 +134,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
         self.assertEqual(len(dev), 5)
 
         # test len on test
-        test = readers.SocialnormsCorpusDataset(
+        test = readers.ScruplesCorpusDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
@@ -143,7 +143,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
 
     def test___get_item__(self):
         # test __get_item__ on train
-        train = readers.SocialnormsCorpusDataset(
+        train = readers.ScruplesCorpusDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
@@ -157,7 +157,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
         self.assertEqual(label, 'OTHER')
 
         # test __get_item__ on dev
-        dev = readers.SocialnormsCorpusDataset(
+        dev = readers.ScruplesCorpusDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
@@ -171,7 +171,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
         self.assertEqual(label, 'OTHER')
 
         # test __get_item__ on test
-        test = readers.SocialnormsCorpusDataset(
+        test = readers.ScruplesCorpusDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
@@ -187,7 +187,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
     def test_init_with_transform(self):
         # test the train split
         train_transform = Mock(return_value='foo')
-        train = readers.SocialnormsCorpusDataset(
+        train = readers.ScruplesCorpusDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=train_transform,
@@ -206,7 +206,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
 
         # test the dev split
         dev_transform = Mock(return_value='foo')
-        dev = readers.SocialnormsCorpusDataset(
+        dev = readers.ScruplesCorpusDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=dev_transform,
@@ -225,7 +225,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
 
         # test the test split
         test_transform = Mock(return_value='foo')
-        test = readers.SocialnormsCorpusDataset(
+        test = readers.ScruplesCorpusDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=test_transform,
@@ -245,7 +245,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
     def test_init_with_label_transform(self):
         # test the train split
         train_label_transform = Mock(return_value='foo')
-        train = readers.SocialnormsCorpusDataset(
+        train = readers.ScruplesCorpusDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
@@ -261,7 +261,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
 
         # test the dev split
         dev_label_transform = Mock(return_value='foo')
-        dev = readers.SocialnormsCorpusDataset(
+        dev = readers.ScruplesCorpusDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
@@ -277,7 +277,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
 
         # test the test split
         test_label_transform = Mock(return_value='foo')
-        test = readers.SocialnormsCorpusDataset(
+        test = readers.ScruplesCorpusDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
@@ -292,15 +292,15 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
         self.assertEqual(kwargs, {})
 
 
-class SocialnormsBenchmarkTestCase(unittest.TestCase):
-    """Test socialnorms.dataset.readers.SocialnormsBenchmark."""
+class ScruplesBenchmarkTestCase(unittest.TestCase):
+    """Test scruples.dataset.readers.ScruplesBenchmark."""
 
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
         # copy the benchmark-easy dataset to the temporary directory
-        for split in readers.SocialnormsBenchmark.SPLITS:
+        for split in readers.ScruplesBenchmark.SPLITS:
             split_filename =\
-                socialnorms_settings.BENCHMARK_FILENAME_TEMPLATE.format(
+                scruples_settings.BENCHMARK_FILENAME_TEMPLATE.format(
                     split=split)
             utils.copy_pkg_resource_to_disk(
                 pkg='tests',
@@ -312,12 +312,12 @@ class SocialnormsBenchmarkTestCase(unittest.TestCase):
 
     def test_benchmark_has_correct_splits(self):
         self.assertEqual(
-            set(readers.SocialnormsBenchmark.SPLITS),
+            set(readers.ScruplesBenchmark.SPLITS),
             set(['train', 'dev', 'test']))
 
     def test_reads_in_splits(self):
         # read the dataset
-        benchmark = readers.SocialnormsBenchmark(data_dir=self.temp_dir.name)
+        benchmark = readers.ScruplesBenchmark(data_dir=self.temp_dir.name)
 
         # train
         train_ids, train_features, train_labels = benchmark.train
@@ -362,15 +362,15 @@ class SocialnormsBenchmarkTestCase(unittest.TestCase):
         self.assertEqual(test_labels.tolist()[0], 0)
 
 
-class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
-    """Test socialnorms.dataset.readers.SocialnormsBenchmarkDataset."""
+class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
+    """Test scruples.dataset.readers.ScruplesBenchmarkDataset."""
 
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
         # copy the benchmark-easy dataset to the temporary directory
-        for split in readers.SocialnormsBenchmarkDataset.SPLITS:
+        for split in readers.ScruplesBenchmarkDataset.SPLITS:
             split_filename =\
-                socialnorms_settings.BENCHMARK_FILENAME_TEMPLATE.format(
+                scruples_settings.BENCHMARK_FILENAME_TEMPLATE.format(
                     split=split)
             utils.copy_pkg_resource_to_disk(
                 pkg='tests',
@@ -382,7 +382,7 @@ class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
 
     def test_benchmark_has_correct_splits(self):
         self.assertEqual(
-            set(readers.SocialnormsBenchmarkDataset.SPLITS),
+            set(readers.ScruplesBenchmarkDataset.SPLITS),
             set(['train', 'dev', 'test']))
 
     def test_init_raises_error_if_bad_split_provided(self):
@@ -390,7 +390,7 @@ class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
                 ValueError,
                 r'split must be one of train, dev, test\.'
         ):
-          readers.SocialnormsBenchmarkDataset(
+          readers.ScruplesBenchmarkDataset(
               data_dir=self.temp_dir.name,
               split='val',
               transform=None,
@@ -398,7 +398,7 @@ class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
 
     def test_len(self):
         # test len on train
-        train = readers.SocialnormsBenchmarkDataset(
+        train = readers.ScruplesBenchmarkDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
@@ -406,7 +406,7 @@ class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
         self.assertEqual(len(train), 16)
 
         # test len on dev
-        dev = readers.SocialnormsBenchmarkDataset(
+        dev = readers.ScruplesBenchmarkDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
@@ -414,7 +414,7 @@ class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
         self.assertEqual(len(dev), 4)
 
         # test len on test
-        test = readers.SocialnormsBenchmarkDataset(
+        test = readers.ScruplesBenchmarkDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
@@ -423,7 +423,7 @@ class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
 
     def test___get_item__(self):
         # test __get_item__ on train
-        train = readers.SocialnormsBenchmarkDataset(
+        train = readers.ScruplesBenchmarkDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
@@ -437,7 +437,7 @@ class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
         self.assertEqual(label, 0)
 
         # test __get_item__ on dev
-        dev = readers.SocialnormsBenchmarkDataset(
+        dev = readers.ScruplesBenchmarkDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
@@ -451,7 +451,7 @@ class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
         self.assertEqual(label, 0)
 
         # test __get_item__ on test
-        test = readers.SocialnormsBenchmarkDataset(
+        test = readers.ScruplesBenchmarkDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
@@ -467,7 +467,7 @@ class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
     def test_init_with_transform(self):
         # test the train split
         train_transform = Mock(return_value='foo')
-        train = readers.SocialnormsBenchmarkDataset(
+        train = readers.ScruplesBenchmarkDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=train_transform,
@@ -486,7 +486,7 @@ class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
 
         # test the dev split
         dev_transform = Mock(return_value='foo')
-        dev = readers.SocialnormsBenchmarkDataset(
+        dev = readers.ScruplesBenchmarkDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=dev_transform,
@@ -505,7 +505,7 @@ class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
 
         # test the test split
         test_transform = Mock(return_value='foo')
-        test = readers.SocialnormsBenchmarkDataset(
+        test = readers.ScruplesBenchmarkDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=test_transform,
@@ -525,7 +525,7 @@ class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
     def test_init_with_label_transform(self):
         # test the train split
         train_label_transform = Mock(return_value='foo')
-        train = readers.SocialnormsBenchmarkDataset(
+        train = readers.ScruplesBenchmarkDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
@@ -541,7 +541,7 @@ class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
 
         # test the dev split
         dev_label_transform = Mock(return_value='foo')
-        dev = readers.SocialnormsBenchmarkDataset(
+        dev = readers.ScruplesBenchmarkDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
@@ -557,7 +557,7 @@ class SocialnormsBenchmarkDatasetTestCase(unittest.TestCase):
 
         # test the test split
         test_label_transform = Mock(return_value='foo')
-        test = readers.SocialnormsBenchmarkDataset(
+        test = readers.ScruplesBenchmarkDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,

@@ -1,12 +1,12 @@
-"""Tests for socialnorms.extraction.filters."""
+"""Tests for scruples.extraction.filters."""
 
 import unittest
 
-from socialnorms.extraction import filters
+from scruples.extraction import filters
 
 
 class EmptyStringFilterTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.filters.EmptyStringFilter."""
+    """Test scruples.extraction.filters.EmptyStringFilter."""
 
     def test_instantiates_without_arguments(self):
         filters.EmptyStringFilter()
@@ -32,7 +32,7 @@ class EmptyStringFilterTestCase(unittest.TestCase):
 
 
 class TooFewCharactersFilterTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.filters.TooFewCharactersFilter."""
+    """Test scruples.extraction.filters.TooFewCharactersFilter."""
 
     def test_requires_min_chars_argument(self):
         with self.assertRaises(TypeError):
@@ -50,7 +50,7 @@ class TooFewCharactersFilterTestCase(unittest.TestCase):
 
 
 class TooFewWordsFilterTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.filters.TooFewWordsFilter."""
+    """Test scruples.extraction.filters.TooFewWordsFilter."""
 
     def test_requires_min_words_argument(self):
         with self.assertRaises(TypeError):
@@ -72,7 +72,7 @@ class TooFewWordsFilterTestCase(unittest.TestCase):
 
 
 class PrefixFilterTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.filters.PrefixFilter."""
+    """Test scruples.extraction.filters.PrefixFilter."""
 
     def test_requires_prefix_argument(self):
         with self.assertRaises(TypeError):
@@ -147,7 +147,7 @@ class PrefixFilterTestCase(unittest.TestCase):
 
 
 class StartsWithGerundFilterTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.filters.StartsWithGerundFilter."""
+    """Test scruples.extraction.filters.StartsWithGerundFilter."""
 
     def test_instantiates_without_arguments(self):
         filters.StartsWithGerundFilter()
@@ -225,7 +225,7 @@ class StartsWithGerundFilterTestCase(unittest.TestCase):
 
 
 class WhWordFilterTestCase(unittest.TestCase):
-    """Test socialnorms.extraction.filters.WhWordFilter."""
+    """Test scruples.extraction.filters.WhWordFilter."""
 
     def test_instantiates_without_arguments(self):
         filters.WhWordFilter()

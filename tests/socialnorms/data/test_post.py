@@ -1,4 +1,4 @@
-"""Tests for socialnorms.data.post."""
+"""Tests for scruples.data.post."""
 
 import json
 import pkg_resources
@@ -7,17 +7,17 @@ from unittest.mock import patch
 
 import attr
 
-from socialnorms.data import post
-from socialnorms.data.comment import Comment
-from socialnorms.data.label_scores import LabelScores
-from socialnorms.data.labels import Label
-from socialnorms.data.post_types import PostType
+from scruples.data import post
+from scruples.data.comment import Comment
+from scruples.data.label_scores import LabelScores
+from scruples.data.labels import Label
+from scruples.data.post_types import PostType
 
 from ... import settings
 
 
 class PostTestCase(unittest.TestCase):
-    """Test socialnorms.data.post.Post."""
+    """Test scruples.data.post.Post."""
 
     def setUp(self):
         # load the comments for the test post
@@ -366,7 +366,7 @@ class PostTestCase(unittest.TestCase):
             # patch test_post with the bad truth value for the cached
             # property. We'll patch where the cached_property decorator
             # will look for the cached value, since the attribute itself
-            # is read-only. See socialnorms.data.utils.cached_property
+            # is read-only. See scruples.data.utils.cached_property
             # for how the cached properties work.
             object.__setattr__(test_post, f'_{attribute}', truth_value)
 
@@ -399,7 +399,7 @@ class PostTestCase(unittest.TestCase):
             # patch test_post with the bad truth value for the cached
             # property. We'll patch where the cached_property decorator
             # will look for the cached value, since the attribute itself
-            # is read-only. See socialnorms.data.utils.cached_property
+            # is read-only. See scruples.data.utils.cached_property
             # for how the cached properties work.
             object.__setattr__(test_post, f'_{attribute}', truth_value)
 

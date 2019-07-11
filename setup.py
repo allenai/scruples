@@ -1,4 +1,4 @@
-"""setup.py file for packaging ``socialnorms``."""
+"""setup.py file for packaging ``scruples``."""
 
 from setuptools import setup
 
@@ -11,15 +11,15 @@ with open('requirements.txt', 'r') as requirements_file:
 
 
 setup(
-    name='socialnorms',
+    name='scruples',
     version='0.0.0',
     description='A benchmark for detecting social norm violations in stories.',
     long_description=readme,
-    url='https://github.com/allenai/socialnorms',
+    url='https://github.com/allenai/scruples',
     author='Nicholas Lourie',
     author_email='nicholasl@allenai.org',
-    keywords='social norms artificial intelligence ai machine learning'
-             ' ml',
+    keywords='scruples social norms artificial intelligence ai'
+             ' machine learning ml',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 3.7',
@@ -28,11 +28,9 @@ setup(
         'Topic :: Scientific/Engineering :: Artificial Intelligence'
     ],
     license='Apache',
-    packages=['socialnorms'],
+    packages=['scruples'],
     package_dir={'': 'src'},
-    scripts=[
-        'bin/socialnorms'
-    ],
+    scripts=['bin/scruples'],
     install_requires=[
         'Click >= 7.0',
         'Pattern >= 3.6',

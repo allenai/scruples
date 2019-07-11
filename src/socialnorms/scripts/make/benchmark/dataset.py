@@ -1,4 +1,4 @@
-"""Make the final version of the socialnorms benchmark.
+"""Make the final version of the scruples benchmark.
 
 This script takes the raw annotation data from MTurk and creates the
 final labeled version of the dataset.
@@ -42,9 +42,9 @@ def dataset(
         judgments_path: str,
         min_agreement: int
 ) -> None:
-    """Create the socialnorms benchmark.
+    """Create the scruples benchmark.
 
-    Create the socialnorms benchmark, reading the proposed dataset
+    Create the scruples benchmark, reading the proposed dataset
     instances from PROPOSALS_PATH, the MTurk annotations from
     ANNOTATIONS_PATH and then writing the resulting dataset instances to
     INSTANCES_PATH along with the individual annotator's judgments to

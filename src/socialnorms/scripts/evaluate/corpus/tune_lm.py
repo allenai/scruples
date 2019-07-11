@@ -66,7 +66,7 @@ def tune_lm(
     """Tune hyper-parameters for pre-trained LMs on the corpus.
 
     Tune hyper-parameters for a pre-trained language model on the
-    socialnorms corpus, reading the dataset from DATA_DIR, and writing
+    scruples corpus, reading the dataset from DATA_DIR, and writing
     all artifacts to MODELS_DIR. Tuning is performed with Bayesian
     optimization.
     """

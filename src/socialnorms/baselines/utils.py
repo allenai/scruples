@@ -1,4 +1,4 @@
-"""Utilities for baselines on socialnorms."""
+"""Utilities for baselines on scruples."""
 
 from typing import Any, Dict
 
@@ -18,7 +18,7 @@ def concat_title_and_text(features: pd.DataFrame) -> np.ndarray:
     Parameters
     ----------
     features : pd.DataFrame
-        The features for the socialnorms dataset.
+        The features for the scruples dataset.
 
     Returns
     -------
@@ -32,11 +32,11 @@ def concat_title_and_text(features: pd.DataFrame) -> np.ndarray:
 # classes
 
 class BenchmarkTransformer(BaseEstimator, TransformerMixin):
-    """Featurize the action pairs from the socialnorms benchmark.
+    """Featurize the action pairs from the scruples benchmark.
 
     ``BenchmarkTransformer`` applies the same featurization pipeline
     (``self.transformer``) to both actions in an instance from the
-    socialnorms benchmark and then takes the difference of their
+    scruples benchmark and then takes the difference of their
     features.
 
     You can set parameters on the ``self.transformer`` attribute by

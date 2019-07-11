@@ -121,8 +121,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-# project directories
-data/
-!src/socialnorms/data/
-!tests/socialnorms/data/

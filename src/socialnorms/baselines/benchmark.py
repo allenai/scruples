@@ -1,4 +1,4 @@
-"""Baseline configuration for the socialnorms benchmark."""
+"""Baseline configuration for the scruples benchmark."""
 
 from . import (
     bert,
@@ -41,7 +41,7 @@ SHALLOW_BASELINES = {
         style.STYLE_RANKER_HYPER_PARAMETERS
     )
 }
-"""Shallow baseline models for the socialnorms benchmark."""
+"""Shallow baseline models for the scruples benchmark."""
 
 
 FINE_TUNE_LM_BASELINES = {
@@ -52,4 +52,4 @@ FINE_TUNE_LM_BASELINES = {
         bert.BERT_RANKER_TRANSFORM
     )
 }
-"""Fine-tuned language model baselines for the socialnorms benchmark."""
+"""Fine-tuned language model baselines for the scruples benchmark."""
