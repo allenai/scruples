@@ -232,12 +232,12 @@ class Post:
             return None
 
         pronormative_score = (
-            self.label_scores.label_to_score[Label.NTA]
-            + self.label_scores.label_to_score[Label.NAH]
+            self.label_scores.label_to_score[Label.OTHER]
+            + self.label_scores.label_to_score[Label.NOBODY]
         )
         contranormative_score = (
-            self.label_scores.label_to_score[Label.YTA]
-            + self.label_scores.label_to_score[Label.ESH]
+            self.label_scores.label_to_score[Label.AUTHOR]
+            + self.label_scores.label_to_score[Label.EVERYBODY]
         )
 
         return Action(

@@ -99,8 +99,8 @@ class SocialnormsCorpusDataset(Dataset):
         tuples. If ``None``, no transformation is applied.
     label_transform : Optional[Callable], optional (default=None)
         A transformation to apply to the labels. The labels are passed
-        in as strings ("YTA", "NTA", "ESH", "NAH", and "INFO"). If
-        ``None``, no transformation is applied.
+        in as strings ("AUTHOR", "OTHER", "EVERYBODY", "NOBODY", and
+        "INFO"). If ``None``, no transformation is applied.
     """
     SPLITS = [split['name'] for split in settings.SPLITS]
 

@@ -14,9 +14,9 @@ class PostType(enum.Enum):
 
     Posts are categorized into three types:
 
-      1. **AITA**  : The author is asking if they're in the wrong, based
+      1. **HISTORICAL**  : The author is asking if they're in the wrong, based
          on an event that has actually happened.
-      2. **WIBTA** : The author is asking if they would be in the wrong,
+      2. **HYPOTHETICAL** : The author is asking if they would be in the wrong,
          if they were to perform some action.
       3. **META**  : The post is discussing the subreddit itself.
 
@@ -28,21 +28,24 @@ class PostType(enum.Enum):
     ----------
     index : int
         A (unique) numerical index assigned to the post type.
+    reddit_name : str
+        The name for the post type used on the subreddit from which the
+        data originates.
     patterns : List[str]
         A list of strings, each representing a regular expression
         pattern used to extract that post type from a post's title. Note
         that patterns are compiled to regular expressions when they're
         bound to the ``PostType`` instance as an attribute.
     """
-    AITA = (0, [
+    HISTORICAL = (0, 'AITA', [
         r'\m(?i:AITAH?)\M',
         r'(?i:Am I the asshole){e<=2}'
     ])
-    WIBTA = (1, [
+    HYPOTHETICAL = (1, 'WIBTA', [
         r'\m(?i:WIBTAH?)\M',
         r'(?i:Would I be the asshole){e<=2}'
     ])
-    META = (2, [
+    META = (2, 'META', [
         r'\mMETA\M',
         r'\[(?i:META)\]'
     ])
@@ -77,9 +80,11 @@ class PostType(enum.Enum):
     def __init__(
             self,
             index: int,
+            reddit_name: str,
             patterns: List[str]
     ) -> None:
         self.index = index
+        self.reddit_name = reddit_name
         self.patterns = [regex.compile(pattern) for pattern in patterns]
 
     def in_(

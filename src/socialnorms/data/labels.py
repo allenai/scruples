@@ -28,10 +28,10 @@ class Label(enum.Enum):
     of patterns. The labels are an enumeration with the following
     possible values:
 
-      1. **YTA**  : The author of the anecdote is in the wrong.
-      2. **NTA**  : The other person in the anecdote is in the wrong.
-      3. **ESH**  : Everyone in the anecdote is in the wrong.
-      4. **NAH**  : No one in the anecdote is in the wrong.
+      1. **AUTHOR**  : The author of the anecdote is in the wrong.
+      2. **OTHER**  : The other person in the anecdote is in the wrong.
+      3. **EVERYBODY**  : Everyone in the anecdote is in the wrong.
+      4. **NOBODY**  : No one in the anecdote is in the wrong.
       5. **INFO** : More information is required to make a judgment.
 
     Attributes
@@ -42,13 +42,16 @@ class Label(enum.Enum):
     ----------
     index : int
         A (unique) numerical index assigned to the label.
+    reddit_name : str
+        The name for the label used on the subreddit from which the data
+        originates.
     patterns : List[str]
         A list of strings, each representing a regular expression
         pattern used to extract that label from a comment's body
         text. Note that the patterns are compiled to regular expressions
         when they're bound to the ``Label`` instance as an attribute.
     """
-    YTA = (0, [
+    AUTHOR = (0, 'YTA', [
         r'\m(?i:YTAH?)\M',
         r"(?e)(?i:"
           r"you(?:'re|r| are)? "
@@ -65,7 +68,7 @@ class Label(enum.Enum):
           r"(?:asshole|a-?hole)"
         r"){e<=1}"
     ])
-    NTA = (1, [
+    OTHER = (1, 'NTA', [
         r'\m(?i:Y?NTAH?)\M',
         r'(?e)(?i:'
           r'not '
@@ -74,17 +77,17 @@ class Label(enum.Enum):
           r'(asshole|a-?hole)\M'
         r'){e<=1}'
     ])
-    ESH = (2, [
+    EVERYBODY = (2, 'ESH', [
         r'\m(?i:ESH)\M',
         r'(?e)(?i:every(?:one|body) sucks here){e<=1}',
         r'(?e)(?i:you both suck){e<=1}'
     ])
-    NAH = (3, [
+    NOBODY = (3, 'NAH', [
         r'\m(?i:NAH?H)\M',
         r'(?e)(?i:no (?:assholes|a-?holes) here){e<=1}',
         r'(?e)(?i:no one is the (?:asshole|a-?hole)){e<=1}'
     ])
-    INFO = (4, [
+    INFO = (4, 'INFO', [
         r'\m(?i:INFO)\M',
         r'(?e)(?i:not enough info){e<=1}',
         r'(?e)(?i:needs? more info){e<=1}',
@@ -154,9 +157,11 @@ class Label(enum.Enum):
     def __init__(
             self,
             index: int,
+            reddit_name: str,
             patterns: List[str]
     ) -> None:
         self.index = index
+        self.reddit_name = reddit_name
         self.patterns = [regex.compile(pattern) for pattern in patterns]
 
     def find(

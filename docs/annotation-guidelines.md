@@ -20,10 +20,10 @@ object has the following keys:
   </dd>
   <dt><code>label</code></dt>
   <dd>
-    a gold annotation for the label (one of <code>"YTA"</code>,
-    <code>"NTA"</code>, <code>"ESH"</code>, <code>"NAH"</code>, or
-    <code>"INFO"</code>) expressed by the comment, or <code>null</code>
-    if no label is expressed
+    a gold annotation for the label (one of <code>"AUTHOR"</code>,
+    <code>"OTHER"</code>, <code>"EVERYBODY"</code>,
+    <code>"NOBODY"</code>, or <code>"INFO"</code>) expressed by the
+    comment, or <code>null</code> if no label is expressed
   </dd>
   <dt><code>implied</code></dt>
   <dd>
@@ -40,19 +40,19 @@ object has the following keys:
 The possible labels are:
 
 <dl>
-  <dt><code>YTA</code></dt>
+  <dt><code>AUTHOR</code></dt>
   <dd>
     The author of the anecdote is in the wrong.
   </dd>
-  <dt><code>NTA</code></dt>
+  <dt><code>OTHER</code></dt>
   <dd>
     The other person in the anecdote is in the wrong.
   </dd>
-  <dt><code>ESH</code></dt>
+  <dt><code>EVERYBODY</code></dt>
   <dd>
     Everyone in the anecdote is in the wrong.
   </dd>
-  <dt><code>NAH</code></dt>
+  <dt><code>NOBODY</code></dt>
   <dd>
     No one in the anecdote is in the wrong.
   </dd>
@@ -74,9 +74,9 @@ If the comment expresses no labels explicitly but still has a viewpoint
 that clearly expresses one of the labels, then use that label for the
 comment. Mark `implied` as `true` and `spam` as `false`.
 
-Finally, if the comment expresses no label (i.e., none of `YTA`, `NTA`,
-`NAH`, `ESH`, or `INFO`), then mark `label` as `null`, `implied` as
-`null`, and `spam` as `true`.
+Finally, if the comment expresses no label (i.e., none of `AUTHOR`,
+`OTHER`, `NOBODY`, `EVERYBODY`, or `INFO`), then mark `label` as `null`,
+`implied` as `null`, and `spam` as `true`.
 
 
 Post Annotations
@@ -107,9 +107,9 @@ object has the following keys:
 Possible post types are:
 
 <dl>
-  <dt><code>AITA</code></dt>
+  <dt><code>HISTORICAL</code></dt>
   <dd>The author is asking "am I the a&ast;&ast;hole?"</dd>
-  <dt><code>WIBTA</code></dt>
+  <dt><code>HYPOTHETICAL</code></dt>
   <dd>The author is asking "would I be the a&ast;&ast;hole?"</dd>
   <dt><code>META</code></dt>
   <dd>The post is about the subreddit itself.</dd>
@@ -119,8 +119,8 @@ If the post type is explicitly stated in the post title, then mark
 `post_type` as the stated post type, mark `implied` as `false`, and
 `spam` as `false`, unless the post type is `META` in which case mark
 spam as `true`. Additionally, if the post type is explicitly stated but
-clearly wrong (such as using AITA for a WIBTA post), then use the true
-post type rather than the stated one.
+clearly wrong (such as using HISTORICAL for a HYPOTHETICAL post), then
+use the true post type rather than the stated one.
 
 If the post type is not explicitly stated in the post title, but
 otherwise clear from the post, mark the appropriate post type, mark

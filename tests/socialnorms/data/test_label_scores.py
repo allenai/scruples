@@ -11,58 +11,58 @@ class LabelScoresTestCase(unittest.TestCase):
 
     def test_best_label(self):
         # test that the best label is the one with the highest score
-        # when the best label is NTA
+        # when the best label is OTHER
         self.assertEqual(
             label_scores.LabelScores(
                 label_to_score={
-                    labels.Label.NTA: 10,
-                    labels.Label.YTA: 2,
-                    labels.Label.ESH: 1,
-                    labels.Label.NAH: 9,
+                    labels.Label.OTHER: 10,
+                    labels.Label.AUTHOR: 2,
+                    labels.Label.EVERYBODY: 1,
+                    labels.Label.NOBODY: 9,
                     labels.Label.INFO: 3
                 }).best_label,
-            labels.Label.NTA)
-        # when the best label is YTA
+            labels.Label.OTHER)
+        # when the best label is AUTHOR
         self.assertEqual(
             label_scores.LabelScores(
                 label_to_score={
-                    labels.Label.NTA: 0,
-                    labels.Label.YTA: 10,
-                    labels.Label.ESH: 0,
-                    labels.Label.NAH: 0,
+                    labels.Label.OTHER: 0,
+                    labels.Label.AUTHOR: 10,
+                    labels.Label.EVERYBODY: 0,
+                    labels.Label.NOBODY: 0,
                     labels.Label.INFO: 0
                 }).best_label,
-            labels.Label.YTA)
-        # when the best label is ESH
+            labels.Label.AUTHOR)
+        # when the best label is EVERYBODY
         self.assertEqual(
             label_scores.LabelScores(
                 label_to_score={
-                    labels.Label.NTA: 1,
-                    labels.Label.YTA: 1,
-                    labels.Label.ESH: 3,
-                    labels.Label.NAH: 2,
+                    labels.Label.OTHER: 1,
+                    labels.Label.AUTHOR: 1,
+                    labels.Label.EVERYBODY: 3,
+                    labels.Label.NOBODY: 2,
                     labels.Label.INFO: 1
                 }).best_label,
-            labels.Label.ESH)
-        # when the best label is NAH
+            labels.Label.EVERYBODY)
+        # when the best label is NOBODY
         self.assertEqual(
             label_scores.LabelScores(
                 label_to_score={
-                    labels.Label.NTA: 0,
-                    labels.Label.YTA: 0,
-                    labels.Label.ESH: 0,
-                    labels.Label.NAH: 6,
+                    labels.Label.OTHER: 0,
+                    labels.Label.AUTHOR: 0,
+                    labels.Label.EVERYBODY: 0,
+                    labels.Label.NOBODY: 6,
                     labels.Label.INFO: 0
                 }).best_label,
-            labels.Label.NAH)
+            labels.Label.NOBODY)
         # when the best label is INFO
         self.assertEqual(
             label_scores.LabelScores(
                 label_to_score={
-                    labels.Label.NTA: 0,
-                    labels.Label.YTA: 5,
-                    labels.Label.ESH: 3,
-                    labels.Label.NAH: 0,
+                    labels.Label.OTHER: 0,
+                    labels.Label.AUTHOR: 5,
+                    labels.Label.EVERYBODY: 3,
+                    labels.Label.NOBODY: 0,
                     labels.Label.INFO: 23
                 }).best_label,
             labels.Label.INFO)
@@ -81,10 +81,10 @@ class LabelScoresTestCase(unittest.TestCase):
         self.assertEqual(
             label_scores.LabelScores(
                 label_to_score={
-                    labels.Label.NTA: 1,
-                    labels.Label.YTA: 0,
-                    labels.Label.ESH: 0,
-                    labels.Label.NAH: 0,
+                    labels.Label.OTHER: 1,
+                    labels.Label.AUTHOR: 0,
+                    labels.Label.EVERYBODY: 0,
+                    labels.Label.NOBODY: 0,
                     labels.Label.INFO: 0
                 }).is_all_zero,
             False)

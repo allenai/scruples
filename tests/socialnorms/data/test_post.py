@@ -43,10 +43,10 @@ class PostTestCase(unittest.TestCase):
         self.assertEqual(
             post.Post(**kwargs).label_scores,
             LabelScores(label_to_score={
-                Label.YTA: 1,
-                Label.NTA: 2,
-                Label.ESH: 0,
-                Label.NAH: 0,
+                Label.AUTHOR: 1,
+                Label.OTHER: 2,
+                Label.EVERYBODY: 0,
+                Label.NOBODY: 0,
                 Label.INFO: 0
             }))
 
@@ -105,21 +105,21 @@ class PostTestCase(unittest.TestCase):
         self.assertEqual(post.Post(**kwargs).original_text, '')
 
     def test_post_type(self):
-        # test when post type should be AITA
+        # test when post type should be HISTORICAL
         kwargs = self.post_kwargs.copy()
         kwargs.update(title='AITA for what I did?')
 
         self.assertEqual(
             post.Post(**kwargs).post_type,
-            PostType.AITA)
+            PostType.HISTORICAL)
 
-        # test when post type should be WIBTA
+        # test when post type should be HYPOTHETICAL
         kwargs = self.post_kwargs.copy()
         kwargs.update(title='WIBTA for this?')
 
         self.assertEqual(
             post.Post(**kwargs).post_type,
-            PostType.WIBTA)
+            PostType.HYPOTHETICAL)
 
         # test when post type should be META
         kwargs = self.post_kwargs.copy()
@@ -197,7 +197,7 @@ class PostTestCase(unittest.TestCase):
 
     def test_has_post_type(self):
         # test when has_post_type should be true
-        # when post_type is AITA
+        # when post_type is HISTORICAL
         kwargs = self.post_kwargs.copy()
         kwargs.update(title='AITA for this?')
 
@@ -205,7 +205,7 @@ class PostTestCase(unittest.TestCase):
             post.Post(**kwargs).has_post_type,
             True)
 
-        # when post_type is WIBTA
+        # when post_type is HYPOTHETICAL
         kwargs = self.post_kwargs.copy()
         kwargs.update(title='WIBTA for this?')
 

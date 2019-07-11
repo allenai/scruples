@@ -19,33 +19,33 @@ class CommentTestCase(unittest.TestCase):
             self.comment_kwargs = json.load(comment_file)
 
     def test_extracts_labels_correctly(self):
-        # test that NTA is extracted correctly
-        nta_kwargs = self.comment_kwargs.copy()
-        nta_kwargs.update(body='I believe this post is NTA.')
+        # test that OTHER is extracted correctly
+        other_kwargs = self.comment_kwargs.copy()
+        other_kwargs.update(body='I believe this post is NTA.')
         self.assertEqual(
-            comment.Comment(**nta_kwargs).label,
-            labels.Label.NTA)
+            comment.Comment(**other_kwargs).label,
+            labels.Label.OTHER)
 
-        # test that YTA is extracted correctly
-        yta_kwargs = self.comment_kwargs.copy()
-        yta_kwargs.update(body='I believe this post is YTA.')
+        # test that AUTHOR is extracted correctly
+        author_kwargs = self.comment_kwargs.copy()
+        author_kwargs.update(body='I believe this post is YTA.')
         self.assertEqual(
-            comment.Comment(**yta_kwargs).label,
-            labels.Label.YTA)
+            comment.Comment(**author_kwargs).label,
+            labels.Label.AUTHOR)
 
-        # test that ESH is extracted correctly
-        esh_kwargs = self.comment_kwargs.copy()
-        esh_kwargs.update(body='I believe this post is ESH.')
+        # test that EVERYBODY is extracted correctly
+        everybody_kwargs = self.comment_kwargs.copy()
+        everybody_kwargs.update(body='I believe this post is ESH.')
         self.assertEqual(
-            comment.Comment(**esh_kwargs).label,
-            labels.Label.ESH)
+            comment.Comment(**everybody_kwargs).label,
+            labels.Label.EVERYBODY)
 
-        # test that NAH is extracted correctly
-        nah_kwargs = self.comment_kwargs.copy()
-        nah_kwargs.update(body='I believe this post is NAH.')
+        # test that NOBODY is extracted correctly
+        nobody_kwargs = self.comment_kwargs.copy()
+        nobody_kwargs.update(body='I believe this post is NAH.')
         self.assertEqual(
-            comment.Comment(**nah_kwargs).label,
-            labels.Label.NAH)
+            comment.Comment(**nobody_kwargs).label,
+            labels.Label.NOBODY)
 
         # test that INFO is extracted correctly
         info_kwargs = self.comment_kwargs.copy()

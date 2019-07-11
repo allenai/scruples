@@ -9,12 +9,12 @@ class PostTypeTestCase(unittest.TestCase):
     """Test socialnorms.data.post_types.PostType."""
 
     POST_TYPE_TO_PHRASES = {
-        post_types.PostType.AITA: [
+        post_types.PostType.HISTORICAL: [
             'am I the asshole',
             'am I the ahole',
             'am I the a-hole'
         ],
-        post_types.PostType.WIBTA: [
+        post_types.PostType.HYPOTHETICAL: [
             'would I be the asshole',
             'would I be the ahole',
             'would I be the a-hole'
@@ -32,17 +32,17 @@ class PostTypeTestCase(unittest.TestCase):
             # when the initialism starts the text
             self.assertEqual(
                 post_types.PostType.extract_from_title(
-                    f'{post_type.name} if...'),
+                    f'{post_type.reddit_name} if...'),
                 post_type)
             # when the initialism ends the text
             self.assertEqual(
                 post_types.PostType.extract_from_title(
-                    f'If I... then {post_type.name}'),
+                    f'If I... then {post_type.reddit_name}'),
                 post_type)
             # when the initialism is in the middle of the text
             self.assertEqual(
                 post_types.PostType.extract_from_title(
-                    f"If I... {post_type.name}, what do you think?"),
+                    f"If I... {post_type.reddit_name}, what do you think?"),
                 post_type)
             # "meta" is too common a word so it's abbreviation is only
             # used to identify a post if the abbreviation is all caps.
@@ -51,17 +51,17 @@ class PostTypeTestCase(unittest.TestCase):
                 # when the initialism is uppercased
                 self.assertEqual(
                     post_types.PostType.extract_from_title(
-                        f'If I... {post_type.name.upper()}?'),
+                        f'If I... {post_type.reddit_name.upper()}?'),
                     post_type)
                 # when the initialism is lowercased
                 self.assertEqual(
                     post_types.PostType.extract_from_title(
-                        f'If I... {post_type.name.lower()}?'),
+                        f'If I... {post_type.reddit_name.lower()}?'),
                     post_type)
                 # when the initialism is capitalized
                 self.assertEqual(
                     post_types.PostType.extract_from_title(
-                        f'If I... {post_type.name.lower().capitalize()}?'),
+                        f'If I... {post_type.reddit_name.lower().capitalize()}?'),
                     post_type)
 
     def test_extract_from_title_on_phrases(self):
@@ -118,40 +118,50 @@ class PostTypeTestCase(unittest.TestCase):
                     continue
                 # when the initialism starts the text
                 self.assertTrue(
-                    post_type1.in_(f'{post_type1.name} if I...'))
+                    post_type1.in_(f'{post_type1.reddit_name} if I...'))
                 self.assertFalse(
-                    post_type2.in_(f'{post_type1.name} if I...'))
+                    post_type2.in_(f'{post_type1.reddit_name} if I...'))
                 # when the initialism ends the text
                 self.assertTrue(
-                    post_type1.in_(f'If I... {post_type1.name}'))
+                    post_type1.in_(f'If I... {post_type1.reddit_name}'))
                 self.assertFalse(
-                    post_type2.in_(f'If I... {post_type1.name}'))
+                    post_type2.in_(f'If I... {post_type1.reddit_name}'))
                 # when the initialism is in the middle of the text
                 self.assertTrue(
                     post_type1.in_(
-                        f"If I... {post_type1.name}, what do you think?"))
+                        f'If I... {post_type1.reddit_name}, what do you'
+                        f' think?'))
                 self.assertFalse(
                     post_type2.in_(
-                        f"If I... {post_type1.name}, what do you think?"))
+                        f'If I... {post_type1.reddit_name}, what do you'
+                        f' think?'))
                 # "meta" is too common a word so it's abbreviation is only
                 # used to identify a post if the abbreviation is all caps.
                 # Skip the capitalization tests if post_type1 is META.
                 if post_type1 != post_types.PostType.META:
                     # when the initialism is uppercased
                     self.assertTrue(
-                        post_type1.in_(f'If I... {post_type1.name.upper()}?'))
+                        post_type1.in_(
+                            f'If I... {post_type1.reddit_name.upper()}?'))
                     self.assertFalse(
-                        post_type2.in_(f'If I... {post_type1.name.upper()}?'))
+                        post_type2.in_(
+                            f'If I... {post_type1.reddit_name.upper()}?'))
                     # when the initialism is lowercased
                     self.assertTrue(
-                        post_type1.in_(f'If I... {post_type1.name.lower()}?'))
+                        post_type1.in_(
+                            f'If I... {post_type1.reddit_name.lower()}?'))
                     self.assertFalse(
-                        post_type2.in_(f'If I... {post_type1.name.lower()}?'))
+                        post_type2.in_(
+                            f'If I... {post_type1.reddit_name.lower()}?'))
                     # when the initialism is capitalized
                     self.assertTrue(
-                        post_type1.in_(f'If I... {post_type1.name.lower().capitalize()}?'))
+                        post_type1.in_(
+                            f'If I...'
+                            f' {post_type1.reddit_name.lower().capitalize()}?'))
                     self.assertFalse(
-                        post_type2.in_(f'If I... {post_type1.name.lower().capitalize()}?'))
+                        post_type2.in_(
+                            f'If I...'
+                            f' {post_type1.reddit_name.lower().capitalize()}?'))
 
     def test_in__on_phrases(self):
         for post_type1 in post_types.PostType:
@@ -171,9 +181,11 @@ class PostTypeTestCase(unittest.TestCase):
                         post_type2.in_(f"If I... {phrase}"))
                     # when the phrase is in the middle of the text
                     self.assertTrue(
-                        post_type1.in_(f"If I... {phrase}, what do you think?"))
+                        post_type1.in_(
+                            f"If I... {phrase}, what do you think?"))
                     self.assertFalse(
-                        post_type2.in_(f"If I... {phrase}, what do you think?"))
+                        post_type2.in_(
+                            f"If I... {phrase}, what do you think?"))
                     # when the phrase is uppercased
                     self.assertTrue(
                         post_type1.in_(f'If I... {phrase.upper()}?'))
@@ -186,9 +198,11 @@ class PostTypeTestCase(unittest.TestCase):
                         post_type2.in_(f'If I... {phrase.lower()}?'))
                     # when the phrase is capitalized
                     self.assertTrue(
-                        post_type1.in_(f'If I... {phrase.lower().capitalize()}?'))
+                        post_type1.in_(
+                            f'If I... {phrase.lower().capitalize()}?'))
                     self.assertFalse(
-                        post_type2.in_(f'If I... {phrase.lower().capitalize()}?'))
+                        post_type2.in_(
+                            f'If I... {phrase.lower().capitalize()}?'))
 
     def test_in__doesnt_return_true_on_spurious_titles(self):
         for post_type in post_types.PostType:

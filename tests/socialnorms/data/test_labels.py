@@ -9,7 +9,7 @@ class LabelTestCase(unittest.TestCase):
     """Test socialnorms.data.labels.Label."""
 
     LABEL_TO_PHRASES = {
-        labels.Label.YTA: [
+        labels.Label.AUTHOR: [
             "you're the asshole",
             'your the asshole',
             'you are the asshole',
@@ -22,7 +22,7 @@ class LabelTestCase(unittest.TestCase):
             "you are indeed an asshole",
             "you're just a big asshole"
         ],
-        labels.Label.NTA: [
+        labels.Label.OTHER: [
             'not an asshole',
             'not the asshole',
             'not an ahole',
@@ -30,14 +30,14 @@ class LabelTestCase(unittest.TestCase):
             'not an a-hole',
             'not really an asshole'
         ],
-        labels.Label.ESH: [
+        labels.Label.EVERYBODY: [
             'everyone sucks here',
             'everybody sucks here',
             'every one sucks here',
             'every body sucks here',
             'you both suck'
         ],
-        labels.Label.NAH: [
+        labels.Label.NOBODY: [
             'no assholes here',
             'no aholes here',
             'no a-holes here'
@@ -59,31 +59,33 @@ class LabelTestCase(unittest.TestCase):
         for label in labels.Label:
             # when the initialism starts the text
             self.assertEqual(
-                labels.Label.extract_from_text(f'{label.name}. Definitely.'),
+                labels.Label.extract_from_text(
+                    f'{label.reddit_name}. Definitely.'),
                 label)
             # when the initialism ends the text
             self.assertEqual(
-                labels.Label.extract_from_text(f'I think {label.name}'),
+                labels.Label.extract_from_text(
+                    f'I think {label.reddit_name}'),
                 label)
             # when the initialism is in the middle of the text
             self.assertEqual(
                 labels.Label.extract_from_text(
-                    f"I'd say {label.name}, but I'm not sure."),
+                    f"I'd say {label.reddit_name}, but I'm not sure."),
                 label)
             # when the initialism is uppercased
             self.assertEqual(
                 labels.Label.extract_from_text(
-                    f'I think {label.name.upper()}.'),
+                    f'I think {label.reddit_name.upper()}.'),
                 label)
             # when the initialism is lowercased
             self.assertEqual(
                 labels.Label.extract_from_text(
-                    f'I think {label.name.lower()}.'),
+                    f'I think {label.reddit_name.lower()}.'),
                 label)
             # when the initialism is capitalized
             self.assertEqual(
                 labels.Label.extract_from_text(
-                    f'I think {label.name.lower().capitalize()}.'),
+                    f'I think {label.reddit_name.lower().capitalize()}.'),
                 label)
 
     def test_extract_from_text_on_phrases(self):
@@ -124,12 +126,12 @@ class LabelTestCase(unittest.TestCase):
         self.assertEqual(
             labels.Label.extract_from_text(
                 "YTA. They're totally NTA here!").name,
-            'YTA')
+            'AUTHOR')
         self.assertEqual(
             labels.Label.extract_from_text(
                 "I was going to say YTA, but thinking more I'll say NTA."
             ).name,
-            'NTA')
+            'OTHER')
 
     def test_extract_from_text_doesnt_extract_spurious_labels(self):
         self.assertEqual(
@@ -145,40 +147,44 @@ class LabelTestCase(unittest.TestCase):
                     continue
                 # when the initialism starts the text
                 self.assertEqual(
-                    label1.find(f'{label1.name}. Definitely.'),
-                    (0, len(label1.name)))
+                    label1.find(f'{label1.reddit_name}. Definitely.'),
+                    (0, len(label1.reddit_name)))
                 self.assertIsNone(
-                    label2.find(f'{label1.name}. Definitely.'))
+                    label2.find(f'{label1.reddit_name}. Definitely.'))
                 # when the initialism ends the text
                 self.assertEqual(
-                    label1.find(f'I think {label1.name}'),
-                    (8, 8 + len(label1.name)))
+                    label1.find(f'I think {label1.reddit_name}'),
+                    (8, 8 + len(label1.reddit_name)))
                 self.assertIsNone(
-                    label2.find(f'I think {label1.name}'))
+                    label2.find(f'I think {label1.reddit_name}'))
                 # when the initialism is in the middle of the text
                 self.assertEqual(
-                    label1.find(f"I'd say {label1.name}, but I'm not sure."),
-                    (8, 8 + len(label1.name)))
+                    label1.find(
+                        f"I'd say {label1.reddit_name}, but I'm not sure."),
+                    (8, 8 + len(label1.reddit_name)))
                 self.assertIsNone(
-                    label2.find(f"I'd say {label1.name}, but I'm not sure."))
+                    label2.find(
+                        f"I'd say {label1.reddit_name}, but I'm not sure."))
                 # when the initialism is uppercased
                 self.assertEqual(
-                    label1.find(f'I think {label1.name.upper()}.'),
-                    (8, 8 + len(label1.name)))
+                    label1.find(f'I think {label1.reddit_name.upper()}.'),
+                    (8, 8 + len(label1.reddit_name)))
                 self.assertIsNone(
-                    label2.find(f'I think {label1.name.upper()}.'))
+                    label2.find(f'I think {label1.reddit_name.upper()}.'))
                 # when the initialism is lowercased
                 self.assertEqual(
-                    label1.find(f'I think {label1.name.lower()}.'),
-                    (8, 8 + len(label1.name)))
+                    label1.find(f'I think {label1.reddit_name.lower()}.'),
+                    (8, 8 + len(label1.reddit_name)))
                 self.assertIsNone(
-                    label2.find(f'I think {label1.name.lower()}.'))
+                    label2.find(f'I think {label1.reddit_name.lower()}.'))
                 # when the initialism is capitalized
                 self.assertEqual(
-                    label1.find(f'I think {label1.name.lower().capitalize()}.'),
-                    (8, 8 + len(label1.name)))
+                    label1.find(
+                        f'I think {label1.reddit_name.lower().capitalize()}.'),
+                    (8, 8 + len(label1.reddit_name)))
                 self.assertIsNone(
-                    label2.find(f'I think {label1.name.lower().capitalize()}.'))
+                    label2.find(
+                        f'I think {label1.reddit_name.lower().capitalize()}.'))
 
     def test_find_on_phrases(self):
         for label1 in labels.Label:
@@ -231,15 +237,18 @@ class LabelTestCase(unittest.TestCase):
         for label in labels.Label:
             # when the utterance is an initialism
             self.assertEqual(
-                label.find(f'{label.name} foo {label.name}.'),
-                (0, len(label.name)))
-            self.assertEqual(
-                label.find(f'foo {label.name} bar {label.name}.'),
-                (4, 4 + len(label.name)))
+                label.find(
+                    f'{label.reddit_name} foo {label.reddit_name}.'),
+                (0, len(label.reddit_name)))
             self.assertEqual(
                 label.find(
-                    f'foo {label.name} bar {label.name} baz {label.name}.'),
-                (4, 4 + len(label.name)))
+                    f'foo {label.reddit_name} bar {label.reddit_name}.'),
+                (4, 4 + len(label.reddit_name)))
+            self.assertEqual(
+                label.find(
+                    f'foo {label.reddit_name} bar {label.reddit_name}'
+                    f' baz {label.reddit_name}.'),
+                (4, 4 + len(label.reddit_name)))
             # when the utterance is a phrase
             for phrase in self.LABEL_TO_PHRASES[label]:
                 self.assertEqual(

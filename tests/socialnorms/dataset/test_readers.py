@@ -51,7 +51,7 @@ class SocialnormsCorpusTestCase(unittest.TestCase):
                 "text": "This post is nta."
             })
         self.assertIsInstance(train_labels, pd.Series)
-        self.assertEqual(train_labels.tolist()[0], 'NTA')
+        self.assertEqual(train_labels.tolist()[0], 'OTHER')
 
         # dev
         dev_ids, dev_features, dev_labels = corpus.dev
@@ -65,7 +65,7 @@ class SocialnormsCorpusTestCase(unittest.TestCase):
                 "text": "Label this post nta."
             })
         self.assertIsInstance(dev_labels, pd.Series)
-        self.assertEqual(dev_labels.tolist()[0], 'NTA')
+        self.assertEqual(dev_labels.tolist()[0], 'OTHER')
 
         # test
         test_ids, test_features, test_labels = corpus.test
@@ -79,7 +79,7 @@ class SocialnormsCorpusTestCase(unittest.TestCase):
                 "text": "The label for this post should be nta."
             })
         self.assertIsInstance(test_labels, pd.Series)
-        self.assertEqual(test_labels.tolist()[0], 'NTA')
+        self.assertEqual(test_labels.tolist()[0], 'OTHER')
 
 
 class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
@@ -154,7 +154,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
             "AITA test post",
             "This post is nta."
         ))
-        self.assertEqual(label, 'NTA')
+        self.assertEqual(label, 'OTHER')
 
         # test __get_item__ on dev
         dev = readers.SocialnormsCorpusDataset(
@@ -168,7 +168,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
             "AITA test post",
             "Label this post nta."
         ))
-        self.assertEqual(label, 'NTA')
+        self.assertEqual(label, 'OTHER')
 
         # test __get_item__ on test
         test = readers.SocialnormsCorpusDataset(
@@ -182,7 +182,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
             "AITA test post",
             "The label for this post should be nta."
         ))
-        self.assertEqual(label, 'NTA')
+        self.assertEqual(label, 'OTHER')
 
     def test_init_with_transform(self):
         # test the train split
@@ -256,7 +256,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
         # check that the transform was called correctly
         self.assertEqual(train_label_transform.call_count, 1)
         args, kwargs = train_label_transform.call_args
-        self.assertEqual(args, ('NTA',))
+        self.assertEqual(args, ('OTHER',))
         self.assertEqual(kwargs, {})
 
         # test the dev split
@@ -272,7 +272,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
         # check that the transform was called correctly
         self.assertEqual(dev_label_transform.call_count, 1)
         args, kwargs = dev_label_transform.call_args
-        self.assertEqual(args, ('NTA',))
+        self.assertEqual(args, ('OTHER',))
         self.assertEqual(kwargs, {})
 
         # test the test split
@@ -288,7 +288,7 @@ class SocialnormsCorpusDatasetTestCase(unittest.TestCase):
         # check that the transform was called correctly
         self.assertEqual(test_label_transform.call_count, 1)
         args, kwargs = test_label_transform.call_args
-        self.assertEqual(args, ('NTA',))
+        self.assertEqual(args, ('OTHER',))
         self.assertEqual(kwargs, {})
 
 

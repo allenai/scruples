@@ -1,5 +1,5 @@
-{"id": "id_25", "post_type": "AITA", "title": "AITA test post", "text": "The label for this post should be nta.", "label_scores": {"YTA": 0, "NTA": 10, "ESH": 0, "NAH": 0, "INFO": 0}, "label": "NTA"}
-{"id": "id_26", "post_type": "AITA", "title": "AITA test post", "text": "The label for this post should be yta.", "label_scores": {"YTA": 10, "NTA": 0, "ESH": 0, "NAH": 0, "INFO": 0}, "label": "YTA"}
-{"id": "id_27", "post_type": "AITA", "title": "AITA test post", "text": "The label for this post should be esh.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 10, "NAH": 0, "INFO": 0}, "label": "ESH"}
-{"id": "id_28", "post_type": "AITA", "title": "AITA test post", "text": "The label for this post should be nah.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 0, "NAH": 10, "INFO": 0}, "label": "NAH"}
-{"id": "id_29", "post_type": "AITA", "title": "AITA test post", "text": "The label for this post should be info.", "label_scores": {"YTA": 0, "NTA": 0, "ESH": 0, "NAH": 0, "INFO": 10}, "label": "INFO"}
+{"id": "id_25", "post_type": "HISTORICAL", "title": "AITA test post", "text": "The label for this post should be nta.", "label_scores": {"AUTHOR": 0, "OTHER": 10, "EVERYBODY": 0, "NOBODY": 0, "INFO": 0}, "label": "OTHER"}
+{"id": "id_26", "post_type": "HISTORICAL", "title": "AITA test post", "text": "The label for this post should be yta.", "label_scores": {"AUTHOR": 10, "OTHER": 0, "EVERYBODY": 0, "NOBODY": 0, "INFO": 0}, "label": "AUTHOR"}
+{"id": "id_27", "post_type": "HISTORICAL", "title": "AITA test post", "text": "The label for this post should be esh.", "label_scores": {"AUTHOR": 0, "OTHER": 0, "EVERYBODY": 10, "NOBODY": 0, "INFO": 0}, "label": "EVERYBODY"}
+{"id": "id_28", "post_type": "HISTORICAL", "title": "AITA test post", "text": "The label for this post should be nah.", "label_scores": {"AUTHOR": 0, "OTHER": 0, "EVERYBODY": 0, "NOBODY": 10, "INFO": 0}, "label": "NOBODY"}
+{"id": "id_29", "post_type": "HISTORICAL", "title": "AITA test post", "text": "The label for this post should be info.", "label_scores": {"AUTHOR": 0, "OTHER": 0, "EVERYBODY": 0, "NOBODY": 0, "INFO": 10}, "label": "INFO"}
