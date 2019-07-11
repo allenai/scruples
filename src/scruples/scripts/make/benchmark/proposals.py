@@ -52,7 +52,7 @@ def proposals(
     # Iterate over each split of the corpus, creating the benchmark data
     # for each.
     for split in settings.SPLITS:
-        logger.info(f'Reading the {split} split from the corpus.')
+        logger.info(f'Reading the {split["name"]} split from the corpus.')
 
         ids_actions = []
         corpus_split_path = os.path.join(
