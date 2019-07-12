@@ -5,6 +5,7 @@ final labeled version of the dataset.
 """
 
 import collections
+import copy
 import json
 import logging
 import random
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
     'proposals_path',
     type=click.Path(exists=True, file_okay=True, dir_okay=False))
 @click.argument(
-    'annotations_path',
+    'hits_path',
     type=click.Path(exists=True, file_okay=True, dir_okay=False))
 @click.argument(
     'instances_path',
@@ -30,61 +31,48 @@ logger = logging.getLogger(__name__)
 @click.argument(
     'judgments_path',
     type=click.Path(exists=False, file_okay=True, dir_okay=False))
-@click.option(
-    '--min-agreement', type=int, default=2,
-    help='The minimum number of annotators (out of'
-        f' {settings.N_ANNOTATORS_FOR_GOLD_LABELS}) required to agree'
-         ' for the instance to be included in the dataset.')
 def dataset(
         proposals_path: str,
-        annotations_path: str,
+        hits_path: str,
         instances_path: str,
-        judgments_path: str,
-        min_agreement: int
+        judgments_path: str
 ) -> None:
     """Create the scruples benchmark.
 
     Create the scruples benchmark, reading the proposed dataset
-    instances from PROPOSALS_PATH, the MTurk annotations from
-    ANNOTATIONS_PATH and then writing the resulting dataset instances to
-    INSTANCES_PATH along with the individual annotator's judgments to
-    JUDGMENTS_PATH.
+    instances from PROPOSALS_PATH, the MTurk HITs from HITS_PATH and
+    then writing the resulting dataset instances to INSTANCES_PATH along
+    with the individual annotator's judgments to JUDGMENTS_PATH.
 
-    The annotations provided at ANNOTATIONS_PATH should be the results
-    from running "amti extract tabular" command with a JSON Lines output
+    The HIT data provided at HITS_PATH should be the results from
+    running the "amti extract tabular" command with a JSON Lines output
     format on the HIT batches. The proposals should be the data provided
     to the HITs for annotation.
     """
-    if not min_agreement <= settings.N_ANNOTATORS_FOR_GOLD_LABELS:
-        raise ValueError(
-            '--min-agreement must be less than or equal to'
-            ' the number of annotators for the gold labels'
-           f' ({settings.N_ANNOTATORS_FOR_GOLD_LABELS}).')
-
     logger.info(f'Reading dataset instances from {proposals_path}')
 
-    instances = []
+    proposals = []
     with click.open_file(proposals_path, 'r') as proposals_file:
         for ln in proposals_file:
             row = json.loads(ln)
-            for instance in row['instances']:
-                instances.append(instance)
+            for proposal in row['instances']:
+                proposals.append(proposal)
 
-    logger.info(f'Reading annotations from {annotations_path}.')
+    logger.info(f'Reading HITs from {hits_path}.')
 
     instance_id_to_annotations = collections.defaultdict(list)
-    with click.open_file(annotations_path, 'r') as annotations_file:
-        for ln in annotations_file:
-            annotation = json.loads(ln)
+    with click.open_file(hits_path, 'r') as hits_file:
+        for ln in hits_file:
+            assignment = json.loads(ln)
 
-            # parse the responses from the HIT.
+            # parse the responses in the HIT's assignment.
 
-            # Each HIT has a number of form elements named
+            # Each assignment has a number of form elements named
             # ``instance-$idx`` and ``action-$idx`` where ``$idx`` is
             # the index of the item in the form.
             instance_ids = [None for _ in range(settings.N_INSTANCES_PER_HIT)]
             action_ids = [None for _ in range(settings.N_INSTANCES_PER_HIT)]
-            for key, value in annotation.items():
+            for key, value in assignment.items():
                 if key.startswith('instance'):
                     _, idx = key.split('-')
                     idx = int(idx)
@@ -100,8 +88,8 @@ def dataset(
             for instance_id, action_id in zip(instance_ids, action_ids):
                 if instance_id is None and action_id is None:
                     logger.warning(
-                         'Found a HIT with fewer than'
-                        f' {settings.N_INSTANCES_PER_HIT} instances.')
+                        'Found an item with neither an instance ID nor'
+                        ' an action ID.')
                     continue
                 elif instance_id is not None and action_id is None:
                     logger.error(
@@ -115,16 +103,19 @@ def dataset(
                     continue
 
                 instance_id_to_annotations[instance_id].append(
-                    (annotation['WorkerId'], action_id))
+                    (assignment['WorkerId'], action_id))
 
     logger.info(f'Assembling the datset from the annotations.')
 
-    n_expected_annotators = settings.N_ANNOTATORS_FOR_GOLD_LABELS \
-        + settings.N_ANNOTATORS_FOR_HUMAN_PERFORMANCE
-    dropped_instances = 0
-    dataset = []
+    n_expected_annotators = (
+        settings.N_ANNOTATORS_FOR_GOLD_LABELS
+        + settings.N_ANNOTATORS_FOR_HUMAN_PERFORMANCE)
+    controversial_instances = 0
+    instances = []
     judgments = []
-    for instance in instances:
+    for proposal in proposals:
+        instance = copy.deepcopy(proposal)
+
         action_id_to_idx = {
             action['id']: idx
             for idx, action in enumerate(instance['actions'])
@@ -159,10 +150,6 @@ def dataset(
             enumerate(instance['gold_annotations']),
             key=lambda t: t[1])
 
-        if gold_action_score < min_agreement:
-            dropped_instances += 1
-            continue
-
         instance['gold_label'] = gold_action_idx
 
         # compute the human performance annotations / label
@@ -180,7 +167,17 @@ def dataset(
 
         instance['human_perf_label'] = human_action_idx
 
-        dataset.append(instance)
+        # add a label for controversiality to the instance
+
+        instance['controversial'] = gold_action_score < settings.MIN_AGREEMENT
+
+        if instance['controversial']:
+            controversial_instances += 1
+
+        # gather the instance's information in the proper places
+
+        instances.append(instance)
+
         for worker_id, action_id in gold_annotations:
             judgments.append({
                 'instance_id': instance['id'],
@@ -196,11 +193,11 @@ def dataset(
                 'label': action_id_to_idx[action_id]
             })
 
-    logger.info(f'Writing the dataset to {instances_path}.')
+    logger.info(f'Writing the instances to {instances_path}.')
 
-    with click.open_file(instances_path, 'w') as output_file:
-        for instance in dataset:
-            output_file.write(json.dumps(instance) + '\n')
+    with click.open_file(instances_path, 'w') as instances_file:
+        for instance in instances:
+            instances_file.write(json.dumps(instance) + '\n')
 
     logger.info(f'Writing annotator judgments to {judgments_path}.')
 
@@ -209,4 +206,5 @@ def dataset(
             judgments_file.write(json.dumps(judgment) + '\n')
 
     logger.info(
-        f'Finished writing output. Dropped {dropped_instances} instances.')
+        f'Finished writing output. {controversial_instances} instances'
+        f' were found to be controversial.')
