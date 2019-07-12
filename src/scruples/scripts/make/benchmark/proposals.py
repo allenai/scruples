@@ -33,7 +33,8 @@ logger = logging.getLogger(__name__)
     '--rounds', type=int, default=3,
     help='The number of rounds of random matchings to run. Each round'
          ' uses every action from the benchmark once. So, k rounds will'
-         ' use an action at most k times. Defaults to 3.')
+         ' use an action at most k times. Duplicate action pairs are'
+         ' dropped after each round. Defaults to 3.')
 def proposals(
         corpus_dir: str,
         proposals_dir: str,
@@ -68,10 +69,25 @@ def proposals(
 
         logger.info(f'Computing random matchings for {rounds} rounds.')
 
+        seen_pairs = set()
         instances = []
         for _ in range(rounds):
             random.shuffle(ids_actions)
             for i in range(0, len(ids_actions) - 1, 2):
+                # check if the pair is a duplicate
+
+                id0, _ = ids_actions[i]
+                id1, _ = ids_actions[i+1]
+                # canonicalize the order of the pair
+                id0, id1 = sorted([id0, id1])
+                # check if the pair has been seen before
+                if (id0, id1) in seen_pairs:
+                    continue
+                else:
+                    seen_pairs.add((id0, id1))
+
+                # add the instance to the proposals
+
                 instances.append({
                     'id': utils.make_id(),
                     'actions': [
