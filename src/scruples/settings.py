@@ -53,10 +53,10 @@ PROPOSALS_FILENAME_TEMPLATE = '{split}.scruples-proposals.jsonl'
 BENCHMARK_FILENAME_TEMPLATE = '{split}.scruples-benchmark.jsonl'
 """A template string for the benchmark's split filenames."""
 
-N_ANNOTATORS_FOR_GOLD_LABELS = 3
+N_ANNOTATORS_FOR_GOLD_LABELS = 5
 """The number of annotators to use for creating the gold labels."""
 
-MIN_AGREEMENT = 3
+MIN_AGREEMENT = 5
 """The minimum number of gold annotators required to agree.
 
 The minimum number of gold annotators required to agree for the instance
@@ -64,7 +64,7 @@ to be considered non-controversial (and thus be included in the final
 dataset.
 """
 
-N_ANNOTATORS_FOR_HUMAN_PERFORMANCE = 3
+N_ANNOTATORS_FOR_HUMAN_PERFORMANCE = 5
 """The number of annotators to use for evaluating human performance."""
 
 N_INSTANCES_PER_HIT = 20
