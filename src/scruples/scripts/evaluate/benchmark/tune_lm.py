@@ -40,9 +40,9 @@ COMPRESSION_LEVEL = 9
     default='xentropy-hard',
     help='The loss type to use for training.')
 @click.option(
-    '--n-iter', type=int, default=256,
+    '--n-iter', type=int, default=64,
     help='The number of iterations of Bayesian optimization to run when'
-         ' tuning the hyper-parameters. Defaults to 256.')
+         ' tuning the hyper-parameters. Defaults to 64.')
 @click.option(
     '--compute-train-batch-size', type=int, default=4,
     help='The largest batch size that can fit on the hardware during'
@@ -50,8 +50,8 @@ COMPRESSION_LEVEL = 9
          ' the actual size of the batch on the hardware respects this'
          ' limit. Defaults to 4.')
 @click.option(
-    '--predict-batch-size', type=int, default=64,
-    help='The batch size for prediction. Defaults to 64.')
+    '--predict-batch-size', type=int, default=32,
+    help='The batch size for prediction. Defaults to 32.')
 @click.option(
     '--mixed-precision', is_flag=True,
     help='Use mixed precision training.')

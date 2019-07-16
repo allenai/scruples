@@ -47,7 +47,7 @@ BERT_CLASSIFIER_HYPER_PARAM_SPACE = [
         name='lr'),
     skopt.space.Real(
         low=1e-5,
-        high=1e-1,
+        high=1e0,
         prior='log-uniform',
         name='weight_decay'),
     skopt.space.Real(
@@ -57,11 +57,11 @@ BERT_CLASSIFIER_HYPER_PARAM_SPACE = [
         name='warmup_proportion'),
     skopt.space.Integer(
         low=1,
-        high=25,
+        high=10,
         name='n_epochs'),
     skopt.space.Integer(
         low=3,
-        high=8,
+        high=10,
         name='log_train_batch_size')
 ]
 """The hyper-param search space for ``BERTClassifier``."""
@@ -124,7 +124,7 @@ BERT_RANKER_HYPER_PARAM_SPACE = [
         name='lr'),
     skopt.space.Real(
         low=1e-5,
-        high=1e-1,
+        high=1e0,
         prior='log-uniform',
         name='weight_decay'),
     skopt.space.Real(
@@ -138,7 +138,7 @@ BERT_RANKER_HYPER_PARAM_SPACE = [
         name='n_epochs'),
     skopt.space.Integer(
         low=3,
-        high=8,
+        high=10,
         name='log_train_batch_size')
 ]
 """The hyper-param seach space for ``BERTRanker``."""
