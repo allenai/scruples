@@ -105,7 +105,7 @@ def run_shallow(
             **settings.TQDM_KWARGS
     ):
         # tune the hyper-parameters and train the model
-        ids, features, labels = dataset.train
+        ids, features, labels, label_scores = dataset.train
         if hyper_parameter_space:
             model = BayesSearchCV(
                 Model,
@@ -130,7 +130,7 @@ def run_shallow(
         # Step 5: Run evaluation on the splits.
 
         for split in splits:
-            ids, features, labels = getattr(dataset, split)
+            ids, features, labels, label_scores = getattr(dataset, split)
 
             predictions = model.predict(features)
             probabilities = model.predict_proba(features)

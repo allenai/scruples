@@ -8,7 +8,7 @@ from typing import Optional
 import click
 import skopt
 
-from .... import baselines, utils
+from .... import baselines, settings, utils
 from ....vendor.skopt import CheckpointSaver
 
 
@@ -35,6 +35,11 @@ COMPRESSION_LEVEL = 9
     default='bert',
     help='The model to train. Defaults to "bert".')
 @click.option(
+    '--loss-type',
+    type=click.Choice(settings.LOSS_TYPES),
+    default='xentropy-hard',
+    help='The loss type to use for training.')
+@click.option(
     '--n-iter', type=int, default=256,
     help='The number of iterations of Bayesian optimization to run when'
          ' tuning the hyper-parameters. Defaults to 256.')
@@ -57,6 +62,7 @@ def tune_lm(
         data_dir: str,
         models_dir: str,
         baseline: str,
+        loss_type: str,
         n_iter: int,
         compute_train_batch_size: int,
         predict_batch_size: int,
@@ -109,6 +115,7 @@ def tune_lm(
             dataset='corpus',
             baseline=baseline,
             hyper_params=hyper_params,
+            loss_type=loss_type,
             compute_train_batch_size=compute_train_batch_size,
             predict_batch_size=predict_batch_size,
             mixed_precision=mixed_precision,

@@ -14,6 +14,7 @@ from typing import (
 from apex.optimizers import (
     FP16_Optimizer,
     FusedAdam)
+import numpy as np
 from pytorch_pretrained_bert.optimization import (
     BertAdam,
     warmup_linear)
@@ -24,6 +25,9 @@ import tqdm
 
 from . import benchmark, corpus
 from .. import settings
+from ..baselines.loss import (
+    SoftCrossEntropyLoss,
+    DirichletMultinomialLoss)
 from ..data.labels import Label
 from ..dataset.readers import (
     ScruplesBenchmarkDataset,
@@ -36,6 +40,7 @@ def train_lm(
         dataset: str,
         baseline: str,
         hyper_params: Dict[str, Any],
+        loss_type: str,
         compute_train_batch_size: int,
         predict_batch_size: int,
         mixed_precision: bool,
@@ -64,6 +69,10 @@ def train_lm(
         function.
     hyper_params : Dict[str, Any]
         The dictionary of hyper-parameters for the model.
+    loss_type : str
+        The type of loss to use. Should be one of ``"xentropy-hard"``,
+        ``"xentropy-soft"``, ``"xentropy-full"`` or
+        ``"dirichlet-multinomial"``.
     compute_train_batch_size : int
         The largest batch size that will fit on the hardware during
         training. Gradient accumulation will be used to make sure the
@@ -83,6 +92,12 @@ def train_lm(
     bool
         ``True`` if the training loss diverged, ``False`` otherwise.
     """
+    if loss_type not in settings.LOSS_TYPES:
+        raise ValueError(
+            f'Unrecognized loss type: {loss_type}. Please use one of'
+            f' "xentropy-hard", "xentropy-soft", "xentropy-full" or'
+            f' "dirichlet-multinomial".')
+
     # Step 1: Manage and construct paths.
 
     if logger is not None:
@@ -123,6 +138,7 @@ def train_lm(
             'dataset': dataset,
             'baseline': baseline,
             'hyper_params': hyper_params,
+            'loss_type': loss_type,
             'compute_train_batch_size': compute_train_batch_size,
             'predict_batch_size': predict_batch_size,
             'mixed_precision': mixed_precision,
@@ -179,9 +195,16 @@ def train_lm(
     if dataset == 'benchmark':
         Dataset = ScruplesBenchmarkDataset
         labelize = None
+        labelize_scores = lambda scores: np.array(scores).astype(float)
     elif dataset == 'corpus':
         Dataset = ScruplesCorpusDataset
         labelize = lambda s: getattr(Label, s).index
+        labelize_scores = lambda scores: np.array([
+            score
+            for _, score in sorted(
+                    scores.items(),
+                    key=lambda t: labelize(t[0]))
+        ]).astype(float)
     else:
         raise ValueError(
             f'dataset must be either "benchmark" or "corpus", not'
@@ -191,12 +214,14 @@ def train_lm(
         data_dir=data_dir,
         split='train',
         transform=featurize,
-        label_transform=labelize)
+        label_transform=labelize,
+        label_scores_transform=labelize_scores)
     dev = Dataset(
         data_dir=data_dir,
         split='dev',
         transform=featurize,
-        label_transform=labelize)
+        label_transform=labelize,
+        label_scores_transform=labelize_scores)
 
     train_loader = DataLoader(
         dataset=train,
@@ -261,7 +286,14 @@ def train_lm(
             warmup=hyper_params['warmup_proportion'],
             t_total=n_optimization_steps)
 
-    loss = torch.nn.CrossEntropyLoss()
+    if loss_type == 'xentropy-hard':
+        loss = torch.nn.CrossEntropyLoss()
+    elif loss_type == 'xentropy-soft':
+        loss = SoftCrossEntropyLoss()
+    elif loss_type == 'xentropy-full':
+        loss = SoftCrossEntropyLoss()
+    elif loss_type == 'dirichlet-multinomial':
+        loss = DirichletMultinomialLoss()
 
     # Step 8: Run training.
 
@@ -277,8 +309,9 @@ def train_lm(
 
         # run training for the epoch
         epoch_train_loss = 0
+        epoch_train_xentropy = 0
         epoch_train_accuracy = 0
-        for i, (_, features, labels) in tqdm.tqdm(
+        for i, (_, features, labels, label_scores) in tqdm.tqdm(
                 enumerate(train_loader),
                 total=n_gradient_accumulation * n_train_batches_per_epoch,
                 **settings.TQDM_KWARGS
@@ -287,16 +320,42 @@ def train_lm(
             features = {k: v.to(device) for k, v in features.items()}
             labels = labels.to(device)
 
+            if loss_type == 'xentropy-hard':
+                targets = labels
+                encoded_labels = labels
+            elif loss_type == 'xentropy-soft':
+                targets = label_scores
+                targets = targets / torch.unsqueeze(
+                    torch.sum(targets, dim=-1), dim=-1)
+                encoded_labels = torch.eye(len(Label))[labels]
+            elif loss_type == 'xentropy-full':
+                targets = label_scores
+                encoded_labels = torch.eye(len(Label))[labels]
+            elif loss_type == 'dirichlet-multinomial':
+                targets = label_scores
+                encoded_labels = torch.eye(len(Label))[labels]
+
+            if mixed_precision and loss_type != 'xentropy-hard':
+                targets = targets.half()
+                encoded_labels = encoded_labels.half()
+
+            targets = targets.to(device)
+            encoded_labels = encoded_labels.to(device)
+
             # make predictions
             logits = model(**features)
             _, predictions = torch.max(logits, 1)
 
-            batch_loss = loss(logits, labels)
+            batch_loss = loss(logits, targets)
+            batch_xentropy = loss(logits, encoded_labels)
             batch_accuracy = (predictions == labels).float().mean()
 
             # update training statistics
             epoch_train_loss = (
                 batch_loss.item() + i * epoch_train_loss
+            ) / (i + 1)
+            epoch_train_xentropy = (
+                batch_xentropy.item() + i * epoch_train_xentropy
             ) / (i + 1)
             epoch_train_accuracy = (
                 batch_accuracy.item() + i * epoch_train_accuracy
@@ -329,6 +388,7 @@ def train_lm(
                 (i + 1) // n_gradient_accumulation)
             if step % 100 == 0 and (i + 1) % n_gradient_accumulation == 0:
                 writer.add_scalar('train/loss', epoch_train_loss, step)
+                writer.add_scalar('train/xentropy', epoch_train_xentropy, step)
                 writer.add_scalar('train/accuracy', epoch_train_accuracy, step)
 
         # run evaluation
@@ -338,8 +398,9 @@ def train_lm(
 
             # run validation for the epoch
             epoch_dev_loss = 0
+            epoch_dev_xentropy = 0
             epoch_dev_accuracy = 0
-            for i, (_, features, labels) in tqdm.tqdm(
+            for i, (_, features, labels, label_scores) in tqdm.tqdm(
                     enumerate(dev_loader),
                     total=n_dev_batch_per_epoch,
                     **settings.TQDM_KWARGS):
@@ -351,12 +412,38 @@ def train_lm(
                 logits = model(**features)
                 _, predictions = torch.max(logits, 1)
 
-                batch_loss = loss(logits, labels)
+                if loss_type == 'xentropy-hard':
+                    targets = labels
+                    encoded_labels = labels
+                elif loss_type == 'xentropy-soft':
+                    targets = label_scores
+                    targets = targets / torch.unsqueeze(
+                        torch.sum(targets, dim=-1), dim=-1)
+                    encoded_labels = torch.eye(len(Label))[labels]
+                elif loss_type == 'xentropy-full':
+                    targets = label_scores
+                    encoded_labels = torch.eye(len(Label))[labels]
+                elif loss_type == 'dirichlet-multinomial':
+                    targets = label_scores
+                    encoded_labels = torch.eye(len(Label))[labels]
+
+                if mixed_precision and loss_type != 'xentropy-hard':
+                    targets = targets.half()
+                    encoded_labels = encoded_labels.half()
+
+                targets = targets.to(device)
+                encoded_labels = encoded_labels.to(device)
+
+                batch_loss = loss(logits, targets)
+                batch_xentropy = loss(logits, encoded_labels)
                 batch_accuracy = (predictions == labels).float().mean()
 
                 # update validation statistics
                 epoch_dev_loss = (
                     batch_loss.item() + i * epoch_dev_loss
+                ) / (i + 1)
+                epoch_dev_xentropy = (
+                    batch_xentropy.item() + i * epoch_dev_xentropy
                 ) / (i + 1)
                 epoch_dev_accuracy = (
                     batch_accuracy.item() + i * epoch_dev_accuracy
@@ -364,6 +451,7 @@ def train_lm(
 
             # write validation statistics to tensorboard
             writer.add_scalar('dev/loss', epoch_dev_loss, step)
+            writer.add_scalar('dev/xentropy', epoch_dev_xentropy, step)
             writer.add_scalar('dev/accuracy', epoch_dev_accuracy, step)
 
             if logger is not None:
@@ -371,8 +459,10 @@ def train_lm(
                     f'\n\n'
                     f'  epoch {epoch}:\n'
                     f'    train loss     : {epoch_train_loss:.4f}\n'
+                    f'    train xentropy : {epoch_train_xentropy:.4f}\n'
                     f'    train accuracy : {epoch_train_accuracy:.4f}\n'
                     f'    dev loss       : {epoch_dev_loss:.4f}\n'
+                    f'    dev xentropy   : {epoch_dev_xentropy:.4f}\n'
                     f'    dev accuracy   : {epoch_dev_accuracy:.4f}\n')
 
         # update checkpoints

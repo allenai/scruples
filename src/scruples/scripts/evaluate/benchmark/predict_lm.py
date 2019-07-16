@@ -14,6 +14,7 @@ import tqdm
 
 from .... import settings, baselines
 from ....baselines.metrics import METRICS
+from ....baselines.utils import dirichlet_multinomial
 from ....dataset.readers import ScruplesBenchmarkDataset
 
 
@@ -162,8 +163,16 @@ def predict_lm(
 
                 ids.extend(mb_ids)
                 predictions.extend(mb_predictions.cpu().numpy().tolist())
-                probabilities.extend(
-                    softmax(mb_logits.cpu().numpy(), axis=1).tolist())
+                if (
+                        config['loss_type'] == 'xentropy-hard'
+                        or config['loss_type'] == 'xentropy-soft'
+                        or config['loss_type'] == 'xentropy-full'
+                ):
+                    probabilities.extend(
+                        softmax(mb_logits.cpu().numpy(), axis=1).tolist())
+                elif config['loss_type'] == 'dirichlet-multinomial':
+                    probabilities.extend(dirichlet_multinomial(
+                        mb_logits.cpu().numpy()).tolist())
                 labels.extend(mb_labels.cpu().numpy().tolist())
 
         # write metrics to disk

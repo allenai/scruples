@@ -110,11 +110,13 @@ class BaselineTestMixin:
         baseline = self.BASELINE_MODEL
 
         # train the model
-        _, train_features, train_labels = self.dataset.train
+        _, train_features, train_labels, train_label_scores =\
+            self.dataset.train
         baseline.fit(train_features, train_labels)
 
         # predict with the model on dev
-        _, dev_features, dev_labels = self.dataset.dev
+        _, dev_features, dev_labels, dev_label_scores =\
+            self.dataset.dev
         predictions = baseline.predict(dev_features)
 
         # check that the accuracy is 100%
@@ -136,11 +138,13 @@ class BaselineTestMixin:
             refit=True)
 
         # train the model, tuning hyper-parameters
-        _, train_features, train_labels = self.dataset.train
+        _, train_features, train_labels, train_label_scores =\
+            self.dataset.train
         baseline.fit(train_features, train_labels)
 
         # predict with the model on dev
-        _, dev_features, dev_labels = self.dataset.dev
+        _, dev_features, dev_labels, dev_label_scores =\
+            self.dataset.dev
         predictions = baseline.predict(dev_features)
 
         # check that the accuracy is 100%

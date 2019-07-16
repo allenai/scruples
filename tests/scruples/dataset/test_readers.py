@@ -40,7 +40,8 @@ class ScruplesCorpusTestCase(unittest.TestCase):
         corpus = readers.ScruplesCorpus(data_dir=self.temp_dir.name)
 
         # train
-        train_ids, train_features, train_labels = corpus.train
+        train_ids, train_features, train_labels, train_label_scores =\
+            corpus.train
         self.assertIsInstance(train_ids, pd.Series)
         self.assertEqual(train_ids.tolist()[0], 'id_0')
         self.assertIsInstance(train_features, pd.DataFrame)
@@ -52,9 +53,18 @@ class ScruplesCorpusTestCase(unittest.TestCase):
             })
         self.assertIsInstance(train_labels, pd.Series)
         self.assertEqual(train_labels.tolist()[0], 'OTHER')
+        self.assertIsInstance(train_label_scores, pd.DataFrame)
+        self.assertEqual(
+            {
+                k: v
+                for k, v in zip(
+                        train_label_scores.columns,
+                        train_label_scores.to_records()[0].tolist()[1:])
+            },
+            {"AUTHOR": 0, "OTHER": 10, "EVERYBODY": 0, "NOBODY": 0, "INFO": 0})
 
         # dev
-        dev_ids, dev_features, dev_labels = corpus.dev
+        dev_ids, dev_features, dev_labels, dev_label_scores = corpus.dev
         self.assertIsInstance(dev_ids, pd.Series)
         self.assertEqual(dev_ids.tolist()[0], 'id_20')
         self.assertIsInstance(dev_features, pd.DataFrame)
@@ -66,9 +76,18 @@ class ScruplesCorpusTestCase(unittest.TestCase):
             })
         self.assertIsInstance(dev_labels, pd.Series)
         self.assertEqual(dev_labels.tolist()[0], 'OTHER')
+        self.assertIsInstance(dev_label_scores, pd.DataFrame)
+        self.assertEqual(
+            {
+                k: v
+                for k, v in zip(
+                        dev_label_scores.columns,
+                        dev_label_scores.to_records()[0].tolist()[1:])
+            },
+            {"AUTHOR": 0, "OTHER": 10, "EVERYBODY": 0, "NOBODY": 0, "INFO": 0})
 
         # test
-        test_ids, test_features, test_labels = corpus.test
+        test_ids, test_features, test_labels, test_label_scores = corpus.test
         self.assertIsInstance(test_ids, pd.Series)
         self.assertEqual(test_ids.tolist()[0], 'id_25')
         self.assertIsInstance(test_features, pd.DataFrame)
@@ -80,6 +99,15 @@ class ScruplesCorpusTestCase(unittest.TestCase):
             })
         self.assertIsInstance(test_labels, pd.Series)
         self.assertEqual(test_labels.tolist()[0], 'OTHER')
+        self.assertIsInstance(test_label_scores, pd.DataFrame)
+        self.assertEqual(
+            {
+                k: v
+                for k, v in zip(
+                        test_label_scores.columns,
+                        test_label_scores.to_records()[0].tolist()[1:])
+            },
+            {"AUTHOR": 0, "OTHER": 10, "EVERYBODY": 0, "NOBODY": 0, "INFO": 0})
 
 
 class ScruplesCorpusDatasetTestCase(unittest.TestCase):
@@ -114,7 +142,8 @@ class ScruplesCorpusDatasetTestCase(unittest.TestCase):
               data_dir=self.temp_dir.name,
               split='val',
               transform=None,
-              label_transform=None)
+              label_transform=None,
+              label_scores_transform=None)
 
     def test_len(self):
         # test len on train
@@ -122,7 +151,8 @@ class ScruplesCorpusDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
-            label_transform=None)
+            label_transform=None,
+            label_scores_transform=None)
         self.assertEqual(len(train), 20)
 
         # test len on dev
@@ -130,7 +160,8 @@ class ScruplesCorpusDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
-            label_transform=None)
+            label_transform=None,
+            label_scores_transform=None)
         self.assertEqual(len(dev), 5)
 
         # test len on test
@@ -138,7 +169,8 @@ class ScruplesCorpusDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
-            label_transform=None)
+            label_transform=None,
+            label_scores_transform=None)
         self.assertEqual(len(test), 5)
 
     def test___get_item__(self):
@@ -147,14 +179,18 @@ class ScruplesCorpusDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
-            label_transform=None)
-        id_, feature, label = train[0]
+            label_transform=None,
+            label_scores_transform=None)
+        id_, feature, label, label_scores = train[0]
         self.assertEqual(id_, 'id_0')
         self.assertEqual(feature, (
             "AITA test post",
             "This post is nta."
         ))
         self.assertEqual(label, 'OTHER')
+        self.assertEqual(
+            label_scores,
+            {"AUTHOR": 0, "OTHER": 10, "EVERYBODY": 0, "NOBODY": 0, "INFO": 0})
 
         # test __get_item__ on dev
         dev = readers.ScruplesCorpusDataset(
@@ -162,13 +198,16 @@ class ScruplesCorpusDatasetTestCase(unittest.TestCase):
             split='dev',
             transform=None,
             label_transform=None)
-        id_, feature, label = dev[0]
+        id_, feature, label, label_scores = dev[0]
         self.assertEqual(id_, 'id_20')
         self.assertEqual(feature, (
             "AITA test post",
             "Label this post nta."
         ))
         self.assertEqual(label, 'OTHER')
+        self.assertEqual(
+            label_scores,
+            {"AUTHOR": 0, "OTHER": 10, "EVERYBODY": 0, "NOBODY": 0, "INFO": 0})
 
         # test __get_item__ on test
         test = readers.ScruplesCorpusDataset(
@@ -176,13 +215,16 @@ class ScruplesCorpusDatasetTestCase(unittest.TestCase):
             split='test',
             transform=None,
             label_transform=None)
-        id_, feature, label = test[0]
+        id_, feature, label, label_scores = test[0]
         self.assertEqual(id_, 'id_25')
         self.assertEqual(feature, (
             "AITA test post",
             "The label for this post should be nta."
         ))
         self.assertEqual(label, 'OTHER')
+        self.assertEqual(
+            label_scores,
+            {"AUTHOR": 0, "OTHER": 10, "EVERYBODY": 0, "NOBODY": 0, "INFO": 0})
 
     def test_init_with_transform(self):
         # test the train split
@@ -191,9 +233,10 @@ class ScruplesCorpusDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='train',
             transform=train_transform,
-            label_transform=None)
+            label_transform=None,
+            label_scores_transform=None)
         # call the transform and check the return value
-        _, feature, _ = train[0]
+        _, feature, _, _ = train[0]
         self.assertEqual(feature, 'foo')
         # check that the transform was called correctly
         self.assertEqual(train_transform.call_count, 1)
@@ -210,9 +253,10 @@ class ScruplesCorpusDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='dev',
             transform=dev_transform,
-            label_transform=None)
+            label_transform=None,
+            label_scores_transform=None)
         # call the transform and check the return value
-        _, feature, _ = dev[0]
+        _, feature, _, _ = dev[0]
         self.assertEqual(feature, 'foo')
         # check that the transform was called correctly
         self.assertEqual(dev_transform.call_count, 1)
@@ -229,9 +273,10 @@ class ScruplesCorpusDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='test',
             transform=test_transform,
-            label_transform=None)
+            label_transform=None,
+            label_scores_transform=None)
         # call the transform and check the return value
-        _, feature, _ = test[0]
+        _, feature, _, _ = test[0]
         self.assertEqual(feature, 'foo')
         # check that the transform was called correctly
         self.assertEqual(test_transform.call_count, 1)
@@ -249,9 +294,10 @@ class ScruplesCorpusDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
-            label_transform=train_label_transform)
+            label_transform=train_label_transform,
+            label_scores_transform=None)
         # call the transform and check the return value
-        _, _, label = train[0]
+        _, _, label, _ = train[0]
         self.assertEqual(label, 'foo')
         # check that the transform was called correctly
         self.assertEqual(train_label_transform.call_count, 1)
@@ -265,9 +311,10 @@ class ScruplesCorpusDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
-            label_transform=dev_label_transform)
+            label_transform=dev_label_transform,
+            label_scores_transform=None)
         # call the transform and check the return value
-        _, _, label = dev[0]
+        _, _, label, _ = dev[0]
         self.assertEqual(label, 'foo')
         # check that the transform was called correctly
         self.assertEqual(dev_label_transform.call_count, 1)
@@ -281,14 +328,97 @@ class ScruplesCorpusDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
-            label_transform=test_label_transform)
+            label_transform=test_label_transform,
+            label_scores_transform=None)
         # call the transform and check the return value
-        _, _, label = test[0]
+        _, _, label, _ = test[0]
         self.assertEqual(label, 'foo')
         # check that the transform was called correctly
         self.assertEqual(test_label_transform.call_count, 1)
         args, kwargs = test_label_transform.call_args
         self.assertEqual(args, ('OTHER',))
+        self.assertEqual(kwargs, {})
+
+    def test_init_with_label_scores_transform(self):
+        # test the train split
+        train_label_scores_transform = Mock(return_value='foo')
+        train = readers.ScruplesCorpusDataset(
+            data_dir=self.temp_dir.name,
+            split='train',
+            transform=None,
+            label_transform=None,
+            label_scores_transform=train_label_scores_transform)
+        # call the transform and check the return value
+        _, _, _, label_scores = train[0]
+        self.assertEqual(label_scores, 'foo')
+        # check that the transform was called correctly
+        self.assertEqual(train_label_scores_transform.call_count, 1)
+        args, kwargs = train_label_scores_transform.call_args
+        self.assertEqual(
+            args,
+            (
+                {
+                    'AUTHOR': 0,
+                    'OTHER': 10,
+                    'EVERYBODY': 0,
+                    'NOBODY': 0,
+                    'INFO': 0
+                },
+            ))
+        self.assertEqual(kwargs, {})
+
+        # test the dev split
+        dev_label_scores_transform = Mock(return_value='foo')
+        dev = readers.ScruplesCorpusDataset(
+            data_dir=self.temp_dir.name,
+            split='dev',
+            transform=None,
+            label_transform=None,
+            label_scores_transform=dev_label_scores_transform)
+        # call the transform and check the return value
+        _, _, _, label_scores = dev[0]
+        self.assertEqual(label_scores, 'foo')
+        # check that the transform was called correctly
+        self.assertEqual(dev_label_scores_transform.call_count, 1)
+        args, kwargs = dev_label_scores_transform.call_args
+        self.assertEqual(
+            args,
+            (
+                {
+                    'AUTHOR': 0,
+                    'OTHER': 10,
+                    'EVERYBODY': 0,
+                    'NOBODY': 0,
+                    'INFO': 0
+                },
+            ))
+        self.assertEqual(kwargs, {})
+
+        # test the test split
+        test_label_scores_transform = Mock(return_value='foo')
+        test = readers.ScruplesCorpusDataset(
+            data_dir=self.temp_dir.name,
+            split='test',
+            transform=None,
+            label_transform=None,
+            label_scores_transform=test_label_scores_transform)
+        # call the transform and check the return value
+        _, _, _, label_scores = test[0]
+        self.assertEqual(label_scores, 'foo')
+        # check that the transform was called correctly
+        self.assertEqual(test_label_scores_transform.call_count, 1)
+        args, kwargs = test_label_scores_transform.call_args
+        self.assertEqual(
+            args,
+            (
+                {
+                    'AUTHOR': 0,
+                    'OTHER': 10,
+                    'EVERYBODY': 0,
+                    'NOBODY': 0,
+                    'INFO': 0
+                },
+            ))
         self.assertEqual(kwargs, {})
 
 
@@ -320,7 +450,8 @@ class ScruplesBenchmarkTestCase(unittest.TestCase):
         benchmark = readers.ScruplesBenchmark(data_dir=self.temp_dir.name)
 
         # train
-        train_ids, train_features, train_labels = benchmark.train
+        train_ids, train_features, train_labels, train_label_scores =\
+            benchmark.train
         self.assertIsInstance(train_ids, pd.Series)
         self.assertEqual(train_ids.tolist()[0], 'id_0')
         self.assertIsInstance(train_features, pd.DataFrame)
@@ -332,9 +463,14 @@ class ScruplesBenchmarkTestCase(unittest.TestCase):
             })
         self.assertIsInstance(train_labels, pd.Series)
         self.assertEqual(train_labels.tolist()[0], 0)
+        self.assertIsInstance(train_label_scores, pd.DataFrame)
+        self.assertEqual(
+            list(train_label_scores.to_records()[0])[1:],
+            [1, 0])
 
         # dev
-        dev_ids, dev_features, dev_labels = benchmark.dev
+        dev_ids, dev_features, dev_labels, dev_label_scores =\
+            benchmark.dev
         self.assertIsInstance(dev_ids, pd.Series)
         self.assertEqual(dev_ids.tolist()[0], 'id_16')
         self.assertIsInstance(dev_features, pd.DataFrame)
@@ -346,9 +482,14 @@ class ScruplesBenchmarkTestCase(unittest.TestCase):
             })
         self.assertIsInstance(dev_labels, pd.Series)
         self.assertEqual(dev_labels.tolist()[0], 0)
+        self.assertIsInstance(dev_label_scores, pd.DataFrame)
+        self.assertEqual(
+            list(dev_label_scores.to_records()[0])[1:],
+            [1, 0])
 
         # test
-        test_ids, test_features, test_labels = benchmark.test
+        test_ids, test_features, test_labels, test_label_scores =\
+            benchmark.test
         self.assertIsInstance(test_ids, pd.Series)
         self.assertEqual(test_ids.tolist()[0], 'id_20')
         self.assertIsInstance(test_features, pd.DataFrame)
@@ -360,6 +501,10 @@ class ScruplesBenchmarkTestCase(unittest.TestCase):
             })
         self.assertIsInstance(test_labels, pd.Series)
         self.assertEqual(test_labels.tolist()[0], 0)
+        self.assertIsInstance(test_label_scores, pd.DataFrame)
+        self.assertEqual(
+            list(test_label_scores.to_records()[0])[1:],
+            [1, 0])
 
 
 class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
@@ -394,7 +539,8 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
               data_dir=self.temp_dir.name,
               split='val',
               transform=None,
-              label_transform=None)
+              label_transform=None,
+              label_scores_transform=None)
 
     def test_len(self):
         # test len on train
@@ -402,7 +548,8 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
-            label_transform=None)
+            label_transform=None,
+            label_scores_transform=None)
         self.assertEqual(len(train), 16)
 
         # test len on dev
@@ -410,7 +557,8 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
-            label_transform=None)
+            label_transform=None,
+            label_scores_transform=None)
         self.assertEqual(len(dev), 4)
 
         # test len on test
@@ -418,7 +566,8 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
-            label_transform=None)
+            label_transform=None,
+            label_scores_transform=None)
         self.assertEqual(len(test), 4)
 
     def test___get_item__(self):
@@ -427,42 +576,48 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
-            label_transform=None)
-        id_, feature, label = train[0]
+            label_transform=None,
+            label_scores_transform=None)
+        id_, feature, label, label_scores = train[0]
         self.assertEqual(id_, 'id_0')
         self.assertEqual(feature, (
             "A good action.",
             "A bad action."
         ))
         self.assertEqual(label, 0)
+        self.assertEqual(label_scores, [1, 0])
 
         # test __get_item__ on dev
         dev = readers.ScruplesBenchmarkDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
-            label_transform=None)
-        id_, feature, label = dev[0]
+            label_transform=None,
+            label_scores_transform=None)
+        id_, feature, label, label_scores = dev[0]
         self.assertEqual(id_, 'id_16')
         self.assertEqual(feature, (
             "The good action.",
             "The bad action."
         ))
         self.assertEqual(label, 0)
+        self.assertEqual(label_scores, [1, 0])
 
         # test __get_item__ on test
         test = readers.ScruplesBenchmarkDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
-            label_transform=None)
-        id_, feature, label = test[0]
+            label_transform=None,
+            label_scores_transform=None)
+        id_, feature, label, label_scores = test[0]
         self.assertEqual(id_, 'id_20')
         self.assertEqual(feature, (
             "Indeed, this describes a very good action.",
             "Indeed, this describes a very bad action."
         ))
         self.assertEqual(label, 0)
+        self.assertEqual(label_scores, [1, 0])
 
     def test_init_with_transform(self):
         # test the train split
@@ -471,9 +626,10 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='train',
             transform=train_transform,
-            label_transform=None)
+            label_transform=None,
+            label_scores_transform=None)
         # call the transform and check the return value
-        _, feature, _ = train[0]
+        _, feature, _, _ = train[0]
         self.assertEqual(feature, 'foo')
         # check that the transform was called correctly
         self.assertEqual(train_transform.call_count, 1)
@@ -490,9 +646,10 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='dev',
             transform=dev_transform,
-            label_transform=None)
+            label_transform=None,
+            label_scores_transform=None)
         # call the transform and check the return value
-        _, feature, _ = dev[0]
+        _, feature, _, _ = dev[0]
         self.assertEqual(feature, 'foo')
         # check that the transform was called correctly
         self.assertEqual(dev_transform.call_count, 1)
@@ -509,9 +666,10 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='test',
             transform=test_transform,
-            label_transform=None)
+            label_transform=None,
+            label_scores_transform=None)
         # call the transform and check the return value
-        _, feature, _ = test[0]
+        _, feature, _, _ = test[0]
         self.assertEqual(feature, 'foo')
         # check that the transform was called correctly
         self.assertEqual(test_transform.call_count, 1)
@@ -529,9 +687,10 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
-            label_transform=train_label_transform)
+            label_transform=train_label_transform,
+            label_scores_transform=None)
         # call the transform and check the return value
-        _, _, label = train[0]
+        _, _, label, _ = train[0]
         self.assertEqual(label, 'foo')
         # check that the transform was called correctly
         self.assertEqual(train_label_transform.call_count, 1)
@@ -545,9 +704,10 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
-            label_transform=dev_label_transform)
+            label_transform=dev_label_transform,
+            label_scores_transform=None)
         # call the transform and check the return value
-        _, _, label = dev[0]
+        _, _, label, _ = dev[0]
         self.assertEqual(label, 'foo')
         # check that the transform was called correctly
         self.assertEqual(dev_label_transform.call_count, 1)
@@ -561,12 +721,65 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
-            label_transform=test_label_transform)
+            label_transform=test_label_transform,
+            label_scores_transform=None)
         # call the transform and check the return value
-        _, _, label = test[0]
+        _, _, label, _ = test[0]
         self.assertEqual(label, 'foo')
         # check that the transform was called correctly
         self.assertEqual(test_label_transform.call_count, 1)
         args, kwargs = test_label_transform.call_args
         self.assertEqual(args, (0,))
+        self.assertEqual(kwargs, {})
+
+    def test_init_with_label_scores_transform(self):
+        # test the train split
+        train_label_scores_transform = Mock(return_value='foo')
+        train = readers.ScruplesBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='train',
+            transform=None,
+            label_transform=None,
+            label_scores_transform=train_label_scores_transform)
+        # call the transform and check the return value
+        _, _, _, label_scores = train[0]
+        self.assertEqual(label_scores, 'foo')
+        # check that the transform was called correctly
+        self.assertEqual(train_label_scores_transform.call_count, 1)
+        args, kwargs = train_label_scores_transform.call_args
+        self.assertEqual(args, ([1, 0],))
+        self.assertEqual(kwargs, {})
+
+        # test the dev split
+        dev_label_scores_transform = Mock(return_value='foo')
+        dev = readers.ScruplesBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='dev',
+            transform=None,
+            label_transform=None,
+            label_scores_transform=dev_label_scores_transform)
+        # call the transform and check the return value
+        _, _, _, label_scores = dev[0]
+        self.assertEqual(label_scores, 'foo')
+        # check that the transform was called correctly
+        self.assertEqual(dev_label_scores_transform.call_count, 1)
+        args, kwargs = dev_label_scores_transform.call_args
+        self.assertEqual(args, ([1, 0],))
+        self.assertEqual(kwargs, {})
+
+        # test the test split
+        test_label_scores_transform = Mock(return_value='foo')
+        test = readers.ScruplesBenchmarkDataset(
+            data_dir=self.temp_dir.name,
+            split='test',
+            transform=None,
+            label_transform=None,
+            label_scores_transform=test_label_scores_transform)
+        # call the transform and check the return value
+        _, _, _, label_scores = test[0]
+        self.assertEqual(label_scores, 'foo')
+        # check that the transform was called correctly
+        self.assertEqual(test_label_scores_transform.call_count, 1)
+        args, kwargs = test_label_scores_transform.call_args
+        self.assertEqual(args, ([1, 0],))
         self.assertEqual(kwargs, {})

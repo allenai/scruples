@@ -4,6 +4,7 @@ from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
+from scipy.special import gammaln
 from sklearn.base import (
     BaseEstimator,
     TransformerMixin)
@@ -27,6 +28,27 @@ def concat_title_and_text(features: pd.DataFrame) -> np.ndarray:
         newline character, in a numpy array.
     """
     return (features['title'] + '\n' + features['text']).values
+
+
+def dirichlet_multinomial(log_alphas: np.ndarray) -> np.ndarray:
+    """Return class probabilities from a dirichlet-multinomial model.
+
+    Parameters
+    ----------
+    log_alphas : np.ndarray
+        An n x k dimensional numpy array where n is the number of
+        samples and k is the number of classes. The values of the array
+        should correspond to the log of the alpha parameters for the
+        predicted dirichlet distribution corresponding to each instance.
+
+    Returns
+    -------
+    np.ndarray
+        An n x k dimensional array giving the class probabilities
+        corresponding to ``log_alphas`` for each sample.
+    """
+    alphas = np.exp(log_alphas)
+    return alphas / np.expand_dims(np.sum(alphas, axis=-1), -1)
 
 
 # classes

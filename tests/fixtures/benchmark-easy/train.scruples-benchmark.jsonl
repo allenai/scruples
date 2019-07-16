@@ -1,16 +1,16 @@
-{"id": "id_0", "actions": [{"id": "action_id_0_0", "description": "A good action."}, {"id": "action_id_0_1", "description": "A bad action."}], "gold_label": 0}
-{"id": "id_1", "actions": [{"id": "action_id_1_0", "description": "A very bad action."}, {"id": "action_id_1_1", "description": "A very good action."}], "gold_label": 1}
-{"id": "id_2", "actions": [{"id": "action_id_2_0", "description": "This action is good."}, {"id": "action_id_2_1", "description": "This action is bad."}], "gold_label": 0}
-{"id": "id_3", "actions": [{"id": "action_id_3_0", "description": "bad!"}, {"id": "action_id_3_1", "description": "good!"}], "gold_label": 1}
-{"id": "id_4", "actions": [{"id": "action_id_4_0", "description": "Very good."}, {"id": "action_id_4_1", "description": "Very bad."}], "gold_label": 0}
-{"id": "id_5", "actions": [{"id": "action_id_5_0", "description": "A most bad thing to do."}, {"id": "action_id_5_1", "description": "A most good thing to do."}], "gold_label": 1}
-{"id": "id_6", "actions": [{"id": "action_id_6_0", "description": "Do choose this good thing."}, {"id": "action_id_6_1", "description": "Don't choose this bad thing"}], "gold_label": 0}
-{"id": "id_7", "actions": [{"id": "action_id_7_0", "description": "This description is about a bad action."}, {"id": "action_id_7_1", "description": "This description is about a good action."}], "gold_label": 1}
-{"id": "id_8", "actions": [{"id": "action_id_8_0", "description": "A good action."}, {"id": "action_id_8_1", "description": "A very bad action."}], "gold_label": 0}
-{"id": "id_9", "actions": [{"id": "action_id_9_0", "description": "A bad action."}, {"id": "action_id_9_1", "description": "A very good action."}], "gold_label": 1}
-{"id": "id_10", "actions": [{"id": "action_id_10_0", "description": "good!"}, {"id": "action_id_10_1", "description": "This action is bad."}], "gold_label": 0}
-{"id": "id_11", "actions": [{"id": "action_id_11_0", "description": "bad!"}, {"id": "action_id_11_1", "description": "This action is good."}], "gold_label": 1}
-{"id": "id_12", "actions": [{"id": "action_id_12_0", "description": "A most good thing to do."}, {"id": "action_id_12_1", "description": "Very bad."}], "gold_label": 0}
-{"id": "id_13", "actions": [{"id": "action_id_13_0", "description": "A most bad thing to do."}, {"id": "action_id_13_1", "description": "Very good."}], "gold_label": 1}
-{"id": "id_14", "actions": [{"id": "action_id_14_0", "description": "This description is about a good action."}, {"id": "action_id_14_1", "description": "Don't choose this bad thing."}], "gold_label": 0}
-{"id": "id_15", "actions": [{"id": "action_id_15_0", "description": "This description is about a bad action."}, {"id": "action_id_15_1", "description": "Do choose this good thing."}], "gold_label": 1}
+{"id": "id_0", "actions": [{"id": "action_id_0_0", "description": "A good action."}, {"id": "action_id_0_1", "description": "A bad action."}], "gold_label": 0, "gold_annotations": [1, 0]}
+{"id": "id_1", "actions": [{"id": "action_id_1_0", "description": "A very bad action."}, {"id": "action_id_1_1", "description": "A very good action."}], "gold_label": 1, "gold_annotations": [0, 1]}
+{"id": "id_2", "actions": [{"id": "action_id_2_0", "description": "This action is good."}, {"id": "action_id_2_1", "description": "This action is bad."}], "gold_label": 0, "gold_annotations": [1, 0]}
+{"id": "id_3", "actions": [{"id": "action_id_3_0", "description": "bad!"}, {"id": "action_id_3_1", "description": "good!"}], "gold_label": 1, "gold_annotations": [0, 1]}
+{"id": "id_4", "actions": [{"id": "action_id_4_0", "description": "Very good."}, {"id": "action_id_4_1", "description": "Very bad."}], "gold_label": 0, "gold_annotations": [1, 0]}
+{"id": "id_5", "actions": [{"id": "action_id_5_0", "description": "A most bad thing to do."}, {"id": "action_id_5_1", "description": "A most good thing to do."}], "gold_label": 1, "gold_annotations": [0, 1]}
+{"id": "id_6", "actions": [{"id": "action_id_6_0", "description": "Do choose this good thing."}, {"id": "action_id_6_1", "description": "Don't choose this bad thing"}], "gold_label": 0, "gold_annotations": [1, 0]}
+{"id": "id_7", "actions": [{"id": "action_id_7_0", "description": "This description is about a bad action."}, {"id": "action_id_7_1", "description": "This description is about a good action."}], "gold_label": 1, "gold_annotations": [0, 1]}
+{"id": "id_8", "actions": [{"id": "action_id_8_0", "description": "A good action."}, {"id": "action_id_8_1", "description": "A very bad action."}], "gold_label": 0, "gold_annotations": [1, 0]}
+{"id": "id_9", "actions": [{"id": "action_id_9_0", "description": "A bad action."}, {"id": "action_id_9_1", "description": "A very good action."}], "gold_label": 1, "gold_annotations": [0, 1]}
+{"id": "id_10", "actions": [{"id": "action_id_10_0", "description": "good!"}, {"id": "action_id_10_1", "description": "This action is bad."}], "gold_label": 0, "gold_annotations": [1, 0]}
+{"id": "id_11", "actions": [{"id": "action_id_11_0", "description": "bad!"}, {"id": "action_id_11_1", "description": "This action is good."}], "gold_label": 1, "gold_annotations": [0, 1]}
+{"id": "id_12", "actions": [{"id": "action_id_12_0", "description": "A most good thing to do."}, {"id": "action_id_12_1", "description": "Very bad."}], "gold_label": 0, "gold_annotations": [1, 0]}
+{"id": "id_13", "actions": [{"id": "action_id_13_0", "description": "A most bad thing to do."}, {"id": "action_id_13_1", "description": "Very good."}], "gold_label": 1, "gold_annotations": [0, 1]}
+{"id": "id_14", "actions": [{"id": "action_id_14_0", "description": "This description is about a good action."}, {"id": "action_id_14_1", "description": "Don't choose this bad thing."}], "gold_label": 0, "gold_annotations": [1, 0]}
+{"id": "id_15", "actions": [{"id": "action_id_15_0", "description": "This description is about a bad action."}, {"id": "action_id_15_1", "description": "Do choose this good thing."}], "gold_label": 1, "gold_annotations": [0, 1]}

@@ -71,6 +71,35 @@ N_INSTANCES_PER_HIT = 20
 """The number of instances annotated in a single HIT."""
 
 
+# evaluation
+
+LOSS_TYPES = [
+    'xentropy-hard',
+    'xentropy-soft',
+    'xentropy-full',
+    'dirichlet-multinomial'
+]
+"""The different loss types for deep baseline models.
+
+``"xentropy-hard"`` uses cross-entropy on the hard labels derived from
+the plurality.
+
+``"xentropy-soft"`` uses cross-entropy against soft labels derived from
+averaging the individual labels together.
+
+``"xentropy-full"`` uses the full negative log-likelihood objective with
+all of the annotations. So, unlike ``"xentropy-soft"``, it doesn't
+average the annotations then compute the cross-entropy, but simply sums
+the contributions from each label. This loss is equivalent to
+``"xentropy-soft"`` in the case where each instance has the same number
+of annotations.
+
+``"dirichlet-multinomial"`` uses a dirichlet-multinomial likelihood
+where the model is predicting the parameters for the dirichlet
+distribution as part of the hierarchical model.
+"""
+
+
 # output and logging
 
 LOG_FORMAT = '%(asctime)s:%(levelname)s:%(name)s: %(message)s'

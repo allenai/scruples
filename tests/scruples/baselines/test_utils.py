@@ -23,6 +23,34 @@ class ConcatTitleAndTextTestCase(unittest.TestCase):
             ['The Title A\nThe text A.', 'The Title B\nThe text B.'])
 
 
+class DirichletMultinomialTestCase(unittest.TestCase):
+    """Test dirichlet_multinomial."""
+
+    def test_dirichlet_multinomial(self):
+        self.assertTrue(np.allclose(
+            utils.dirichlet_multinomial(
+                [[np.log(0.1), np.log(0.1)]]
+            ).tolist(),
+            [[0.5, 0.5]]))
+        self.assertTrue(np.allclose(
+            utils.dirichlet_multinomial(
+                [[np.log(1.), np.log(1.)],
+                 [np.log(1.), np.log(4.)]]
+            ).tolist(),
+            [[0.5, 0.5], [0.2, 0.8]]))
+        self.assertTrue(np.allclose(
+            utils.dirichlet_multinomial(
+                [[np.log(1.), np.log(1.), np.log(1.)]]
+            ).tolist(),
+            [[1/3., 1/3., 1/3.]]))
+        self.assertTrue(np.allclose(
+            utils.dirichlet_multinomial(
+                [[np.log(1.), np.log(2.), np.log(1.)],
+                 [np.log(2.), np.log(3.), np.log(5.)]]
+            ).tolist(),
+            [[0.25, 0.5, 0.25], [0.2, 0.3, 0.5]]))
+
+
 class BenchmarkTransformerTestCase(unittest.TestCase):
     """Test BenchmarkTransformer."""
 
