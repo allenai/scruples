@@ -1,8 +1,8 @@
-socialnorms
-===========
+scruples
+========
 A benchmark for detecting social norm violations in anecdotes.
 
-This repository contains code for creating the `socialnorms` dataset: a
+This repository contains code for creating the `scruples` dataset: a
 benchmark for detecting social norm violations in anecdotes.
 
 For more information about the project, read the
@@ -16,7 +16,7 @@ This project creates a dataset for detecting social norm violations,
 using data from the [Am I the A&ast;&ast;hole][amitheasshole-subreddit]
 subreddit.
 
-### Overview: The `socialnorms` Dataset
+### Overview: The `scruples` Dataset
 
 Each instance in the dataset has some title text, body text, and then a
 label which is one of:
@@ -58,7 +58,7 @@ Usually, people post anecdotes drawn from their own experiences and ask
 whether or not they (or the other person involved) handled the situation
 well. Members of the community then comment with their opinion, usually
 by leaving one of the acronyms discussed in
-[Overview](#overview-the-socialnorms-dataset).
+[Overview](#overview-the-scruples-dataset).
 
 Posts talking about an anecdote begin with `AITA` (Am I the
 A&ast;&ast;hole) and posts discussing hypothetical situations begin with
@@ -88,11 +88,34 @@ other comments).
 
 Setup
 -----
-This project requires Python 3.7. To install the requirements:
+This project requires Python 3.7. To setup the project:
 
-```
-pip install -r requirements.txt
-```
+  1. Make sure you have the MySQL client (on ubuntu):
+
+         sudo apt-get install libmysqlclient-dev
+
+  2. Install [PyTorch][pytorch] using the directions on their site.
+  3. Install [apex][apex]:
+
+         pip install \
+           --no-cache-dir \
+           --global-option="--cpp_ext" \
+           --global-option="--cuda_ext" \
+           git+git://github.com/nvidia/apex.git
+
+  4. Install this repository:
+
+         pip install --editable .
+
+  5. Download the english model for spacy:
+
+         python -m spacy download en
+
+  6. (optional) Run the tests to make sure that everything is
+     working. They'll take about 2 minutes to complete:
+
+         pip install pytest
+         py.test
 
 
 Quickstart
@@ -117,6 +140,8 @@ Options:
 
 
 [amitheasshole-subreddit]: https://www.reddit.com/r/AmItheAsshole/
+[apex]: https://github.com/nvidia/apex
 [make-dataset.py]: ./bin/make-dataset.py
+[pytorch]: https://pytorch.org/
 [reddit-posts]: http://files.pushshift.io/reddit/submissions/
 [reddit-comments]: http://files.pushshift.io/reddit/comments/
