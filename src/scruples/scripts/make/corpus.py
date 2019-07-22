@@ -80,7 +80,15 @@ def corpus(
 
             posts.append(post)
 
-    # Step 3: Filter out the bad posts.
+    # Step 3: Write the posts to disk.
+    logger.info('Writing the posts to disk.')
+
+    processed_posts_path = os.path.join(corpus_dir, settings.POSTS_FILENAME)
+    with open(processed_posts_path, 'w') as processed_posts_file:
+        for post in posts:
+            processed_posts_file.write(json.dumps(attr.asdict(post)) + '\n')
+
+    # Step 4: Filter out the bad posts.
     logger.info('Filtering out bad posts.')
 
     dataset_posts = [
@@ -89,7 +97,7 @@ def corpus(
         if post.is_good
     ]
 
-    # Step 4: Create the splits then write them to disk.
+    # Step 5: Create the splits then write them to disk.
     logger.info('Creating splits and writing them to disk.')
 
     # Shuffle dataset_posts so that the splits will be random.

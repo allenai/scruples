@@ -45,6 +45,10 @@ used in the other splits should go to that split.
 CORPUS_FILENAME_TEMPLATE = '{split}.scruples-corpus.jsonl'
 """A template string for the corpus's split filenames."""
 
+POSTS_FILENAME = 'all.scruples-posts.jsonl'
+"""The filename for the file containing all the posts."""
+
+
 # benchmark settings
 
 PROPOSALS_FILENAME_TEMPLATE = '{split}.scruples-proposals.jsonl'
