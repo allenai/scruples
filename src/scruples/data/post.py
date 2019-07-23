@@ -1,6 +1,8 @@
 """A class representing a post."""
 
 from typing import (
+    Any,
+    Dict,
     List,
     Optional)
 
@@ -14,6 +16,21 @@ from .label_scores import LabelScores
 from .labels import Label
 from .post_types import PostType
 
+
+# helper functions
+
+def _convert_to_comments(
+        comments: List[Dict[str, Any]]
+) -> List[Comment]:
+    return [
+        Comment(**kwargs)
+        if not isinstance(kwargs, Comment)
+        else kwargs
+        for kwargs in comments
+    ]
+
+
+# main class
 
 @attr.s(frozen=True, kw_only=True)
 class Post:
@@ -180,7 +197,8 @@ class Post:
         converter=str)
     comments: List[Comment] = attr.ib(
         validator=attr.validators.deep_iterable(
-            attr.validators.instance_of(Comment)))
+            attr.validators.instance_of(Comment)),
+        converter=_convert_to_comments)
 
     # user interactions
     score: int = attr.ib(
