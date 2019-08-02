@@ -5,6 +5,7 @@ import logging
 import click
 
 from . import (
+    corpus,
     extractions,
     predictions)
 
@@ -23,6 +24,7 @@ def analyze():
 # register subcommands to the command group
 
 subcommands = [
+    corpus.corpus,
     extractions.extractions,
     predictions.predictions
 ]
