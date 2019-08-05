@@ -38,9 +38,9 @@ logger = logging.getLogger(__name__)
     help='The metric to use for hyper-parameter tuning. Defaults to'
          ' f1_macro.')
 @click.option(
-    '--n-iter', type=int, default=256,
+    '--n-iter', type=int, default=128,
     help='The number of iterations of Bayesian optimization to run when'
-         ' tuning baseline hyper-parameters. Defaults to 256.')
+         ' tuning baseline hyper-parameters. Defaults to 128.')
 @click.option(
     '--n-points', type=int, default=8,
     help='The number of points to evaluate in parallel during Bayesian'
