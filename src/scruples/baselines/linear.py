@@ -5,7 +5,7 @@ from sklearn.feature_extraction.text import (
     TfidfTransformer)
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import FunctionTransformer
+from sklearn.preprocessing import FunctionTransformer, MaxAbsScaler
 
 from . import utils
 
@@ -34,14 +34,19 @@ LogisticRegressionBaseline = Pipeline([
         TfidfTransformer(smooth_idf=True)
     ),
     (
+        'scaler',
+        MaxAbsScaler()
+    ),
+    (
         'classifier',
         LogisticRegression(
+            penalty='l2',
             dual=False,
             tol=1e-4,
             intercept_scaling=1.,
-            solver='saga',
+            solver='lbfgs',
             max_iter=100,
-            warm_start=False)
+            warm_start=True)
     )
 ])
 """Predict using logistic regression on bag-of-ngrams features."""
@@ -62,7 +67,6 @@ LOGISTIC_REGRESSION_HYPER_PARAMETERS = {
     'tfidf__norm': ['l1', 'l2', None],
     'tfidf__use_idf': [True, False],
     'tfidf__sublinear_tf': [True, False],
-    'classifier__penalty': ['l1', 'l2'],
     'classifier__C': (1e-6, 1e2, 'log-uniform'),
     'classifier__fit_intercept': [True, False],
     'classifier__class_weight': ['balanced', None],
@@ -93,19 +97,24 @@ LogisticRankerBaseline = Pipeline([
                 (
                     'tfidf',
                     TfidfTransformer(smooth_idf=True)
+                ),
+                (
+                    'scaler',
+                    MaxAbsScaler()
                 )
             ]))
     ),
     (
         'classifier',
         LogisticRegression(
+            penalty='l2',
             dual=False,
             tol=1e-4,
             fit_intercept=False,
             intercept_scaling=1.,
-            solver='saga',
+            solver='lbfgs',
             max_iter=100,
-            warm_start=False)
+            warm_start=True)
     )
 ])
 """Rank using logistic regression on bag-of-ngrams features."""
@@ -126,7 +135,6 @@ LOGISTIC_RANKER_HYPER_PARAMETERS = {
     'featurizer__transformer__tfidf__norm': ['l1', 'l2', None],
     'featurizer__transformer__tfidf__use_idf': [True, False],
     'featurizer__transformer__tfidf__sublinear_tf': [True, False],
-    'classifier__penalty': ['l1', 'l2'],
     'classifier__C': (1e-6, 1e2, 'log-uniform'),
     'classifier__class_weight': ['balanced', None],
 }

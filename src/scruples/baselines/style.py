@@ -11,6 +11,7 @@ from sklearn.base import (
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MaxAbsScaler
 from sklearn.utils.validation import check_is_fitted, check_X_y
 import spacy
 from spacy.parts_of_speech import IDS as POS_TAGS
@@ -386,24 +387,33 @@ StyleRankerBaseline = Pipeline([
     (
         'featurizer',
         utils.BenchmarkTransformer(
-            transformer=StyleFeaturizer())
+            transformer=Pipeline([
+                (
+                    'featurizer',
+                    StyleFeaturizer()
+                ),
+                (
+                    'scaler',
+                    MaxAbsScaler()
+                )
+            ]))
     ),
     (
         'classifier',
         LogisticRegression(
+            penalty='l2',
             dual=False,
             tol=1e-4,
             fit_intercept=False,
             intercept_scaling=1.,
-            solver='saga',
+            solver='lbfgs',
             max_iter=100,
-            warm_start=False)
+            warm_start=True)
     )
 ])
 """Rank using a linear model on style features."""
 
 STYLE_RANKER_HYPER_PARAMETERS = {
-    'classifier__penalty': ['l1', 'l2'],
     'classifier__C': (1e-6, 1e2, 'log-uniform'),
     'classifier__class_weight': ['balanced', None],
 }
