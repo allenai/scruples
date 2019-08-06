@@ -155,6 +155,6 @@ def run_shallow(
                     predictions_file.write(
                         json.dumps({
                             'id': id_,
-                            'label': prediction,
+                            'label': prediction.tolist(),
                             'label_scores': probs.tolist()
                         }) + '\n')
