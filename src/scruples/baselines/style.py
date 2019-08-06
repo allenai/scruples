@@ -4,6 +4,7 @@ import string
 from typing import Any, Iterable
 
 import numpy as np
+import pandas as pd
 from sklearn.base import (
     BaseEstimator,
     ClassifierMixin,
@@ -71,7 +72,15 @@ class LengthRanker(BaseEstimator, ClassifierMixin):
         self : object
             The instance.
         """
-        X, y = check_X_y(X, y)
+        if isinstance(X, pd.DataFrame):
+            X = X.values
+
+        X = np.array(X)
+
+        if isinstance(y, pd.Series):
+            y = y.values
+
+        y = np.array(y)
 
         if self.choose not in ['shortest', 'longest']:
             raise ValueError(
@@ -102,6 +111,11 @@ class LengthRanker(BaseEstimator, ClassifierMixin):
         np.ndarray[int]
             The predicted labels.
         """
+        if isinstance(X, pd.DataFrame):
+            X = X.values
+
+        X = np.array(X)
+
         if self.length == 'words':
             lengths = np.array([[count_words(x) for x in xs] for xs in X])
         elif self.length == 'characters':
