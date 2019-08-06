@@ -129,8 +129,8 @@ LOGISTIC_RANKER_HYPER_PARAMETERS = {
         for hi in range(lo, lo + 5)
     ],
     'featurizer__transformer__vectorizer__analyzer': ['word', 'char', 'char_wb'],
-    'featurizer__transformer__vectorizer__max_df': (0.75, 1., 'uniform'),
-    'featurizer__transformer__vectorizer__min_df': (0., 0.25, 'uniform'),
+    'featurizer__transformer__vectorizer__max_df': (0.90, 1., 'uniform'),
+    'featurizer__transformer__vectorizer__min_df': (0., 0.10, 'uniform'),
     'featurizer__transformer__vectorizer__binary': [True, False],
     'featurizer__transformer__tfidf__norm': ['l1', 'l2', None],
     'featurizer__transformer__tfidf__use_idf': [True, False],
