@@ -148,7 +148,7 @@ def predict_lm(
             # set the model to evaluation mode
             model.eval()
 
-            for i, (mb_ids, mb_features, mb_labels) in tqdm.tqdm(
+            for i, (mb_ids, mb_features, mb_labels, _) in tqdm.tqdm(
                     enumerate(data_loader),
                     total=n_batches,
                     **settings.TQDM_KWARGS
