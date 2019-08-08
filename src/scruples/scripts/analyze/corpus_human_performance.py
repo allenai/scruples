@@ -45,6 +45,11 @@ def corpus_human_performance(
     Read in the comments from COMMENTS_PATH, posts from POSTS_PATH, and
     the split from SPLIT_PATH, then estimate human performance metrics
     and write them to OUTPUT_PATH.
+
+    Human performance is estimated by holding out one comment from each
+    post, and using its label as the human prediction. If the post has
+    only a single comment, then the majority label is used as the
+    prediction.
     """
     logger.info('Reading in comments.')
 
