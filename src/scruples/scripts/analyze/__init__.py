@@ -6,6 +6,7 @@ import click
 
 from . import (
     corpus,
+    corpus_human_performance,
     extractions,
     predictions)
 
@@ -25,6 +26,7 @@ def analyze():
 
 subcommands = [
     corpus.corpus,
+    corpus_human_performance.corpus_human_performance,
     extractions.extractions,
     predictions.predictions
 ]
