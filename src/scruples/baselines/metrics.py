@@ -20,12 +20,56 @@ METRICS = {
             'needs_proba': False
         }
     ),
+    'precision_micro': (
+        'precision (micro)',
+        lambda y_true, y_pred: metrics.precision_score(
+            y_true=y_true,
+            y_pred=y_pred,
+            average='micro'),
+        {
+            'greater_is_better': True,
+            'needs_proba': False
+        }
+    ),
+    'recall_micro': (
+        'recall (micro)',
+        lambda y_true, y_pred: metrics.recall_score(
+            y_true=y_true,
+            y_pred=y_pred,
+            average='micro'),
+        {
+            'greater_is_better': True,
+            'needs_proba': False
+        }
+    ),
     'f1_micro': (
         'f1 (micro)',
         lambda y_true, y_pred: metrics.f1_score(
             y_true=y_true,
             y_pred=y_pred,
             average='micro'),
+        {
+            'greater_is_better': True,
+            'needs_proba': False
+        }
+    ),
+    'precision_macro': (
+        'precision (macro)',
+        lambda y_true, y_pred: metrics.precision_score(
+            y_true=y_true,
+            y_pred=y_pred,
+            average='macro'),
+        {
+            'greater_is_better': True,
+            'needs_proba': False
+        }
+    ),
+    'recall_macro': (
+        'recall (macro)',
+        lambda y_true, y_pred: metrics.recall_score(
+            y_true=y_true,
+            y_pred=y_pred,
+            average='macro'),
         {
             'greater_is_better': True,
             'needs_proba': False
