@@ -8,6 +8,7 @@ from . import (
     corpus,
     corpus_human_performance,
     extractions,
+    latent_traits,
     predictions)
 
 
@@ -28,6 +29,7 @@ subcommands = [
     corpus.corpus,
     corpus_human_performance.corpus_human_performance,
     extractions.extractions,
+    latent_traits.latent_traits,
     predictions.predictions
 ]
 
