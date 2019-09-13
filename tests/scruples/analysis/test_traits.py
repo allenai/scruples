@@ -121,6 +121,7 @@ class LatentTraitModelTestCase(unittest.TestCase):
         model.n_variables_ = n_variables
         model.W_ = th.tensor(W).float()
         model.b_ = th.tensor(b).float()
+        model.deviance_ = 1.
 
         # project the observations into the latent space
         zs_hat = model.project(
@@ -144,6 +145,67 @@ class LatentTraitModelTestCase(unittest.TestCase):
         self.assertLess(
             np.mean((zs - zs_hat)**2),
             7.5e-2)
+
+    def _check_sample_on_synthetic_example(
+            self,
+            latent_dim: int,
+            n_variables: int
+    ) -> None:
+        n_samples = 10000
+
+        # create a random ground-truth for W and b
+        W = np.random.randn(latent_dim, n_variables)
+        b = np.random.randn(n_variables)
+
+        # approximate the distribution of the ground-truth model
+
+        # sample the latent variables
+        zs = np.random.randn(n_samples, latent_dim)
+        # use the latent variables to generate the observations
+        data = (
+            # evaluate the probability vectors
+            1. / (1. + np.exp(-(np.matmul(zs, W) + b)))
+            # compare the probabilities to uniform random noise to
+            # create the observations
+            > np.random.rand(n_samples, n_variables)
+        ).astype(int)
+
+        ground_truth_hist = {
+            tuple(pattern): count / n_samples
+            for pattern, count in zip(
+                    *np.unique(data, axis=0, return_counts=True))
+        }
+
+        # create the model and fit it artificially
+        model = traits.LatentTraitModel(latent_dim=latent_dim)
+        model.n_samples_ = n_samples
+        model.n_variables_ = n_variables
+        model.W_ = th.tensor(W).float()
+        model.b_ = th.tensor(b).float()
+        model.deviance_ = 1.
+
+        # approximate the distribution from the model
+        samples = model.sample(
+            size=n_samples,
+            device=th.device('cuda')
+              if th.cuda.is_available()
+              else th.device('cpu')).numpy()
+
+        model_hist = {
+            tuple(pattern): count / n_samples
+            for pattern, count in zip(
+                    *np.unique(samples, axis=0, return_counts=True))
+        }
+
+        # check that the two distributions have the same support
+        self.assertEqual(
+            set(ground_truth_hist.keys()),
+            set(model_hist.keys()))
+        # check that the two distributions are similar
+        for pattern in model_hist.keys():
+            self.assertLess(
+                abs(model_hist[pattern] - ground_truth_hist[pattern]),
+                5e-2)
 
     def test___init__(self):
         # test that __init__ sets latent_dim
@@ -210,3 +272,45 @@ class LatentTraitModelTestCase(unittest.TestCase):
             n_batch_size=128,
             patience=5,
             n_epochs=250)
+
+    @pytest.mark.slow
+    def test_sample_on_no_trait_model(self):
+        self._check_sample_on_synthetic_example(
+            latent_dim=0,
+            n_variables=1)
+
+        self._check_sample_on_synthetic_example(
+            latent_dim=0,
+            n_variables=2)
+
+        self._check_sample_on_synthetic_example(
+            latent_dim=0,
+            n_variables=3)
+
+    @pytest.mark.slow
+    def test_sample_on_one_trait_model(self):
+        self._check_sample_on_synthetic_example(
+            latent_dim=1,
+            n_variables=1)
+
+        self._check_sample_on_synthetic_example(
+            latent_dim=1,
+            n_variables=2)
+
+        self._check_sample_on_synthetic_example(
+            latent_dim=1,
+            n_variables=3)
+
+    @pytest.mark.slow
+    def test_sample_on_two_trait_model(self):
+        self._check_sample_on_synthetic_example(
+            latent_dim=2,
+            n_variables=1)
+
+        self._check_sample_on_synthetic_example(
+            latent_dim=2,
+            n_variables=2)
+
+        self._check_sample_on_synthetic_example(
+            latent_dim=2,
+            n_variables=3)

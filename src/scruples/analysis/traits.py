@@ -1,6 +1,7 @@
 """Latent trait analysis."""
 
 import numpy as np
+from scipy.stats import entropy
 import torch as th
 
 
@@ -32,11 +33,40 @@ class LatentTraitModel:
     ) -> None:
         self.latent_dim = latent_dim
 
+        # constants
         self.n_samples_ = None
         self.n_variables_ = None
 
+        # parameters
         self.W_ = None
         self.b_ = None
+
+        # diagnostics
+        self.deviance_ = None
+
+    def _check_fitted(self) -> None:
+        if self.n_samples_ is None:
+            raise ValueError(
+                'Missing attribute n_samples_. Has the model been'
+                ' fitted?')
+
+        if self.n_variables_ is None:
+            raise ValueError(
+                'Missing attribute n_variables_. Has the model been'
+                ' fitted?')
+
+        if self.W_ is None:
+            raise ValueError(
+                'Missing attribute W_. Has the model been fitted?')
+
+        if self.b_ is None:
+            raise ValueError(
+                'Missing attribute b_. Has the model been fitted?')
+
+        if self.deviance_ is None:
+            raise ValueError(
+                'Missing attribute deviance_. Has the model been'
+                ' fitted?')
 
     def fit(
             self,
@@ -113,7 +143,7 @@ class LatentTraitModel:
         for epoch in range(n_epochs):
             epoch_nlls = []
             epoch_perm = np.random.permutation(len(data))
-            for i in range(0, len(data), n_batch_size):
+            for i in range(0, n_samples, n_batch_size):
                 optimizer.zero_grad()
 
                 # assemble the mini-batch
@@ -155,6 +185,43 @@ class LatentTraitModel:
             # update the learning rate
             scheduler.step(np.mean(epoch_nlls))
 
+        # compute the log-likelihood for the fitted model
+        with th.no_grad():
+            final_nlls = []
+            for i in range(0, n_samples, n_batch_size):
+                # assemble the mini-batch
+                # shape: n_latent_samples x self.latent_dim
+                mb_latents = th.randn(
+                    n_latent_samples,
+                    self.latent_dim,
+                    device=device)
+                # shape: n_batch_size x n_variables
+                mb_labels = data[i:i+n_batch_size]
+
+                # shape: n_latent_samples x n_variables
+                if self.latent_dim > 0:
+                    mb_latent_probs = th.sigmoid(
+                        th.matmul(mb_latents, W) + b)
+                else:
+                    mb_latent_probs = th.sigmoid(
+                        b.repeat(n_latent_samples, 1))
+
+                # shape: n_batch_size
+                mb_likelihoods = th.mean(
+                    th.prod(
+                        mb_labels.float().unsqueeze(-1)
+                          * mb_latent_probs.t()
+                        + (1 - mb_labels.float()).unsqueeze(-1)
+                          * (1 - mb_latent_probs.t()),
+                        dim=1),
+                    dim=-1)
+
+                # shape: scalar
+                mb_nll = - th.sum(th.log(mb_likelihoods))
+
+                # update statistics
+                final_nlls.append(mb_nll.cpu().item())
+
         # update fitted attributes
 
         self.n_samples_ = n_samples
@@ -162,6 +229,18 @@ class LatentTraitModel:
 
         self.W_ = W.detach().cpu()
         self.b_ = b.detach().cpu()
+
+        self.deviance_ = 2 * (
+            # log-likelihood of the saturated model
+            - n_samples * entropy(
+                np.unique(
+                    data.cpu().numpy(),
+                    axis=0,
+                    return_counts=True
+                )[1])
+            # log-likelihood of the fitted model
+            + np.sum(final_nlls)
+        )
 
     def project(
             self,
@@ -200,6 +279,8 @@ class LatentTraitModel:
             ``data`` projected into the latent space. This tensor has
             the shape: # samples x # latent traits.
         """
+        self._check_fitted()
+
         if self.latent_dim == 0:
             raise ValueError(
                 'Cannot project the observations into the latent space'
@@ -263,7 +344,7 @@ class LatentTraitModel:
             # nlp stands for negative log-probability
             epoch_nlps = []
             epoch_perm = np.random.permutation(len(data))
-            for i in range(0, len(data), n_batch_size):
+            for i in range(0, n_samples, n_batch_size):
                 optimizer.zero_grad()
 
                 # assemble the mini-batch
@@ -293,3 +374,39 @@ class LatentTraitModel:
             scheduler.step(np.mean(epoch_nlps))
 
         return zs.detach().cpu()
+
+    def sample(
+            self,
+            size: int,
+            device: th.device = th.device('cpu')
+    ) -> th.Tensor:
+        """Return ``size`` samples from the model.
+
+        Parameters
+        ----------
+        size : int
+            The number of samples to return.
+        device : th.device, optional (default=th.device('cpu'))
+            The torch device to use.
+
+        Returns
+        -------
+        th.Tensor
+            The size x self.n_variables_ tensor of samples.
+        """
+        self._check_fitted()
+
+        W = self.W_.to(device)
+        b = self.b_.to(device)
+
+        # sample the latent variables
+        # shape: size x self.latent_dim
+        zs = th.randn(size, self.latent_dim, device=device)
+
+        with th.no_grad():
+            samples = (
+                th.sigmoid(th.matmul(zs, W) + b)
+                > th.rand(size, self.n_variables_, device=device)
+            )
+
+        return samples.cpu()
