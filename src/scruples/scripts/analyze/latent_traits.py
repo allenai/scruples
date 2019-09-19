@@ -193,7 +193,7 @@ def latent_traits(
         models.append(model)
 
         with open(
-                os.path.join(output_dir, f'weights-{latent_dim}d.jsonl'), 'w'
+                os.path.join(output_dir, f'weights-{latent_dim}d.json'), 'w'
         ) as weights_file:
             json.dump(
                 {
@@ -285,15 +285,15 @@ def latent_traits(
 
     data_1d_margins = _compute_1d_margins(xs=data)
     with open(
-            os.path.join(output_dir, 'data-1d-margins.jsonl'), 'w'
+            os.path.join(output_dir, 'data-1d-margins.json'), 'w'
     ) as data_1d_margins_file:
-        json.dump(data_1d_margins, data_1d_margins_file, indent=2)
+        json.dump(data_1d_margins, data_1d_margins_file)
 
     data_2d_margins = _compute_2d_margins(xs=data)
     with open(
-            os.path.join(output_dir, 'data-2d-margins.jsonl'), 'w'
+            os.path.join(output_dir, 'data-2d-margins.json'), 'w'
     ) as data_2d_margins_file:
-        json.dump(data_2d_margins, data_2d_margins_file, indent=2)
+        json.dump(data_2d_margins, data_2d_margins_file)
 
     # compute and save the model's margins
 
@@ -304,15 +304,15 @@ def latent_traits(
 
     model_1d_margins = _compute_1d_margins(xs=model_samples)
     with open(
-            os.path.join(output_dir, 'model-1d-margins.jsonl'), 'w'
+            os.path.join(output_dir, 'model-1d-margins.json'), 'w'
     ) as model_1d_margins_file:
-        json.dump(model_1d_margins, model_1d_margins_file, indent=2)
+        json.dump(model_1d_margins, model_1d_margins_file)
 
     model_2d_margins = _compute_2d_margins(xs=model_samples)
     with open(
-            os.path.join(output_dir, 'model-2d-margins.jsonl'), 'w'
+            os.path.join(output_dir, 'model-2d-margins.json'), 'w'
     ) as model_2d_margins_file:
-        json.dump(model_2d_margins, model_2d_margins_file, indent=2)
+        json.dump(model_2d_margins, model_2d_margins_file)
 
     # compute the X^2 statistics and residuals for marginal independence
 
@@ -336,12 +336,12 @@ def latent_traits(
             null_x2_residuals[str((i, j))] = null_x2_residual.tolist()
 
     with open(
-            os.path.join(output_dir, 'null-x2.jsonl'), 'w'
+            os.path.join(output_dir, 'null-x2.json'), 'w'
     ) as null_x2_file:
-        json.dump(null_x2, null_x2_file, indent=2)
+        json.dump(null_x2, null_x2_file)
 
     with open(
-            os.path.join(output_dir, 'null-x2-residuals.jsonl'), 'w'
+            os.path.join(output_dir, 'null-x2-residuals.json'), 'w'
     ) as null_x2_residuals_file:
         json.dump(null_x2_residuals, null_x2_residuals_file)
 
@@ -370,6 +370,6 @@ def latent_traits(
             model_x2_residuals[str((i, j))] = model_x2_residual.tolist()
 
     with open(
-            os.path.join(output_dir, 'model-x2-residuals.jsonl'), 'w'
+            os.path.join(output_dir, 'model-x2-residuals.json'), 'w'
     ) as model_x2_residuals_file:
-        json.dump(model_x2_residuals, model_x2_residuals_file, indent=2)
+        json.dump(model_x2_residuals, model_x2_residuals_file)
