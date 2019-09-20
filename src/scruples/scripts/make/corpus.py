@@ -88,7 +88,7 @@ def corpus(
         for post in posts:
             processed_posts_file.write(json.dumps(attr.asdict(post)) + '\n')
 
-    # Step 4: Filter out the bad posts.
+    # Step 4: Filter out bad posts.
     logger.info('Filtering out bad posts.')
 
     dataset_posts = [
@@ -146,7 +146,14 @@ def corpus(
                         for label, score
                         in post.label_scores.label_to_score.items()
                     },
-                    'label': post.label_scores.best_label.name
+                    'label': post.label_scores.best_label.name,
+                    'binarized_label_scores': {
+                        binarized_label.name: score
+                        for binarized_label, score
+                        in post.label_scores.binarized_label_to_score.items()
+                    },
+                    'binarized_label': post.label_scores\
+                        .best_binarized_label.name
                 }
 
                 split_file.write(json.dumps(instance) + '\n')

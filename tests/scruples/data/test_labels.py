@@ -260,3 +260,28 @@ class LabelTestCase(unittest.TestCase):
                 self.assertEqual(
                     label.find(f'foo {phrase} bar {phrase} baz {phrase}.'),
                     (4, 4 + len(phrase)))
+
+
+class BinarizedLabelTestCase(unittest.TestCase):
+    """Test scruples.data.labels.BinarizedLabel."""
+
+    def test_binarized_labels_have_correct_indices(self):
+        self.assertEqual(labels.BinarizedLabel.RIGHT.index, 0)
+        self.assertEqual(labels.BinarizedLabel.WRONG.index, 1)
+
+    def test_binarize(self):
+        self.assertEqual(
+            labels.BinarizedLabel.binarize(labels.Label.OTHER),
+            labels.BinarizedLabel.RIGHT)
+        self.assertEqual(
+            labels.BinarizedLabel.binarize(labels.Label.NOBODY),
+            labels.BinarizedLabel.RIGHT)
+        self.assertEqual(
+            labels.BinarizedLabel.binarize(labels.Label.AUTHOR),
+            labels.BinarizedLabel.WRONG)
+        self.assertEqual(
+            labels.BinarizedLabel.binarize(labels.Label.EVERYBODY),
+            labels.BinarizedLabel.WRONG)
+        self.assertEqual(
+            labels.BinarizedLabel.binarize(labels.Label.INFO),
+            None)

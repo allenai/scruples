@@ -201,3 +201,66 @@ class Label(enum.Enum):
                 pass
 
         return span
+
+
+@enum.unique
+class BinarizedLabel(enum.Enum):
+    """A binary label saying whether the author was in the wrong.
+
+    The binarized labels group together the full labels in the following
+    way:
+
+      1. **RIGHT** : The full label is ``OTHER`` or ``NOBODY``.
+      2. **WRONG** : The full label is ``AUTHOR`` or ``EVERYBODY``.
+
+    The label ``INFO`` is dropped during binarization.
+
+    Attributes
+    ----------
+    See `Parameters`_.
+
+    Parameters
+    ----------
+    index : int
+        A (unique) numerical index assigned to the binarized label.
+    """
+    RIGHT = 0
+    WRONG = 1
+
+    @classmethod
+    def binarize(
+            cls,
+            label: Label
+    ) -> Optional['BinarizedLabel']:
+        """Return ``label`` binarized into a ``BinarizedLabel``.
+
+        Parameters
+        ----------
+        label : Label
+            The label to binarize.
+
+        Returns
+        -------
+        Optional[BinarizedLabel]
+            ``BinarizedLabel.RIGHT`` if ``label`` is ``Label.OTHER`` or
+            ``Label.NOBODY``, ``BinarizedLabel.WRONG`` if ``label`` is
+            ``Label.AUTHOR`` or ``Label.EVERYBODY``. ``None`` if
+            ``label`` is ``Label.INFO``.
+        """
+        if not isinstance(label, Label):
+            raise ValueError(f'label ({label}) is not of type Label.')
+
+        if label == Label.OTHER or label == Label.NOBODY:
+            return cls.RIGHT
+        elif label == Label.AUTHOR or label == Label.EVERYBODY:
+            return cls.WRONG
+        elif label == Label.INFO:
+            return None
+        else:
+            raise ValueError(f'Unrecognized label: {label}.')
+
+    def __init__(
+            self,
+            index: int
+    ) -> None:
+        self.index = index
