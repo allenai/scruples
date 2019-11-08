@@ -146,7 +146,7 @@ def predictions(
                     ' please notify the maintainers.')
 
             metric_name_to_value['xentropy'] = utils.xentropy(
-                y_true=dataset_label_scores,
+                y_true=dataset_label_scores / np.sum(dataset_label_scores, axis=1),
                 y_pred=predicted_label_scores)
 
         metric_name_width = 1 + max(
