@@ -45,7 +45,7 @@ def train_lm(
         predict_batch_size: int,
         mixed_precision: bool,
         gpu_ids: Optional[List[int]],
-        logger: logging.Logger = None
+        logger: Optional[logging.Logger] = None
 ) -> None:
     """Fine-tune a pre-trained LM baseline on a scruples dataset.
 

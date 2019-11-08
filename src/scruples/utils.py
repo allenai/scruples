@@ -12,12 +12,8 @@ from typing import (
 
 from autograd import grad
 import autograd.numpy as np
-from autograd.scipy.special import (
-    beta,
-    betainc,
-    gammaln)
+from autograd.scipy.special import gammaln
 import regex
-from scipy.integrate import quad
 from scipy.optimize import minimize
 from sklearn import metrics
 
@@ -325,3 +321,107 @@ def next_unique_path(path: str):
         new_path = f'{path}_{number}'
 
     return new_path
+
+
+def estimate_beta_binomial_parameters(
+        successes: np.ndarray,
+        failures: np.ndarray
+) -> Tuple[float, float]:
+    """Return the MLE for the beta-binomial distribution.
+
+    Given success counts, ``successes``, and failure counts,
+    ``failures``, return the MLE for the parameters of a beta-binomial
+    model of that data.
+
+    Parameters
+    ----------
+    successes : np.ndarray
+        An array of integers giving the observed number of successes for
+        each trial.
+    failures : np.ndarray
+        An array of integers giving the observed number of failures for
+        each trail.
+
+    Returns
+    -------
+    a : float, b : float
+        A tuple, ``(a, b)``, giving the MLE of the alpha and beta
+        parameters for the beta-binomial model.
+    """
+    # This function computes the negative log-likelihood for the
+    # beta-binomial model with parameters a and b on the provided data
+    # (successes and failures)
+    def nll(params):
+        a, b = params
+        # N.B. the likelihood must be expressed as a sum of log-gamma
+        # factors in order to avoid overflow / underflow for large
+        # numbers of successes or failures in an observation.
+        return - np.sum(
+            gammaln(successes + failures + 1)
+            + gammaln(successes + a)
+            + gammaln(failures + b)
+            + gammaln(a + b)
+            - gammaln(successes + 1)
+            - gammaln(failures + 1)
+            - gammaln(successes + failures + a + b)
+            - gammaln(a)
+            - gammaln(b))
+
+    # minimize the negative log-likelihood
+    a, b = minimize(
+        fun=nll,
+        x0=[1., 1.],
+        jac=grad(nll),
+        bounds=[(1e-10, None), (1e-10, None)]
+    ).x
+
+    return a, b
+
+
+def estimate_dirichlet_multinomial_parameters(
+        observations: np.ndarray
+) -> Tuple[float]:
+    """Return the MLE for the dirichlet-multinomial distribution.
+
+    Given observations, ``observations``, return the MLE for the
+    parameters of a dirichlet-multinomial model of that data.
+
+    Parameters
+    ----------
+    observations : np.ndarray
+        An n x k array of integers giving the observed number of counts
+        for each class in each trial, where n is the number of trials
+        and k is the number of classes.
+
+    Returns
+    -------
+    Tuple[float]
+        A tuple giving the MLE of the parameters for the
+        dirichlet-multinomial model.
+    """
+    # This function computes the negative log-likelihood for the
+    # dirichlet-multinomial model with parameters given by params and on
+    # the provided data.
+    def nll(params):
+        # N.B. the likelihood must be expressed as a sum of log-gamma
+        # factors in order to avoid overflow / underflow for large
+        # numbers of successes or failures in an observation.
+        return - np.sum(
+            gammaln(np.sum(params))
+            - gammaln(
+                np.sum(params)
+                + np.sum(observations, axis=1))
+            + np.sum(
+                gammaln(observations + params)
+                - gammaln(params),
+              axis=1))
+
+    # minimize the negative log-likelihood
+    params = minimize(
+        fun=nll,
+        x0=[1. for _ in range(observations.shape[-1])],
+        jac=grad(nll),
+        bounds=[(1e-10, None) for _ in range(observations.shape[-1])]
+    ).x
+
+    return params

@@ -1,4 +1,4 @@
-"""Tests for scruples.utils."""
+"""tests for scruples.utils."""
 
 import logging
 import math
@@ -403,3 +403,102 @@ class NextUniquePathTestCase(unittest.TestCase):
                 f.write('')
 
             self.assertEqual(utils.next_unique_path(path), path2)
+
+
+class EstimateBetaBinomialParametersTestCase(unittest.TestCase):
+    """Test scruples.utils.estimate_beta_binomial_parameters."""
+
+    @pytest.mark.slow
+    def test_estimates_parameters_for_beta_binomial_with_fixed_n(self):
+        a_bs = [
+            (1, 1), # uniform prior (beta(1, 1))
+            (5, 0.5), # right-skewed prior (beta(5, 0.5))
+            (0.5, 5) # left-skewed prior (beta(0.5, 5))
+        ]
+        for a, b in a_bs:
+            n = 100
+            ps = stats.beta.rvs(a=a, b=b, size=100000)
+            ss = stats.binom.rvs(n, ps)
+            fs = n - ss
+
+            a_hat, b_hat = utils.estimate_beta_binomial_parameters(
+                successes=ss, failures=fs)
+
+            self.assertLess(abs(a_hat - a), 0.1)
+            self.assertLess(abs(b_hat - b), 0.1)
+
+    @pytest.mark.slow
+    def test_estimates_parameters_for_beta_binomial_with_random_n(self):
+        a_bs = [
+            (1, 1), # uniform prior (beta(1, 1))
+            (5, 0.5), # right-skewed prior (beta(5, 0.5))
+            (0.5, 5) # left-skewed prior (beta(0.5, 5))
+        ]
+        for a, b in a_bs:
+            ps = stats.beta.rvs(a=a, b=b, size=100000)
+            ns = np.random.choice(range(50, 151), size=100000)
+            ss = stats.binom.rvs(ns, ps)
+            fs = ns - ss
+
+            a_hat, b_hat = utils.estimate_beta_binomial_parameters(
+                successes=ss, failures=fs)
+
+            self.assertLess(abs(a_hat - a), 0.1)
+            self.assertLess(abs(b_hat - b), 0.1)
+
+
+class EstimateDirichletMultinomialParametersTestCase(unittest.TestCase):
+    """Test scruples.utils.estimate_dirichlet_multinomial_parameters."""
+
+    @pytest.mark.slow
+    def test_estimates_parameters_for_dirichlet_multinomial_with_fixed_n(self):
+        paramss = [
+            # uniform priors
+            (1, 1),
+            (1, 1, 1),
+            (1, 1, 1, 1),
+            # skewed priors
+            (5, 0.5),
+            (0.5, 5),
+            (0.5, 5, 5),
+            (5, 0.5, 5),
+            (5, 5, 0.5)
+        ]
+        for params in paramss:
+            n = 100
+            pss = stats.dirichlet.rvs(alpha=params, size=100000)
+            obs = np.array([
+                stats.multinomial.rvs(n, ps)
+                for ps in pss
+            ])
+
+            params_hat = utils.estimate_dirichlet_multinomial_parameters(
+                observations=obs)
+
+            self.assertTrue(np.allclose(params_hat, params, atol=0.1))
+
+    @pytest.mark.slow
+    def test_estimates_parameters_for_dirichlet_multinomial_with_random_n(self):
+        paramss = [
+            # uniform priors
+            (1, 1),
+            (1, 1, 1),
+            (1, 1, 1, 1),
+            # skewed priors
+            (5, 0.5),
+            (0.5, 5),
+            (0.5, 5, 5),
+            (5, 0.5, 5),
+            (5, 5, 0.5)
+        ]
+        for params in paramss:
+            ns = np.random.choice(range(50, 151), size=100000)
+            pss = stats.dirichlet.rvs(alpha=params, size=100000)
+            obs = np.array([
+                stats.multinomial.rvs(n, ps)
+                for n, ps in zip(ns, pss)
+            ])
+            params_hat = utils.estimate_dirichlet_multinomial_parameters(
+                observations=obs)
+
+            self.assertTrue(np.allclose(params_hat, params, atol=0.1))
