@@ -9,6 +9,7 @@ from . import (
     corpus_human_performance,
     extractions,
     latent_traits,
+    oracle_performance,
     predictions)
 
 
@@ -30,6 +31,7 @@ subcommands = [
     corpus_human_performance.corpus_human_performance,
     extractions.extractions,
     latent_traits.latent_traits,
+    oracle_performance.oracle_performance,
     predictions.predictions
 ]
 
