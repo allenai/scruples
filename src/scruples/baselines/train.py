@@ -50,7 +50,7 @@ def train_lm(
     """Fine-tune a pre-trained LM baseline on a scruples dataset.
 
     Fine-tune ``baseline`` on ``dataset``, writing all results and
-    artifacts to ``model_dir``. Return the best accuracy achieved on dev
+    artifacts to ``model_dir``. Return the best xentropy achieved on dev
     after any epoch.
 
     Parameters
@@ -88,7 +88,7 @@ def train_lm(
     Returns
     -------
     float
-        The best accuracy on dev achieved after any epoch.
+        The best xentropy on dev achieved after any epoch.
     bool
         ``True`` if the training loss diverged, ``False`` otherwise.
     """
@@ -295,6 +295,8 @@ def train_lm(
     elif loss_type == 'dirichlet-multinomial':
         loss = DirichletMultinomialLoss()
 
+    xentropy = SoftCrossEntropyLoss()
+
     # Step 8: Run training.
 
     n_train_batches_per_epoch = math.ceil(len(train) / train_batch_size)
@@ -302,7 +304,7 @@ def train_lm(
 
     writer = tensorboardX.SummaryWriter(log_dir=tensorboard_dir)
 
-    best_dev_accuracy = - math.inf
+    best_dev_xentropy = - math.inf
     for epoch in range(n_epochs):
         # set the model to training mode
         model.train()
@@ -310,7 +312,6 @@ def train_lm(
         # run training for the epoch
         epoch_train_loss = 0
         epoch_train_xentropy = 0
-        epoch_train_accuracy = 0
         for i, (_, features, labels, label_scores) in tqdm.tqdm(
                 enumerate(train_loader),
                 total=n_gradient_accumulation * n_train_batches_per_epoch,
@@ -318,37 +319,38 @@ def train_lm(
         ):
             # move the data onto the device
             features = {k: v.to(device) for k, v in features.items()}
-            labels = labels.to(device)
 
+            # create the targets
             if loss_type == 'xentropy-hard':
                 targets = labels
-                encoded_labels = labels
             elif loss_type == 'xentropy-soft':
-                targets = label_scores
-                targets = targets / torch.unsqueeze(
-                    torch.sum(targets, dim=-1), dim=-1)
-                encoded_labels = torch.eye(len(Label))[labels]
+                targets = label_scores / torch.unsqueeze(
+                    torch.sum(label_scores, dim=-1), dim=-1)
             elif loss_type == 'xentropy-full':
                 targets = label_scores
-                encoded_labels = torch.eye(len(Label))[labels]
             elif loss_type == 'dirichlet-multinomial':
                 targets = label_scores
-                encoded_labels = torch.eye(len(Label))[labels]
+            # create the soft labels
+            soft_labels = label_scores / torch.unsqueeze(
+                torch.sum(label_scores, dim=-1), dim=-1)
 
+            # coerce the targets and soft labels to the correct precision
             if mixed_precision and loss_type != 'xentropy-hard':
+                # N.B. if loss_type is xentropy-hard then the labels are ints
+                # and cannot be coerced to half-precision.
                 targets = targets.half()
-                encoded_labels = encoded_labels.half()
+            soft_labels = soft_labels.half()
 
+            # move the targets and soft labels to the device
             targets = targets.to(device)
-            encoded_labels = encoded_labels.to(device)
+            soft_labels = soft_labels.to(device)
 
             # make predictions
             logits = model(**features)
             _, predictions = torch.max(logits, 1)
 
             batch_loss = loss(logits, targets)
-            batch_xentropy = loss(logits, encoded_labels)
-            batch_accuracy = (predictions == labels).float().mean()
+            batch_xentropy = xentropy(logits, soft_labels)
 
             # update training statistics
             epoch_train_loss = (
@@ -356,9 +358,6 @@ def train_lm(
             ) / (i + 1)
             epoch_train_xentropy = (
                 batch_xentropy.item() + i * epoch_train_xentropy
-            ) / (i + 1)
-            epoch_train_accuracy = (
-                batch_accuracy.item() + i * epoch_train_accuracy
             ) / (i + 1)
 
             # update the network
@@ -389,7 +388,6 @@ def train_lm(
             if step % 100 == 0 and (i + 1) % n_gradient_accumulation == 0:
                 writer.add_scalar('train/loss', epoch_train_loss, step)
                 writer.add_scalar('train/xentropy', epoch_train_xentropy, step)
-                writer.add_scalar('train/accuracy', epoch_train_accuracy, step)
 
         # run evaluation
         with torch.no_grad():
@@ -399,44 +397,44 @@ def train_lm(
             # run validation for the epoch
             epoch_dev_loss = 0
             epoch_dev_xentropy = 0
-            epoch_dev_accuracy = 0
             for i, (_, features, labels, label_scores) in tqdm.tqdm(
                     enumerate(dev_loader),
                     total=n_dev_batch_per_epoch,
                     **settings.TQDM_KWARGS):
                 # move the data onto the device
                 features = {k: v.to(device) for k, v in features.items()}
-                labels = labels.to(device)
+
+                # create the targets
+                if loss_type == 'xentropy-hard':
+                    targets = labels
+                elif loss_type == 'xentropy-soft':
+                    targets = label_scores / torch.unsqueeze(
+                        torch.sum(label_scores, dim=-1), dim=-1)
+                elif loss_type == 'xentropy-full':
+                    targets = label_scores
+                elif loss_type == 'dirichlet-multinomial':
+                    targets = label_scores
+                # create the soft labels
+                soft_labels = label_scores / torch.unsqueeze(
+                    torch.sum(label_scores, dim=-1), dim=-1)
+
+                # corece the targets and soft labels to the correct precision
+                if mixed_precision and loss_type != 'xentropy-hard':
+                    # N.B. if loss_type is xentropy-hard then the labels are
+                    # ints and cannot be coerced to half-precision
+                    targets = targets.half()
+                soft_labels = soft_labels.half()
+
+                # move the targets and soft labels to the device
+                targets = targets.to(device)
+                soft_labels = soft_labels.to(device)
 
                 # make predictions
                 logits = model(**features)
                 _, predictions = torch.max(logits, 1)
 
-                if loss_type == 'xentropy-hard':
-                    targets = labels
-                    encoded_labels = labels
-                elif loss_type == 'xentropy-soft':
-                    targets = label_scores
-                    targets = targets / torch.unsqueeze(
-                        torch.sum(targets, dim=-1), dim=-1)
-                    encoded_labels = torch.eye(len(Label))[labels]
-                elif loss_type == 'xentropy-full':
-                    targets = label_scores
-                    encoded_labels = torch.eye(len(Label))[labels]
-                elif loss_type == 'dirichlet-multinomial':
-                    targets = label_scores
-                    encoded_labels = torch.eye(len(Label))[labels]
-
-                if mixed_precision and loss_type != 'xentropy-hard':
-                    targets = targets.half()
-                    encoded_labels = encoded_labels.half()
-
-                targets = targets.to(device)
-                encoded_labels = encoded_labels.to(device)
-
                 batch_loss = loss(logits, targets)
-                batch_xentropy = loss(logits, encoded_labels)
-                batch_accuracy = (predictions == labels).float().mean()
+                batch_xentropy = xentropy(logits, soft_labels)
 
                 # update validation statistics
                 epoch_dev_loss = (
@@ -445,14 +443,10 @@ def train_lm(
                 epoch_dev_xentropy = (
                     batch_xentropy.item() + i * epoch_dev_xentropy
                 ) / (i + 1)
-                epoch_dev_accuracy = (
-                    batch_accuracy.item() + i * epoch_dev_accuracy
-                ) / (i + 1)
 
             # write validation statistics to tensorboard
             writer.add_scalar('dev/loss', epoch_dev_loss, step)
             writer.add_scalar('dev/xentropy', epoch_dev_xentropy, step)
-            writer.add_scalar('dev/accuracy', epoch_dev_accuracy, step)
 
             if logger is not None:
                 logger.info(
@@ -460,10 +454,8 @@ def train_lm(
                     f'  epoch {epoch}:\n'
                     f'    train loss     : {epoch_train_loss:.4f}\n'
                     f'    train xentropy : {epoch_train_xentropy:.4f}\n'
-                    f'    train accuracy : {epoch_train_accuracy:.4f}\n'
                     f'    dev loss       : {epoch_dev_loss:.4f}\n'
-                    f'    dev xentropy   : {epoch_dev_xentropy:.4f}\n'
-                    f'    dev accuracy   : {epoch_dev_accuracy:.4f}\n')
+                    f'    dev xentropy   : {epoch_dev_xentropy:.4f}\n')
 
         # update checkpoints
 
@@ -476,17 +468,17 @@ def train_lm(
             last_checkpoint_path)
 
         # update the current best model
-        if epoch_dev_accuracy > best_dev_accuracy:
+        if epoch_dev_xentropy > best_dev_xentropy:
             shutil.copyfile(last_checkpoint_path, best_checkpoint_path)
-            best_dev_accuracy = epoch_dev_accuracy
+            best_dev_xentropy = epoch_dev_xentropy
 
         # exit early if the training loss has diverged
         if math.isnan(epoch_train_loss):
             logger.info('Training loss has diverged. Exiting early.')
 
-            return best_dev_accuracy, True
+            return best_dev_xentropy, True
 
     logger.info(
-        f'Training complete. Best dev accuracy was {best_dev_accuracy:.4f}')
+        f'Training complete. Best dev xentropy was {best_dev_xentropy:.4f}')
 
-    return best_dev_accuracy, False
+    return best_dev_xentropy, False

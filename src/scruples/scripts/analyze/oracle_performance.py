@@ -111,6 +111,7 @@ def oracle_performance(
 
     # estimate performance on the xentropy, which requires soft
     # ground-truth labels
+    logger.info('Computing estimate for xentropy.')
     value_samples = []
     for _ in tqdm.tqdm(range(10000), **settings.TQDM_KWARGS):
         true_scores = np.array([
