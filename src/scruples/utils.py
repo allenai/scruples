@@ -14,7 +14,8 @@ from autograd import grad
 import autograd.numpy as np
 from autograd.scipy.special import gammaln
 import regex
-from scipy.optimize import minimize
+from scipy.optimize import minimize, minimize_scalar
+from scipy.special import softmax
 from sklearn import metrics
 
 from . import settings
@@ -425,3 +426,31 @@ def estimate_dirichlet_multinomial_parameters(
     ).x
 
     return params
+
+
+def calibration_factor(
+        logits: np.ndarray,
+        targets: np.ndarray
+) -> np.float64:
+    """Return the calibrating temperature for the model.
+
+    Parameters
+    ----------
+    logits : np.ndarray, required
+        The logits from the model to calibrate.
+    targets : np.ndarray, required
+        The targets on which to calibrate.
+
+    Returns
+    -------
+    np.float64
+        The temperature to use when calibrating the model. Divide the logits by
+        this number to calibrate them.
+    """
+    def loss(t):
+        return xentropy(y_true=targets, y_pred=softmax(logits / t, axis=-1))
+
+    return minimize_scalar(
+        fun=loss,
+        bounds=(1e-10, 1e10),
+    ).x

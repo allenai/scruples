@@ -18,13 +18,14 @@ import numpy as np
 from pytorch_pretrained_bert.optimization import (
     BertAdam,
     warmup_linear)
+from scipy.special import softmax
 import tensorboardX
 import torch
 from torch.utils.data import DataLoader
 import tqdm
 
 from . import benchmark, corpus
-from .. import settings
+from .. import settings, utils
 from ..baselines.loss import (
     SoftCrossEntropyLoss,
     DirichletMultinomialLoss)
@@ -50,8 +51,8 @@ def train_lm(
     """Fine-tune a pre-trained LM baseline on a scruples dataset.
 
     Fine-tune ``baseline`` on ``dataset``, writing all results and
-    artifacts to ``model_dir``. Return the best xentropy achieved on dev
-    after any epoch.
+    artifacts to ``model_dir``. Return the best calibrated xentropy achieved on
+    dev after any epoch.
 
     Parameters
     ----------
@@ -88,7 +89,7 @@ def train_lm(
     Returns
     -------
     float
-        The best xentropy on dev achieved after any epoch.
+        The best calibrated xentropy on dev achieved after any epoch.
     bool
         ``True`` if the training loss diverged, ``False`` otherwise.
     """
@@ -304,7 +305,7 @@ def train_lm(
 
     writer = tensorboardX.SummaryWriter(log_dir=tensorboard_dir)
 
-    best_dev_xentropy = - math.inf
+    best_dev_calibrated_xentropy = math.inf
     for epoch in range(n_epochs):
         # set the model to training mode
         model.train()
@@ -347,7 +348,6 @@ def train_lm(
 
             # make predictions
             logits = model(**features)
-            _, predictions = torch.max(logits, 1)
 
             batch_loss = loss(logits, targets)
             batch_xentropy = xentropy(logits, soft_labels)
@@ -396,7 +396,8 @@ def train_lm(
 
             # run validation for the epoch
             epoch_dev_loss = 0
-            epoch_dev_xentropy = 0
+            epoch_dev_soft_labels = []
+            epoch_dev_logits = []
             for i, (_, features, labels, label_scores) in tqdm.tqdm(
                     enumerate(dev_loader),
                     total=n_dev_batch_per_epoch,
@@ -414,48 +415,64 @@ def train_lm(
                     targets = label_scores
                 elif loss_type == 'dirichlet-multinomial':
                     targets = label_scores
-                # create the soft labels
-                soft_labels = label_scores / torch.unsqueeze(
-                    torch.sum(label_scores, dim=-1), dim=-1)
 
-                # corece the targets and soft labels to the correct precision
+                # coerce the targets to the correct precision
                 if mixed_precision and loss_type != 'xentropy-hard':
                     # N.B. if loss_type is xentropy-hard then the labels are
                     # ints and cannot be coerced to half-precision
                     targets = targets.half()
-                soft_labels = soft_labels.half()
 
-                # move the targets and soft labels to the device
+                # move the targets to the device
                 targets = targets.to(device)
-                soft_labels = soft_labels.to(device)
 
                 # make predictions
                 logits = model(**features)
-                _, predictions = torch.max(logits, 1)
 
                 batch_loss = loss(logits, targets)
-                batch_xentropy = xentropy(logits, soft_labels)
 
                 # update validation statistics
                 epoch_dev_loss = (
                     batch_loss.item() + i * epoch_dev_loss
                 ) / (i + 1)
-                epoch_dev_xentropy = (
-                    batch_xentropy.item() + i * epoch_dev_xentropy
-                ) / (i + 1)
+                epoch_dev_soft_labels.extend(
+                    (
+                        label_scores
+                        / torch.unsqueeze(torch.sum(label_scores, dim=-1), dim=-1)
+                    ).cpu().numpy().tolist()
+                )
+                epoch_dev_logits.extend(logits.cpu().numpy().tolist())
+
+            # compute validation statistics
+            epoch_dev_soft_labels = np.array(epoch_dev_soft_labels)
+            epoch_dev_logits = np.array(epoch_dev_logits)
+
+            calibration_factor = utils.calibration_factor(
+                logits=epoch_dev_logits,
+                targets=epoch_dev_soft_labels)
+
+            epoch_dev_xentropy = utils.xentropy(
+                y_true=epoch_dev_soft_labels,
+                y_pred=softmax(epoch_dev_logits, axis=-1))
+            epoch_dev_calibrated_xentropy = utils.xentropy(
+                y_true=epoch_dev_soft_labels,
+                y_pred=softmax(epoch_dev_logits / calibration_factor, axis=-1))
 
             # write validation statistics to tensorboard
             writer.add_scalar('dev/loss', epoch_dev_loss, step)
             writer.add_scalar('dev/xentropy', epoch_dev_xentropy, step)
+            writer.add_scalar(
+                'dev/calibrated-xentropy', epoch_dev_calibrated_xentropy, step)
 
             if logger is not None:
                 logger.info(
                     f'\n\n'
                     f'  epoch {epoch}:\n'
-                    f'    train loss     : {epoch_train_loss:.4f}\n'
-                    f'    train xentropy : {epoch_train_xentropy:.4f}\n'
-                    f'    dev loss       : {epoch_dev_loss:.4f}\n'
-                    f'    dev xentropy   : {epoch_dev_xentropy:.4f}\n')
+                    f'    train loss              : {epoch_train_loss:.4f}\n'
+                    f'    train xentropy          : {epoch_train_xentropy:.4f}\n'
+                    f'    dev loss                : {epoch_dev_loss:.4f}\n'
+                    f'    dev xentropy            : {epoch_dev_xentropy:.4f}\n'
+                    f'    dev calibrated xentropy : {epoch_dev_calibrated_xentropy:.4f}\n'
+                    f'    calibration factor      : {calibration_factor:.4f}\n')
 
         # update checkpoints
 
@@ -463,22 +480,24 @@ def train_lm(
             {
                 'epoch': epoch,
                 'model': model.state_dict(),
-                'optimizer': optimizer.state_dict()
+                'optimizer': optimizer.state_dict(),
+                'calibration_factor': calibration_factor
             },
             last_checkpoint_path)
 
         # update the current best model
-        if epoch_dev_xentropy > best_dev_xentropy:
+        if epoch_dev_calibrated_xentropy < best_dev_calibrated_xentropy:
             shutil.copyfile(last_checkpoint_path, best_checkpoint_path)
-            best_dev_xentropy = epoch_dev_xentropy
+            best_dev_calibrated_xentropy = epoch_dev_calibrated_xentropy
 
         # exit early if the training loss has diverged
         if math.isnan(epoch_train_loss):
             logger.info('Training loss has diverged. Exiting early.')
 
-            return best_dev_xentropy, True
+            return best_dev_calibrated_xentropy, True
 
     logger.info(
-        f'Training complete. Best dev xentropy was {best_dev_xentropy:.4f}')
+        f'Training complete. Best dev calibrated xentropy was'
+        f' {best_dev_calibrated_xentropy:.4f}.')
 
-    return best_dev_xentropy, False
+    return best_dev_calibrated_xentropy, False

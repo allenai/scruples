@@ -9,6 +9,7 @@ import unittest
 import numpy as np
 import pytest
 from scipy import stats
+from scipy.special import softmax
 
 from scruples import utils
 
@@ -502,3 +503,22 @@ class EstimateDirichletMultinomialParametersTestCase(unittest.TestCase):
                 observations=obs)
 
             self.assertTrue(np.allclose(params_hat, params, atol=0.1))
+
+
+class CalibrationFactorTestCase(unittest.TestCase):
+    """Test scruples.utils.calibration_factor."""
+
+    def test_calibration_factor(self):
+        for _ in range(100):
+            logits = np.random.randn(100, 3)
+            targets = softmax(
+                logits + np.random.rand(1) * np.random.randn(100, 3),
+                axis=-1)
+
+            t_opt = utils.calibration_factor(logits=logits, targets=targets)
+
+            ts = np.linspace(max(1e-10, t_opt - 10), t_opt + 10, num=21)
+            for t in ts:
+                self.assertLess(
+                    utils.xentropy(y_true=targets, y_pred=softmax(logits / t_opt, axis=-1)),
+                    utils.xentropy(y_true=targets, y_pred=softmax(logits / t, axis=-1)))
