@@ -34,9 +34,9 @@ logger = logging.getLogger(__name__)
 @click.option(
     '--metric',
     type=click.Choice(METRICS.keys()),
-    default='accuracy',
+    default='log_loss',
     help='The metric to use for hyper-parameter tuning. Defaults to'
-         ' accuracy.')
+         ' log_loss.')
 @click.option(
     '--n-iter', type=int, default=128,
     help='The number of iterations of Bayesian optimization to run when'
