@@ -151,48 +151,6 @@ class LabelScoresTestCase(unittest.TestCase):
                 }).has_all_zero_binarized_label_scores,
             False)
 
-    def test_has_unique_highest_scoring_binarized_label(self):
-        # test when has_unique_highest_scoring_binarized_label is true
-        self.assertEqual(
-            label_scores.LabelScores(
-                label_to_score={
-                    labels.Label.OTHER: 5,
-                    labels.Label.AUTHOR: 6,
-                    labels.Label.EVERYBODY: 4,
-                    labels.Label.NOBODY: 3,
-                    labels.Label.INFO: 0
-                }).has_unique_highest_scoring_binarized_label,
-            True)
-        self.assertEqual(
-            label_scores.LabelScores(
-                label_to_score={
-                    labels.Label.OTHER: 5,
-                    labels.Label.AUTHOR: 5,
-                    labels.Label.EVERYBODY: 1,
-                    labels.Label.NOBODY: 0,
-                    labels.Label.INFO: 0
-                }).has_unique_highest_scoring_binarized_label,
-            True)
-
-        # test when has_unique_highest_scoring_binarized_label is false
-        self.assertEqual(
-            label_scores.LabelScores(
-                label_to_score={
-                    label: 10
-                    for label in labels.Label
-                }).has_unique_highest_scoring_label,
-            False)
-        self.assertEqual(
-            label_scores.LabelScores(
-                label_to_score={
-                    labels.Label.OTHER: 5,
-                    labels.Label.AUTHOR: 4,
-                    labels.Label.EVERYBODY: 3,
-                    labels.Label.NOBODY: 2,
-                    labels.Label.INFO: 1
-                }).has_unique_highest_scoring_binarized_label,
-            False)
-
     def test_has_all_zero_label_scores(self):
         # test when has_all_zero_label_scores should be true
         self.assertEqual(
@@ -215,25 +173,6 @@ class LabelScoresTestCase(unittest.TestCase):
                 }).has_all_zero_label_scores,
             False)
 
-    def test_has_unique_highest_scoring_label(self):
-        # test when has_unique_highest_scoring_label should be true
-        self.assertEqual(
-            label_scores.LabelScores(
-                label_to_score={
-                    label: i
-                    for i, label in enumerate(labels.Label)
-                }).has_unique_highest_scoring_label,
-            True)
-
-        # test when has_unique_highest_scoring_label should be false
-        self.assertEqual(
-            label_scores.LabelScores(
-                label_to_score={
-                    label: 10
-                    for label in labels.Label
-                }).has_unique_highest_scoring_label,
-            False)
-
     def test_is_good(self):
         # test when is_good should be true
         self.assertEqual(
@@ -253,30 +192,11 @@ class LabelScoresTestCase(unittest.TestCase):
                     for label in labels.Label
                 }).is_good,
             False)
-        # when has_unique_highest_scoring_binarized_label is false
-        self.assertEqual(
-            label_scores.LabelScores(
-                label_to_score={
-                    labels.Label.OTHER: 5,
-                    labels.Label.AUTHOR: 4,
-                    labels.Label.EVERYBODY: 3,
-                    labels.Label.NOBODY: 2,
-                    labels.Label.INFO: 1
-                }).is_good,
-            False)
         # when has_all_zero_label_scores is true
         self.assertEqual(
             label_scores.LabelScores(
                 label_to_score={
                     label: 0
-                    for label in labels.Label
-                }).is_good,
-            False)
-        # when has_unique_highest_scoring_label is false
-        self.assertEqual(
-            label_scores.LabelScores(
-                label_to_score={
-                    label: 10
                     for label in labels.Label
                 }).is_good,
             False)
