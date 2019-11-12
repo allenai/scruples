@@ -15,7 +15,8 @@ class SoftCrossEntropyLoss(th.nn.Module):
     # equivalent if each instance has the same number of labels.
 
     def forward(self, input, target):
-        return - th.mean(th.sum(target * F.log_softmax(input), dim=-1))
+        return - th.mean(
+            th.sum(target * F.log_softmax(input, dim=-1), dim=-1))
 
 
 class DirichletMultinomialLoss(th.nn.Module):

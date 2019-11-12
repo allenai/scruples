@@ -1,9 +1,9 @@
 """BERT baselines."""
 
-from pytorch_pretrained_bert.modeling import (
+from transformers import (
     BertForMultipleChoice,
-    BertForSequenceClassification)
-from pytorch_pretrained_bert.tokenization import BertTokenizer
+    BertForSequenceClassification,
+    BertTokenizer)
 import skopt
 import torch
 

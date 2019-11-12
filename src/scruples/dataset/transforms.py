@@ -9,7 +9,7 @@ from typing import (
     Sequence,
     Tuple)
 
-from pytorch_pretrained_bert.tokenization import BertTokenizer
+from transformers import BertTokenizer
 
 
 class BertTransform(object):

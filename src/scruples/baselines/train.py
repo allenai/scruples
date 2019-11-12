@@ -11,13 +11,11 @@ from typing import (
     List,
     Optional)
 
-from apex.optimizers import (
-    FP16_Optimizer,
-    FusedAdam)
+from apex import amp
 import numpy as np
-from pytorch_pretrained_bert.optimization import (
-    BertAdam,
-    warmup_linear)
+from transformers import (
+    AdamW,
+    WarmupLinearSchedule)
 from scipy.special import softmax
 import tensorboardX
 import torch
@@ -44,7 +42,7 @@ def train_lm(
         loss_type: str,
         compute_train_batch_size: int,
         predict_batch_size: int,
-        mixed_precision: bool,
+        opt_level: str,
         gpu_ids: Optional[List[int]],
         logger: Optional[logging.Logger] = None
 ) -> None:
@@ -99,6 +97,12 @@ def train_lm(
             f' "xentropy-hard", "xentropy-soft", "xentropy-full" or'
             f' "dirichlet-multinomial".')
 
+    if opt_level == 'O1':
+        raise ValueError(
+            'opt_level of O1 is not supported because it triggers a bug in'
+            ' NVIDIA apex. Use O2 instead. For more information, see'
+            ' https://github.com/NVIDIA/apex/issues/505.')
+
     # Step 1: Manage and construct paths.
 
     if logger is not None:
@@ -142,7 +146,7 @@ def train_lm(
             'loss_type': loss_type,
             'compute_train_batch_size': compute_train_batch_size,
             'predict_batch_size': predict_batch_size,
-            'mixed_precision': mixed_precision,
+            'opt_level': opt_level,
             'gpu_ids': gpu_ids
         }, config_file)
 
@@ -242,11 +246,7 @@ def train_lm(
     if logger is not None:
         logger.info('Initializing the model.')
 
-    model = torch.nn.DataParallel(Model(**baseline_config['model']))
-
-    if mixed_precision:
-        model.half()
-
+    model = Model(**baseline_config['model'])
     model.to(device)
 
     n_optimization_steps = n_epochs * math.ceil(len(train) / train_batch_size)
@@ -272,20 +272,21 @@ def train_lm(
             'weight_decay': hyper_params['weight_decay']
         }
     ]
-    if mixed_precision:
-        optimizer = FP16_Optimizer(
-            FusedAdam(
-                parameter_groups,
-                lr=hyper_params['lr'],
-                bias_correction=False,
-                max_grad_norm=1.0),
-            dynamic_loss_scale=True)
-    else:
-        optimizer = BertAdam(
-            parameter_groups,
-            lr=hyper_params['lr'],
-            warmup=hyper_params['warmup_proportion'],
-            t_total=n_optimization_steps)
+    optimizer = AdamW(parameter_groups, lr=hyper_params['lr'])
+
+    # add fp16 support
+    model, optimizer = amp.initialize(model, optimizer, opt_level=opt_level)
+
+    scheduler = WarmupLinearSchedule(
+        optimizer=optimizer,
+        warmup_steps=int(
+            hyper_params['warmup_proportion']
+            * n_optimization_steps
+        ),
+        t_total=n_optimization_steps)
+
+    # add data parallelism support
+    model = torch.nn.DataParallel(model)
 
     if loss_type == 'xentropy-hard':
         loss = torch.nn.CrossEntropyLoss()
@@ -335,19 +336,12 @@ def train_lm(
             soft_labels = label_scores / torch.unsqueeze(
                 torch.sum(label_scores, dim=-1), dim=-1)
 
-            # coerce the targets and soft labels to the correct precision
-            if mixed_precision and loss_type != 'xentropy-hard':
-                # N.B. if loss_type is xentropy-hard then the labels are ints
-                # and cannot be coerced to half-precision.
-                targets = targets.half()
-            soft_labels = soft_labels.half()
-
             # move the targets and soft labels to the device
             targets = targets.to(device)
             soft_labels = soft_labels.to(device)
 
             # make predictions
-            logits = model(**features)
+            logits = model(**features)[0]
 
             batch_loss = loss(logits, targets)
             batch_xentropy = xentropy(logits, soft_labels)
@@ -361,25 +355,14 @@ def train_lm(
             ) / (i + 1)
 
             # update the network
-            if mixed_precision:
-                optimizer.backward(batch_loss)
-            else:
-                batch_loss.backward()
+            with amp.scale_loss(batch_loss, optimizer) as scaled_loss:
+                scaled_loss.backward()
 
             if (i + 1) % n_gradient_accumulation == 0:
-                if mixed_precision:
-                    new_lr = warmup_linear(
-                        (
-                            n_train_batches_per_epoch * epoch
-                            + ((i+1) // n_gradient_accumulation)
-                        ) / n_optimization_steps,
-                        hyper_params['warmup_proportion']
-                    ) * hyper_params['lr']
-                    for param_group in optimizer.param_groups:
-                        param_group['lr'] = new_lr
-
                 optimizer.step()
                 optimizer.zero_grad()
+
+                scheduler.step()
 
             # write training statistics to tensorboard
 
@@ -416,17 +399,11 @@ def train_lm(
                 elif loss_type == 'dirichlet-multinomial':
                     targets = label_scores
 
-                # coerce the targets to the correct precision
-                if mixed_precision and loss_type != 'xentropy-hard':
-                    # N.B. if loss_type is xentropy-hard then the labels are
-                    # ints and cannot be coerced to half-precision
-                    targets = targets.half()
-
                 # move the targets to the device
                 targets = targets.to(device)
 
                 # make predictions
-                logits = model(**features)
+                logits = model(**features)[0]
 
                 batch_loss = loss(logits, targets)
 

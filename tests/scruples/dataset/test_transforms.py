@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import Mock
 
 import pytest
-from pytorch_pretrained_bert.tokenization import BertTokenizer
+from transformers import BertTokenizer
 
 from scruples.dataset import transforms
 

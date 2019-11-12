@@ -53,8 +53,10 @@ COMPRESSION_LEVEL = 9
     '--predict-batch-size', type=int, default=8,
     help='The batch size for prediction. Defaults to 8.')
 @click.option(
-    '--mixed-precision', is_flag=True,
-    help='Use mixed precision training.')
+    '--opt-level', type=str, default='O0',
+    help='The mixed precision optimization level. Defaults to O0. See'
+         ' https://nvidia.github.io/apex/amp.html#opt-levels-and-properties'
+         ' for more information on the optimization levels. Defaults to O0.')
 @click.option(
     '--gpu-ids', type=str, default=None,
     help='The GPU IDs to use for training as a comma-separated list.')
@@ -66,7 +68,7 @@ def tune_lm(
         n_iter: int,
         compute_train_batch_size: int,
         predict_batch_size: int,
-        mixed_precision: bool,
+        opt_level: str,
         gpu_ids: Optional[str]
 ) -> None:
     """Tune hyper-parameters for pre-trained LMs on the corpus.
@@ -118,7 +120,7 @@ def tune_lm(
             loss_type=loss_type,
             compute_train_batch_size=compute_train_batch_size,
             predict_batch_size=predict_batch_size,
-            mixed_precision=mixed_precision,
+            opt_level=opt_level,
             gpu_ids=gpu_ids,
             logger=logger)
 

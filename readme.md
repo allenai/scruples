@@ -31,7 +31,7 @@ This project requires Python 3.7. To setup the project:
            --no-cache-dir \
            --global-option="--cpp_ext" \
            --global-option="--cuda_ext" \
-           git+git://github.com/nvidia/apex.git@453eefa56454142f8fc788478ad511973cc0fe1b
+           git+git://github.com/nvidia/apex.git@606c3dcccd6ca70f4b506714d38a193e0845ee7f
 
   4. Install this repository:
 

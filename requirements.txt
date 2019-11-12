@@ -10,7 +10,6 @@ networkx==2.3
 numpy==1.16.2
 pandas==0.24.2
 pytest==4.4.1
-pytorch-pretrained-bert==0.6.1
 regex==2018.1.10
 scikit-learn==0.20.3
 scikit-optimize==0.5.2
@@ -23,4 +22,5 @@ tensorflow-estimator==1.13.0
 tensorflow==1.13.1
 torch==1.0.1.post2
 torchvision==0.2.2.post3
+transformers==2.1.1
 xgboost==0.82
