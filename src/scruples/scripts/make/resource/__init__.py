@@ -1,4 +1,4 @@
-"""Scripts for making the scruples benchmark."""
+"""Scripts for making the scruples resource."""
 
 import logging
 
@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 # main function
 
 @click.group()
-def benchmark():
-    """Make different components of the scruples benchmark."""
+def resource():
+    """Make different components of the scruples resource."""
     pass
 
 
@@ -26,4 +26,4 @@ subcommands = [
 ]
 
 for subcommand in subcommands:
-    benchmark.add_command(subcommand)
+    resource.add_command(subcommand)

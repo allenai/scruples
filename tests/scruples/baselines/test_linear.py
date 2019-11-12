@@ -25,4 +25,4 @@ class LogististicRankerBaselineTestCase(
 
     BASELINE_MODEL = linear.LogisticRankerBaseline
     BASELINE_HYPER_PARAMETERS = linear.LOGISTIC_RANKER_HYPER_PARAMETERS
-    DATASET = 'benchmark'
+    DATASET = 'resource'

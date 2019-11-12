@@ -1,4 +1,4 @@
-"""Make the final version of the scruples benchmark.
+"""Make the final version of the scruples resource.
 
 This script takes the raw annotation data from MTurk and creates the
 final labeled version of the dataset.
@@ -37,9 +37,9 @@ def dataset(
         instances_path: str,
         judgments_path: str
 ) -> None:
-    """Create the scruples benchmark.
+    """Create the scruples resource.
 
-    Create the scruples benchmark, reading the proposed dataset
+    Create the scruples resource, reading the proposed dataset
     instances from PROPOSALS_PATH, the MTurk HITs from HITS_PATH and
     then writing the resulting dataset instances to INSTANCES_PATH along
     with the individual annotator's judgments to JUDGMENTS_PATH.

@@ -152,7 +152,7 @@ class Action:
        means more people view it as violating a norm.
     is_good : bool
        ``True`` if the action is considered a good candidate for
-       creating an instance in the benchmark, otherwise ``False``.
+       creating an instance in the resource, otherwise ``False``.
 
     See `Parameters`_ for additional attributes.
 

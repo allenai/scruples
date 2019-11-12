@@ -1,4 +1,4 @@
-"""Predict labels for the benchmark with a fine-tuned language model."""
+"""Predict labels for the resource with a fine-tuned language model."""
 
 import json
 import math
@@ -15,7 +15,7 @@ import tqdm
 from .... import settings, baselines
 from ....baselines.metrics import METRICS
 from ....baselines.utils import dirichlet_multinomial
-from ....dataset.readers import ScruplesBenchmarkDataset
+from ....dataset.readers import ScruplesResourceDataset
 
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
     'results_dir',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
 @click.argument(
-    'splits', type=click.Choice(ScruplesBenchmarkDataset.SPLITS), nargs=-1)
+    'splits', type=click.Choice(ScruplesResourceDataset.SPLITS), nargs=-1)
 @click.option(
     '--predict-batch-size', type=int, default=64,
     help='The batch size for prediction.')
@@ -49,9 +49,9 @@ def predict_lm(
         predict_batch_size: int,
         gpu_ids: Optional[str]
 ) -> None:
-    """Predict using a fine-tuned LM baseline on the benchmark.
+    """Predict using a fine-tuned LM baseline on the resource.
 
-    Read the benchmark dataset from DATA_DIR, load the fine-tuned LM
+    Read the resource dataset from DATA_DIR, load the fine-tuned LM
     baseline model from MODEL_DIR, and write the metrics and predictions
     to RESULTS_DIR, for each split provided as an argument.
     """
@@ -81,7 +81,7 @@ def predict_lm(
         config = json.load(config_file)
 
     Model, baseline_config, _, make_transform =\
-        baselines.benchmark.FINE_TUNE_LM_BASELINES[config['baseline']]
+        baselines.resource.FINE_TUNE_LM_BASELINES[config['baseline']]
 
     # Step 3: Configure GPUs.
 
@@ -123,7 +123,7 @@ def predict_lm(
 
         logger.info(f'Loading the dataset from {data_dir}.')
 
-        dataset = ScruplesBenchmarkDataset(
+        dataset = ScruplesResourceDataset(
             data_dir=data_dir,
             split=split,
             transform=featurize)

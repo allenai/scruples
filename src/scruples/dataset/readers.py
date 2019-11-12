@@ -212,8 +212,8 @@ class ScruplesCorpusDataset(Dataset):
         return id_, feature, label, label_scores
 
 
-class ScruplesBenchmark:
-    """A class for reading the scruples benchmark for sklearn.
+class ScruplesResource:
+    """A class for reading the scruples resource for sklearn.
 
     Attributes
     ----------
@@ -268,7 +268,7 @@ class ScruplesBenchmark:
         for split in self.SPLITS:
             split_path = os.path.join(
                 data_dir,
-                settings.BENCHMARK_FILENAME_TEMPLATE.format(split=split))
+                settings.RESOURCE_FILENAME_TEMPLATE.format(split=split))
             rows = []
             with open(split_path, 'r') as split_file:
                 for ln in split_file:
@@ -292,8 +292,8 @@ class ScruplesBenchmark:
             setattr(self, split, ids_features_labels_and_label_scores)
 
 
-class ScruplesBenchmarkDataset(Dataset):
-    """A PyTorch ``Dataset`` class for the scruples benchmark.
+class ScruplesResourceDataset(Dataset):
+    """A PyTorch ``Dataset`` class for the scruples resource.
 
     Iterating through this dataset returns ``(id, feature, label,
     label_scores)`` tuples.
@@ -306,17 +306,17 @@ class ScruplesBenchmarkDataset(Dataset):
         A list of the instance IDs for the split.
     features : List[Tuple[str, str]]
         A list of ``(action0, action1)`` tuples for the instances in the
-        benchmark.
+        resource.
     labels : List[int]
-        A list of the labels for the instances in the benchmark.
+        A list of the labels for the instances in the resource.
     label_scores : List[List[int]]
         A list of lists containing the label scores for the
-        instances in the benchmark.
+        instances in the resource.
 
     Parameters
     ----------
     data_dir : str, required
-        The directory containing the scruples benchmark.
+        The directory containing the scruples resource.
     split : str, required
         The split to read into the class. Must be one of ``"train"``,
         ``"dev"``, or ``"test"``.
@@ -386,7 +386,7 @@ class ScruplesBenchmarkDataset(Dataset):
 
         split_path = os.path.join(
             self.data_dir,
-            settings.BENCHMARK_FILENAME_TEMPLATE.format(split=self.split))
+            settings.RESOURCE_FILENAME_TEMPLATE.format(split=self.split))
         with open(split_path, 'r') as split_file:
             for ln in split_file:
                 row = json.loads(ln)

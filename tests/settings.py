@@ -5,7 +5,7 @@
 
 # easy version dataset fixtures
 CORPUS_EASY_DIR = 'fixtures/corpus-easy'
-BENCHMARK_EASY_DIR = 'fixtures/benchmark-easy'
+RESOURCE_EASY_DIR = 'fixtures/resource-easy'
 
 # raw data fixtures
 TEST_COMMENT_PATH = 'fixtures/raw-data/test-comment.jsonl'

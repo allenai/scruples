@@ -27,7 +27,7 @@ class BaselineTestMixin:
         baseline model.
     DATASET : str
         The dataset against which the baseline should be run. Must be
-        either ``"benchmark"`` or ``"corpus"``.
+        either ``"resource"`` or ``"corpus"``.
 
     Examples
     --------
@@ -71,18 +71,18 @@ class BaselineTestMixin:
                 'Subclasses of BaselineTestMixin must provide a DATASET'
                 ' class attribute.')
 
-        if self.DATASET not in ['benchmark', 'corpus']:
+        if self.DATASET not in ['resource', 'corpus']:
             raise ValueError(
                 'The DATASET class attribute must either be'
-                ' "benchmark", or "corpus".')
+                ' "resource", or "corpus".')
 
         # copy the dataset fixture from the package to disk
 
-        if self.DATASET == 'benchmark':
-            Reader = readers.ScruplesBenchmark
-            fixture_path = settings.BENCHMARK_EASY_DIR
+        if self.DATASET == 'resource':
+            Reader = readers.ScruplesResource
+            fixture_path = settings.RESOURCE_EASY_DIR
             split_filename_template =\
-                scruples_settings.BENCHMARK_FILENAME_TEMPLATE
+                scruples_settings.RESOURCE_FILENAME_TEMPLATE
         elif self.DATASET == 'corpus':
             Reader = readers.ScruplesCorpus
             fixture_path = settings.CORPUS_EASY_DIR

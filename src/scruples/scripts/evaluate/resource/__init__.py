@@ -1,4 +1,4 @@
-"""Scripts for evaluating models on the scruples benchmark."""
+"""Scripts for evaluating models on the scruples resource."""
 
 import logging
 
@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 # main function
 
 @click.group()
-def benchmark():
-    """Evaluate baseline models on the scruples benchmark."""
+def resource():
+    """Evaluate baseline models on the scruples resource."""
     pass
 
 
@@ -30,4 +30,4 @@ subcommands = [
 ]
 
 for subcommand in subcommands:
-    benchmark.add_command(subcommand)
+    resource.add_command(subcommand)

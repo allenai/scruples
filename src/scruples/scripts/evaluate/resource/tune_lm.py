@@ -1,4 +1,4 @@
-"""Tune hyper-parameters for pre-trained LMs on the benchmark."""
+"""Tune hyper-parameters for pre-trained LMs on the resource."""
 
 import json
 import logging
@@ -31,7 +31,7 @@ COMPRESSION_LEVEL = 9
     type=click.Path(file_okay=False, dir_okay=True))
 @click.option(
     '--baseline',
-    type=click.Choice(baselines.benchmark.FINE_TUNE_LM_BASELINES.keys()),
+    type=click.Choice(baselines.resource.FINE_TUNE_LM_BASELINES.keys()),
     default='bert',
     help='The model to train. Defaults to "bert".')
 @click.option(
@@ -69,10 +69,10 @@ def tune_lm(
         mixed_precision: bool,
         gpu_ids: Optional[str]
 ) -> None:
-    """Tune hyper-parameters for pre-trained LMs on the benchmark.
+    """Tune hyper-parameters for pre-trained LMs on the resource.
 
     Tune hyper-parameters for a pre-trained language model on the
-    scruples benchmark, reading the dataset from DATA_DIR, and
+    scruples resource, reading the dataset from DATA_DIR, and
     writing all artifacts to MODELS_DIR. Tuning is performed with
     Bayesian optimization.
     """
@@ -89,7 +89,7 @@ def tune_lm(
 
     # Step 2: Fetch the hyper-parameter space.
 
-    _, _, space, _ = baselines.benchmark.FINE_TUNE_LM_BASELINES[baseline]
+    _, _, space, _ = baselines.resource.FINE_TUNE_LM_BASELINES[baseline]
 
     # Step 3: Create the objective function.
 
@@ -112,7 +112,7 @@ def tune_lm(
                     '_'.join(
                         f'{k}-{v}'
                         for k, v in hyper_params.items()))),
-            dataset='benchmark',
+            dataset='resource',
             baseline=baseline,
             hyper_params=hyper_params,
             loss_type=loss_type,

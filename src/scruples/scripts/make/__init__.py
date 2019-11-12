@@ -5,7 +5,7 @@ import logging
 import click
 
 from . import (
-    benchmark,
+    resource,
     corpus)
 
 
@@ -21,7 +21,7 @@ def make():
 
 
 subcommands = [
-    benchmark.benchmark,
+    resource.resource,
     corpus.corpus
 ]
 

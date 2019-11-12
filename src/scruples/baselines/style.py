@@ -400,7 +400,7 @@ MOST_CHARACTERS_HYPER_PARAMETERS = {}
 StyleRankerBaseline = Pipeline([
     (
         'featurizer',
-        utils.BenchmarkTransformer(
+        utils.ResourceTransformer(
             transformer=Pipeline([
                 (
                     'featurizer',

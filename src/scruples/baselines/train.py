@@ -24,14 +24,14 @@ import torch
 from torch.utils.data import DataLoader
 import tqdm
 
-from . import benchmark, corpus
+from . import resource, corpus
 from .. import settings, utils
 from ..baselines.loss import (
     SoftCrossEntropyLoss,
     DirichletMultinomialLoss)
 from ..data.labels import Label
 from ..dataset.readers import (
-    ScruplesBenchmarkDataset,
+    ScruplesResourceDataset,
     ScruplesCorpusDataset)
 
 
@@ -62,7 +62,7 @@ def train_lm(
         The path to the directory in which to save results.
     dataset : str
         The dataset to use when fine-tuning ``baseline``. Must be either
-        "benchmark" or "corpus".
+        "resource" or "corpus".
     baseline : str
         The pre-trained LM to fine-tune. Should be one of the keys for
         ``scruples.baselines.$dataset.FINE_TUNE_LM_BASELINES`` where
@@ -171,15 +171,15 @@ def train_lm(
     if logger is not None:
         logger.info('Retrieving baseline and related parameters.')
 
-    if dataset == 'benchmark':
+    if dataset == 'resource':
         Model, baseline_config, _, make_transform =\
-            benchmark.FINE_TUNE_LM_BASELINES[baseline]
+            resource.FINE_TUNE_LM_BASELINES[baseline]
     elif dataset == 'corpus':
         Model, baseline_config, _, make_transform =\
             corpus.FINE_TUNE_LM_BASELINES[baseline]
     else:
         raise ValueError(
-            f'dataset must be either "benchmark" or "corpus", not'
+            f'dataset must be either "resource" or "corpus", not'
             f' {dataset}.')
 
     n_epochs = hyper_params['n_epochs']
@@ -193,8 +193,8 @@ def train_lm(
         logger.info(f'Loading the dataset from {data_dir}.')
 
     featurize = make_transform(**baseline_config['transform'])
-    if dataset == 'benchmark':
-        Dataset = ScruplesBenchmarkDataset
+    if dataset == 'resource':
+        Dataset = ScruplesResourceDataset
         labelize = None
         labelize_scores = lambda scores: np.array(scores).astype(float)
     elif dataset == 'corpus':
@@ -208,7 +208,7 @@ def train_lm(
         ]).astype(float)
     else:
         raise ValueError(
-            f'dataset must be either "benchmark" or "corpus", not'
+            f'dataset must be either "resource" or "corpus", not'
             f' {dataset}.')
 
     train = Dataset(

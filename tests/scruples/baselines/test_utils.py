@@ -51,8 +51,8 @@ class DirichletMultinomialTestCase(unittest.TestCase):
             [[0.25, 0.5, 0.25], [0.2, 0.3, 0.5]]))
 
 
-class BenchmarkTransformerTestCase(unittest.TestCase):
-    """Test BenchmarkTransformer."""
+class ResourceTransformerTestCase(unittest.TestCase):
+    """Test ResourceTransformer."""
 
     def test_set_params(self):
         # mock out the inputs
@@ -63,39 +63,39 @@ class BenchmarkTransformerTestCase(unittest.TestCase):
         third_transformer = Mock()
         third_transformer.get_params.return_value = {'x': None}
 
-        benchmark_transformer = utils.BenchmarkTransformer(
+        resource_transformer = utils.ResourceTransformer(
             transformer=transformer)
 
         # test setting params on the transformer attribute
-        benchmark_transformer.set_params(transformer__x=1)
+        resource_transformer.set_params(transformer__x=1)
 
         transformer.set_params.assert_called()
         transformer.set_params.assert_called_with(x=1)
 
-        # test setting params on the BenchmarkTransformer
+        # test setting params on the ResourceTransformer
         self.assertNotEqual(
-            benchmark_transformer.transformer,
+            resource_transformer.transformer,
             second_transformer)
 
-        benchmark_transformer.set_params(
+        resource_transformer.set_params(
             transformer=second_transformer)
 
         self.assertEqual(
-            benchmark_transformer.transformer,
+            resource_transformer.transformer,
             second_transformer)
 
-        # test setting params on the BenchmarkTransformer and the new
+        # test setting params on the ResourceTransformer and the new
         # transformer at the same time
         self.assertNotEqual(
-            benchmark_transformer.transformer,
+            resource_transformer.transformer,
             third_transformer)
 
-        benchmark_transformer.set_params(
+        resource_transformer.set_params(
             transformer=third_transformer,
             transformer__x='foo')
 
         self.assertEqual(
-            benchmark_transformer.transformer,
+            resource_transformer.transformer,
             third_transformer)
 
         third_transformer.set_params.asset_called()
@@ -109,17 +109,17 @@ class BenchmarkTransformerTestCase(unittest.TestCase):
             {'action0': 3, 'action1': 6},
         ])
 
-        # mock arguments to instantiate BenchmarkTransformer
+        # mock arguments to instantiate ResourceTransformer
         transformer = Mock()
 
-        # create the BenchmarkTransformer instance
-        benchmark_transformer = utils.BenchmarkTransformer(
+        # create the ResourceTransformer instance
+        resource_transformer = utils.ResourceTransformer(
             transformer=transformer)
 
         # run tests
         self.assertIsInstance(
-            benchmark_transformer.fit(X),
-            utils.BenchmarkTransformer)
+            resource_transformer.fit(X),
+            utils.ResourceTransformer)
 
         transformer.fit.assert_called()
         self.assertEqual(
@@ -143,14 +143,14 @@ class BenchmarkTransformerTestCase(unittest.TestCase):
             def transform(self, X):
                 return 2 * X
 
-        benchmarks = ['action0', 'action1']
+        resources = ['action0', 'action1']
         transformer = TimesTwoTransformer()
 
-        benchmark_transformer = utils.BenchmarkTransformer(
+        resource_transformer = utils.ResourceTransformer(
             transformer=transformer)
 
-        benchmark_transformer.fit(X)
+        resource_transformer.fit(X)
 
         self.assertEqual(
-            benchmark_transformer.transform(X).tolist(),
+            resource_transformer.transform(X).tolist(),
             X_transformed)

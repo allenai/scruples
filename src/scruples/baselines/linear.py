@@ -80,7 +80,7 @@ LOGISTIC_REGRESSION_HYPER_PARAMETERS = {
 LogisticRankerBaseline = Pipeline([
     (
         'featurizer',
-        utils.BenchmarkTransformer(
+        utils.ResourceTransformer(
             transformer=Pipeline([
                 (
                     'vectorizer',

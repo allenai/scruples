@@ -422,36 +422,36 @@ class ScruplesCorpusDatasetTestCase(unittest.TestCase):
         self.assertEqual(kwargs, {})
 
 
-class ScruplesBenchmarkTestCase(unittest.TestCase):
-    """Test scruples.dataset.readers.ScruplesBenchmark."""
+class ScruplesResourceTestCase(unittest.TestCase):
+    """Test scruples.dataset.readers.ScruplesResource."""
 
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
-        # copy the benchmark-easy dataset to the temporary directory
-        for split in readers.ScruplesBenchmark.SPLITS:
+        # copy the resource-easy dataset to the temporary directory
+        for split in readers.ScruplesResource.SPLITS:
             split_filename =\
-                scruples_settings.BENCHMARK_FILENAME_TEMPLATE.format(
+                scruples_settings.RESOURCE_FILENAME_TEMPLATE.format(
                     split=split)
             utils.copy_pkg_resource_to_disk(
                 pkg='tests',
-                src=os.path.join(settings.BENCHMARK_EASY_DIR, split_filename),
+                src=os.path.join(settings.RESOURCE_EASY_DIR, split_filename),
                 dst=os.path.join(self.temp_dir.name, split_filename))
 
     def tearDown(self):
         self.temp_dir.cleanup()
 
-    def test_benchmark_has_correct_splits(self):
+    def test_resource_has_correct_splits(self):
         self.assertEqual(
-            set(readers.ScruplesBenchmark.SPLITS),
+            set(readers.ScruplesResource.SPLITS),
             set(['train', 'dev', 'test']))
 
     def test_reads_in_splits(self):
         # read the dataset
-        benchmark = readers.ScruplesBenchmark(data_dir=self.temp_dir.name)
+        resource = readers.ScruplesResource(data_dir=self.temp_dir.name)
 
         # train
         train_ids, train_features, train_labels, train_label_scores =\
-            benchmark.train
+            resource.train
         self.assertIsInstance(train_ids, pd.Series)
         self.assertEqual(train_ids.tolist()[0], 'id_0')
         self.assertIsInstance(train_features, pd.DataFrame)
@@ -470,7 +470,7 @@ class ScruplesBenchmarkTestCase(unittest.TestCase):
 
         # dev
         dev_ids, dev_features, dev_labels, dev_label_scores =\
-            benchmark.dev
+            resource.dev
         self.assertIsInstance(dev_ids, pd.Series)
         self.assertEqual(dev_ids.tolist()[0], 'id_16')
         self.assertIsInstance(dev_features, pd.DataFrame)
@@ -489,7 +489,7 @@ class ScruplesBenchmarkTestCase(unittest.TestCase):
 
         # test
         test_ids, test_features, test_labels, test_label_scores =\
-            benchmark.test
+            resource.test
         self.assertIsInstance(test_ids, pd.Series)
         self.assertEqual(test_ids.tolist()[0], 'id_20')
         self.assertIsInstance(test_features, pd.DataFrame)
@@ -507,27 +507,27 @@ class ScruplesBenchmarkTestCase(unittest.TestCase):
             [1, 0])
 
 
-class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
-    """Test scruples.dataset.readers.ScruplesBenchmarkDataset."""
+class ScruplesResourceDatasetTestCase(unittest.TestCase):
+    """Test scruples.dataset.readers.ScruplesResourceDataset."""
 
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
-        # copy the benchmark-easy dataset to the temporary directory
-        for split in readers.ScruplesBenchmarkDataset.SPLITS:
+        # copy the resource-easy dataset to the temporary directory
+        for split in readers.ScruplesResourceDataset.SPLITS:
             split_filename =\
-                scruples_settings.BENCHMARK_FILENAME_TEMPLATE.format(
+                scruples_settings.RESOURCE_FILENAME_TEMPLATE.format(
                     split=split)
             utils.copy_pkg_resource_to_disk(
                 pkg='tests',
-                src=os.path.join(settings.BENCHMARK_EASY_DIR, split_filename),
+                src=os.path.join(settings.RESOURCE_EASY_DIR, split_filename),
                 dst=os.path.join(self.temp_dir.name, split_filename))
 
     def tearDown(self):
         self.temp_dir.cleanup()
 
-    def test_benchmark_has_correct_splits(self):
+    def test_resource_has_correct_splits(self):
         self.assertEqual(
-            set(readers.ScruplesBenchmarkDataset.SPLITS),
+            set(readers.ScruplesResourceDataset.SPLITS),
             set(['train', 'dev', 'test']))
 
     def test_init_raises_error_if_bad_split_provided(self):
@@ -535,7 +535,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
                 ValueError,
                 r'split must be one of train, dev, test\.'
         ):
-          readers.ScruplesBenchmarkDataset(
+          readers.ScruplesResourceDataset(
               data_dir=self.temp_dir.name,
               split='val',
               transform=None,
@@ -544,7 +544,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
 
     def test_len(self):
         # test len on train
-        train = readers.ScruplesBenchmarkDataset(
+        train = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
@@ -553,7 +553,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
         self.assertEqual(len(train), 16)
 
         # test len on dev
-        dev = readers.ScruplesBenchmarkDataset(
+        dev = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
@@ -562,7 +562,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
         self.assertEqual(len(dev), 4)
 
         # test len on test
-        test = readers.ScruplesBenchmarkDataset(
+        test = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
@@ -572,7 +572,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
 
     def test___get_item__(self):
         # test __get_item__ on train
-        train = readers.ScruplesBenchmarkDataset(
+        train = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
@@ -588,7 +588,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
         self.assertEqual(label_scores, [1, 0])
 
         # test __get_item__ on dev
-        dev = readers.ScruplesBenchmarkDataset(
+        dev = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
@@ -604,7 +604,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
         self.assertEqual(label_scores, [1, 0])
 
         # test __get_item__ on test
-        test = readers.ScruplesBenchmarkDataset(
+        test = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
@@ -622,7 +622,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
     def test_init_with_transform(self):
         # test the train split
         train_transform = Mock(return_value='foo')
-        train = readers.ScruplesBenchmarkDataset(
+        train = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=train_transform,
@@ -642,7 +642,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
 
         # test the dev split
         dev_transform = Mock(return_value='foo')
-        dev = readers.ScruplesBenchmarkDataset(
+        dev = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=dev_transform,
@@ -662,7 +662,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
 
         # test the test split
         test_transform = Mock(return_value='foo')
-        test = readers.ScruplesBenchmarkDataset(
+        test = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=test_transform,
@@ -683,7 +683,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
     def test_init_with_label_transform(self):
         # test the train split
         train_label_transform = Mock(return_value='foo')
-        train = readers.ScruplesBenchmarkDataset(
+        train = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
@@ -700,7 +700,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
 
         # test the dev split
         dev_label_transform = Mock(return_value='foo')
-        dev = readers.ScruplesBenchmarkDataset(
+        dev = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
@@ -717,7 +717,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
 
         # test the test split
         test_label_transform = Mock(return_value='foo')
-        test = readers.ScruplesBenchmarkDataset(
+        test = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,
@@ -735,7 +735,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
     def test_init_with_label_scores_transform(self):
         # test the train split
         train_label_scores_transform = Mock(return_value='foo')
-        train = readers.ScruplesBenchmarkDataset(
+        train = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='train',
             transform=None,
@@ -752,7 +752,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
 
         # test the dev split
         dev_label_scores_transform = Mock(return_value='foo')
-        dev = readers.ScruplesBenchmarkDataset(
+        dev = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='dev',
             transform=None,
@@ -769,7 +769,7 @@ class ScruplesBenchmarkDatasetTestCase(unittest.TestCase):
 
         # test the test split
         test_label_scores_transform = Mock(return_value='foo')
-        test = readers.ScruplesBenchmarkDataset(
+        test = readers.ScruplesResourceDataset(
             data_dir=self.temp_dir.name,
             split='test',
             transform=None,

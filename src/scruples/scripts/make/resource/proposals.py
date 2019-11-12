@@ -1,7 +1,7 @@
-"""Create candidate instances for the scruples benchmark.
+"""Create candidate instances for the scruples resource.
 
 This script takes in the scruples corpus and creates candidate
-instances for the scruples benchmark of ranked action pairs. The
+instances for the scruples resource of ranked action pairs. The
 proposals then must be annotated using Mechanical Turk.
 """
 
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 @click.option(
     '--rounds', type=int, default=3,
     help='The number of rounds of random matchings to run. Each round'
-         ' uses every action from the benchmark once. So, k rounds will'
+         ' uses every action from the resource once. So, k rounds will'
          ' use an action at most k times. Duplicate action pairs are'
          ' dropped after each round. Defaults to 3.')
 def proposals(
@@ -40,7 +40,7 @@ def proposals(
         proposals_dir: str,
         rounds: int
 ) -> None:
-    """Propose and write instances for the benchmark to PROPOSALS_DIR.
+    """Propose and write instances for the resource to PROPOSALS_DIR.
 
     Read in the scruples corpus from CORPUS_DIR and then for each
     split in the corpus, randomly pair actions together and write them
@@ -50,7 +50,7 @@ def proposals(
     # Create the output directory
     os.makedirs(proposals_dir)
 
-    # Iterate over each split of the corpus, creating the benchmark data
+    # Iterate over each split of the corpus, creating the resource data
     # for each.
     for split in settings.SPLITS:
         logger.info(f'Reading the {split["name"]} split from the corpus.')

@@ -5,7 +5,7 @@ import logging
 import click
 
 from . import (
-    benchmark,
+    resource,
     corpus)
 
 
@@ -23,7 +23,7 @@ def evaluate():
 # register subcommands to the command group
 
 subcommands = [
-    benchmark.benchmark,
+    resource.resource,
     corpus.corpus
 ]
 

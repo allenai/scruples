@@ -641,7 +641,7 @@ class MostCharactersBaselineTestCase(unittest.TestCase):
 class StyleRankerBaselineTestCase(unittest.TestCase):
     """Test the style ranking baseline."""
     # The stylistic features aren't powerful enough to solve
-    # benchmark-easy (because the style is shared across the labels)
+    # resource-easy (because the style is shared across the labels)
     # so we have to test this baseline differently from the others.
 
     def setUp(self):

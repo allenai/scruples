@@ -1,4 +1,4 @@
-"""Run shallow baseline models on the scruples benchmark."""
+"""Run shallow baseline models on the scruples resource."""
 
 import collections
 import json
@@ -14,7 +14,7 @@ import tqdm
 
 from .... import settings, baselines
 from ....baselines.metrics import METRICS
-from ....dataset.readers import ScruplesBenchmark
+from ....dataset.readers import ScruplesResource
 
 
 logger = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
     'results_dir',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
 @click.argument(
-    'splits', type=click.Choice(ScruplesBenchmark.SPLITS), nargs=-1)
+    'splits', type=click.Choice(ScruplesResource.SPLITS), nargs=-1)
 @click.option(
     '--metric',
     type=click.Choice(METRICS.keys()),
@@ -64,9 +64,9 @@ def run_shallow(
         n_folds: int,
         n_jobs: int
 ) -> None:
-    """Evaluate shallow baselines on the scruples benchmark.
+    """Evaluate shallow baselines on the scruples resource.
 
-    Train shallow baseline models on the scruples benchmark, reading
+    Train shallow baseline models on the scruples resource, reading
     the dataset from DATA_DIR, and writing trained models, logs, and
     other results to RESULTS_DIR. Performance is reported for each split
     provided as an argument.
@@ -79,7 +79,7 @@ def run_shallow(
     model_paths = {}
     metrics_paths = collections.defaultdict(dict)
     predictions_paths = collections.defaultdict(dict)
-    for baseline in baselines.benchmark.SHALLOW_BASELINES.keys():
+    for baseline in baselines.resource.SHALLOW_BASELINES.keys():
         os.makedirs(os.path.join(results_dir, baseline))
         model_paths[baseline] = os.path.join(
             results_dir, baseline, 'model.pkl')
@@ -94,14 +94,14 @@ def run_shallow(
 
     logger.info(f'Loading the data from {data_dir}.')
 
-    dataset = ScruplesBenchmark(data_dir=data_dir)
+    dataset = ScruplesResource(data_dir=data_dir)
 
     # Step 3: Run the baselines.
 
     logger.info('Running the baselines.')
 
     for baseline, (Model, hyper_parameter_space) in tqdm.tqdm(
-            baselines.benchmark.SHALLOW_BASELINES.items(),
+            baselines.resource.SHALLOW_BASELINES.items(),
             **settings.TQDM_KWARGS
     ):
         # tune the hyper-parameters and train the model

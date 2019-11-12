@@ -53,19 +53,19 @@ def dirichlet_multinomial(log_alphas: np.ndarray) -> np.ndarray:
 
 # classes
 
-class BenchmarkTransformer(BaseEstimator, TransformerMixin):
-    """Featurize the action pairs from the scruples benchmark.
+class ResourceTransformer(BaseEstimator, TransformerMixin):
+    """Featurize the action pairs from the scruples resource.
 
-    ``BenchmarkTransformer`` applies the same featurization pipeline
+    ``ResourceTransformer`` applies the same featurization pipeline
     (``self.transformer``) to both actions in an instance from the
-    scruples benchmark and then takes the difference of their
+    scruples resource and then takes the difference of their
     features.
 
     You can set parameters on the ``self.transformer`` attribute by
-    prefixing parameters to ``BenchmarkTransformer`` with
+    prefixing parameters to ``ResourceTransformer`` with
     ``transformer__``.
 
-    ``BenchmarkTransformer`` is particularly useful in front of linear
+    ``ResourceTransformer`` is particularly useful in front of linear
     models like logistic regression, since applying the model to the
     difference of the features is the same as taking the difference of
     the final scores.
@@ -88,7 +88,7 @@ class BenchmarkTransformer(BaseEstimator, TransformerMixin):
     def set_params(
             self,
             **params: Dict[str, Any]
-    ) -> 'BenchmarkTransformer':
+    ) -> 'ResourceTransformer':
         self_params = {}
         transformer_params = {}
         for param, value in params.items():
@@ -107,10 +107,10 @@ class BenchmarkTransformer(BaseEstimator, TransformerMixin):
             self,
             X: pd.DataFrame,
             y: np.ndarray = None
-    ) -> 'BenchmarkTransformer':
+    ) -> 'ResourceTransformer':
         """Fit the instance to ``X``.
 
-        Fitting an instance of ``BenchmarkTransformer`` fits its
+        Fitting an instance of ``ResourceTransformer`` fits its
         ``self.transformer`` attribute to the data. The ``y`` argument
         is ignored.
 

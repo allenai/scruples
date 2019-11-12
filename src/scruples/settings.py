@@ -35,10 +35,10 @@ used in the other splits should go to that split.
 # them). If this variable is modified, make sure to update the doc
 # strings for ``ScruplesCorpus``, ``ScruplesCorpusDataset``.
 #
-# Note that the benchmark splits will have a different number of
+# Note that the resource splits will have a different number of
 # instances than the number of posts used to create them, in
 # general. So, the 'size' attribute doesn't necessarily give the size of
-# the benchmark splits.
+# the resource splits.
 
 # corpus settings
 
@@ -49,13 +49,13 @@ POSTS_FILENAME = 'all.scruples-posts.jsonl'
 """The filename for the file containing all the posts."""
 
 
-# benchmark settings
+# resource settings
 
 PROPOSALS_FILENAME_TEMPLATE = '{split}.scruples-proposals.jsonl'
-"""A template string for the benchmark proposals' split filenames."""
+"""A template string for the resource proposals' split filenames."""
 
-BENCHMARK_FILENAME_TEMPLATE = '{split}.scruples-benchmark.jsonl'
-"""A template string for the benchmark's split filenames."""
+RESOURCE_FILENAME_TEMPLATE = '{split}.scruples-actions.jsonl'
+"""A template string for the resource's split filenames."""
 
 N_ANNOTATORS_FOR_GOLD_LABELS = 5
 """The number of annotators to use for creating the gold labels."""
