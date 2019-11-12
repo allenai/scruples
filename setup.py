@@ -13,7 +13,7 @@ with open('requirements.txt', 'r') as requirements_file:
 setup(
     name='scruples',
     version='0.0.0',
-    description='A benchmark for detecting social norm violations in stories.',
+    description='A corpus and code for understanding norms and subjectivity.',
     long_description=readme,
     url='https://github.com/allenai/scruples',
     author='Nicholas Lourie',
