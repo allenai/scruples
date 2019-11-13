@@ -103,8 +103,7 @@ ROBERTA_RANKER_CONFIG = {
     'model': {
         # N.B. pretrained_model_name_or_path for the model must be the
         # same as pretrained_roberta for the transform
-        'pretrained_model_name_or_path': 'roberta-large',
-        'num_choices': 2
+        'pretrained_model_name_or_path': 'roberta-large'
     },
     'transform': {
         # N.B. pretrained_roberta for the transform must be the same as
