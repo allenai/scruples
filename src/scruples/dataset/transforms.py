@@ -149,15 +149,17 @@ class BertTransform(object):
 
         # compute the number of tokens to keep from each sequence
         if feature1 is None:
-            tokens_to_keep0 = self.max_sequence_length - 2
+            n_special_tokens = 2
+            tokens_to_keep0 = self.max_sequence_length - n_special_tokens
             tokens_to_keep1 = None
         else:
+            n_special_tokens = 2 + (2 if self.starting_sep_token else 1)
             tokens_to_keep0 = max(
-                (self.max_sequence_length - 3) // 2,
-                self.max_sequence_length - len(feature1) - 3)
+                (self.max_sequence_length - n_special_tokens) // 2,
+                self.max_sequence_length - len(feature1) - n_special_tokens)
             tokens_to_keep1 = max(
-                (self.max_sequence_length - 3) // 2,
-                self.max_sequence_length - len(feature0) - 3)
+                (self.max_sequence_length - n_special_tokens) // 2,
+                self.max_sequence_length - len(feature0) - n_special_tokens)
 
         if strategy0 == 'beginning':
             feature0 = feature0[:tokens_to_keep0]
