@@ -1,9 +1,9 @@
-"""BERT baselines."""
+"""RoBERTa baselines."""
 
 from transformers import (
-    BertForMultipleChoice,
-    BertForSequenceClassification,
-    BertTokenizer)
+    RobertaForMultipleChoice,
+    RobertaForSequenceClassification,
+    RobertaTokenizer)
 import skopt
 import torch
 
@@ -14,32 +14,32 @@ from ..dataset.transforms import (
     Map)
 
 
-# the BERT sequence classification baseline
+# the RoBERTa sequence classification baseline
 
-BERTClassifier = BertForSequenceClassification.from_pretrained
-"""Predict fixed classes with a fine-tuned BERT model."""
+RoBERTaClassifier = RobertaForSequenceClassification.from_pretrained
+"""Predict fixed classes with a fine-tuned RoBERTa model."""
 
 
-BERT_CLASSIFIER_CONFIG = {
+ROBERTA_CLASSIFIER_CONFIG = {
     'model': {
         # N.B. pretrained_model_name_or_path for the model must be the
-        # same as pretrained_bert for the transform
-        'pretrained_model_name_or_path': 'bert-large-uncased',
+        # same as pretrained_roberta for the transform
+        'pretrained_model_name_or_path': 'roberta-large',
         'num_labels': len(Label)
     },
     'transform': {
-        # N.B. pretrained_bert for the transform must be the same as
+        # N.B. pretrained_roberta for the transform must be the same as
         # pretrained_model_name_or_path for the model
-        'pretrained_bert': 'bert-large-uncased',
+        'pretrained_roberta': 'roberta-large',
         'max_sequence_length': 512,
         'truncation_strategy_title': 'beginning',
         'truncation_strategy_text': 'beginning'
     }
 }
-"""Configuration for ``BERTClassifier``."""
+"""Configuration for ``RoBERTaClassifier``."""
 
 
-BERT_CLASSIFIER_HYPER_PARAM_SPACE = [
+ROBERTA_CLASSIFIER_HYPER_PARAM_SPACE = [
     skopt.space.Real(
         low=1e-8,
         high=1e-2,
@@ -64,59 +64,59 @@ BERT_CLASSIFIER_HYPER_PARAM_SPACE = [
         high=10,
         name='log_train_batch_size')
 ]
-"""The hyper-param search space for ``BERTClassifier``."""
+"""The hyper-param search space for ``RoBERTaClassifier``."""
 
 
-BERT_CLASSIFIER_TRANSFORM = (
+ROBERTA_CLASSIFIER_TRANSFORM = (
     lambda
-        pretrained_bert,
+        pretrained_roberta,
         max_sequence_length,
         truncation_strategy_title,
         truncation_strategy_text:
     Compose([
         BertTransform(
-            tokenizer=BertTokenizer.from_pretrained(
-                pretrained_bert,
-                do_lower_case=pretrained_bert.endswith('-uncased')),
+            tokenizer=RobertaTokenizer.from_pretrained(
+                pretrained_roberta,
+                do_lower_case=False),
             max_sequence_length=max_sequence_length,
             truncation_strategy=(
                 truncation_strategy_title,
-                truncation_strategy_text
-            )),
+                truncation_strategy_text),
+            starting_sep_token=True
+        ),
         lambda d: {
             'input_ids': torch.tensor(d['input_ids']),
-            'attention_mask': torch.tensor(d['input_mask']),
-            'token_type_ids': torch.tensor(d['segment_ids'])
+            'attention_mask': torch.tensor(d['input_mask'])
         }
     ])
 )
-"""The factory to create data transforms for ``BERTClassifier``."""
+"""The factory to create data transforms for ``RoBERTaClassifier``."""
 
 
-# the BERT ranking baseline
+# the RoBERTa ranking baseline
 
-BERTRanker = BertForMultipleChoice.from_pretrained
-"""Rank choices with a softmax over a fine-tuned BERT model."""
+RoBERTaRanker = RobertaForMultipleChoice.from_pretrained
+"""Rank choices with a softmax over a fine-tuned RoBERTa model."""
 
 
-BERT_RANKER_CONFIG = {
+ROBERTA_RANKER_CONFIG = {
     'model': {
         # N.B. pretrained_model_name_or_path for the model must be the
-        # same as pretrained_bert for the transform
-        'pretrained_model_name_or_path': 'bert-large-uncased',
+        # same as pretrained_roberta for the transform
+        'pretrained_model_name_or_path': 'roberta-large',
         'num_choices': 2
     },
     'transform': {
-        # N.B. pretrained_bert for the transform must be the same as
+        # N.B. pretrained_roberta for the transform must be the same as
         # pretrained_model_name_or_path for the model
-        'pretrained_bert': 'bert-large-uncased',
-        'max_sequence_length': 92
+        'pretrained_roberta': 'roberta-large',
+        'max_sequence_length': 90
     }
 }
-"""Configuration for ``BERTRanker``."""
+"""Configuration for ``RoBERTaRanker``."""
 
 
-BERT_RANKER_HYPER_PARAM_SPACE = [
+ROBERTA_RANKER_HYPER_PARAM_SPACE = [
     skopt.space.Real(
         low=1e-8,
         high=1e-2,
@@ -141,12 +141,12 @@ BERT_RANKER_HYPER_PARAM_SPACE = [
         high=10,
         name='log_train_batch_size')
 ]
-"""The hyper-param seach space for ``BERTRanker``."""
+"""The hyper-param seach space for ``RoBERTaRanker``."""
 
 
-BERT_RANKER_TRANSFORM = (
+ROBERTA_RANKER_TRANSFORM = (
     lambda
-        pretrained_bert,
+        pretrained_roberta,
         max_sequence_length:
     Compose([
         # wrap each action in a tuple for passing it to BertTransform
@@ -154,11 +154,14 @@ BERT_RANKER_TRANSFORM = (
         # map BertTransform across all the action choices
         Map(
             transform=BertTransform(
-                tokenizer=BertTokenizer.from_pretrained(
-                    pretrained_bert,
-                    do_lower_case=pretrained_bert.endswith('-uncased')),
+                tokenizer=RobertaTokenizer.from_pretrained(
+                    pretrained_roberta,
+                    do_lower_case=False),
                 max_sequence_length=max_sequence_length,
-                truncation_strategy=('beginning', 'beginning'))),
+                truncation_strategy=('beginning', 'beginning'),
+                starting_sep_token=True
+            )
+        ),
         # collect the action choices and stack their tensors so the
         # choices can be their own dimension of the batch
         lambda ds: {
@@ -169,12 +172,8 @@ BERT_RANKER_TRANSFORM = (
             'attention_mask': torch.stack([
                 torch.tensor(d['input_mask'])
                 for d in ds
-            ], dim=0),
-            'token_type_ids': torch.stack([
-                torch.tensor(d['segment_ids'])
-                for d in ds
             ], dim=0)
         }
     ])
 )
-"""The factory to create data transforms for ``BERTRanker``."""
+"""The factory to create data transforms for ``RoBERTaRanker``."""

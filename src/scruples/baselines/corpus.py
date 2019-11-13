@@ -5,6 +5,7 @@ from . import (
     labels,
     linear,
     naivebayes,
+    roberta,
     style,
     trees)
 
@@ -52,6 +53,12 @@ FINE_TUNE_LM_BASELINES = {
         bert.BERT_CLASSIFIER_CONFIG,
         bert.BERT_CLASSIFIER_HYPER_PARAM_SPACE,
         bert.BERT_CLASSIFIER_TRANSFORM
+    ),
+    'roberta': (
+        roberta.RoBERTaClassifier,
+        roberta.ROBERTA_CLASSIFIER_CONFIG,
+        roberta.ROBERTA_CLASSIFIER_HYPER_PARAM_SPACE,
+        roberta.ROBERTA_CLASSIFIER_TRANSFORM
     )
 }
 """Fine-tuned language model baselines for the scruples corpus."""

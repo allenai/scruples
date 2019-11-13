@@ -6,6 +6,7 @@ from . import (
     linear,
     metrics,
     naivebayes,
+    roberta,
     style,
     train,
     trees,

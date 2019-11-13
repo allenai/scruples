@@ -9,21 +9,22 @@ from typing import (
     Sequence,
     Tuple)
 
-from transformers import BertTokenizer
+from transformers import PreTrainedTokenizer
 
 
 class BertTransform(object):
-    """Transform a tuple of text into input for BERT.
+    """Transform a tuple of text into input for BERT-like models.
 
     Parameters
     ----------
-    tokenizer : BertTokenizer, required
-        The ``BertTokenizer`` instance to use for tokenization.
+    tokenizer : PreTrainedTokenizer, required
+        The ``PreTrainedTokenizer`` instance to use for tokenization.
     max_sequence_length : int, optional (default=512)
         The maximum length the output sequence should be. If the input
         converts to something longer, it will be truncated. The max
         sequence length must be shorter than the maximum sequence length
-        the BERT model accepts (512 for the standard pretrained BERT).
+        the BERT-like model accepts (512 for the standard pretrained
+        BERT).
     truncation_strategy : Tuple[(str, str)],
                           optional (default=("beginning", "beginning"))
         A tuple of strings providing the truncation strategy to use on
@@ -31,25 +32,27 @@ class BertTransform(object):
         ``"beginning"``, or ``"ending"``. These strings correspond to
         taking text from the beginning of the input, or the ending of
         the input, respectively.
+    starting_sep_token : bool, optional (default=False)
+        If ``True``, insert a sep token before all non-initial text
+        segments (similarly to RoBERTa); otherwise, only insert sep tokens
+        after the text segments (like BERT).
     """
     TRUNCATION_STRATEGIES = ['beginning', 'ending']
 
     def __init__(
             self,
-            tokenizer: BertTokenizer,
+            tokenizer: PreTrainedTokenizer,
             max_sequence_length: int = 512,
-            truncation_strategy: Tuple[str, str] = ('beginning', 'beginning')
+            truncation_strategy: Tuple[str, str] = ('beginning', 'beginning'),
+            starting_sep_token: bool = False
     ) -> None:
-        if not isinstance(tokenizer, BertTokenizer):
-            raise ValueError('tokenizer must be an instance of BertTokenizer')
+        if not isinstance(tokenizer, PreTrainedTokenizer):
+            raise ValueError('tokenizer must be an instance of PreTrainedTokenizer')
 
         max_sequence_length = int(max_sequence_length)
-        if max_sequence_length < 5:
-            # if each piece of text only has 1 token, then the sequence
-            # length will be 5 including separator tokens.
+        if max_sequence_length < 0:
             raise ValueError(
-                'max_sequence_length must be greater than or equal to'
-                ' 5')
+                'max_sequence_length must be greater than or equal to 0.')
 
         truncation_strategy = tuple(truncation_strategy)
         for strategy in truncation_strategy:
@@ -62,6 +65,7 @@ class BertTransform(object):
         self.tokenizer = tokenizer
         self.max_sequence_length = max_sequence_length
         self.truncation_strategy = truncation_strategy
+        self.starting_sep_token = starting_sep_token
 
     def __call__(
             self,
@@ -100,10 +104,16 @@ class BertTransform(object):
         feature = self._truncate(feature)
 
         # convert the tokens to input ids, input mask, and segment ids.
-        tokens = ['[CLS]'] + feature[0] + ['[SEP]']
+        cls = self.tokenizer.cls_token
+        sep = self.tokenizer.sep_token
+
+        tokens = [cls] + feature[0] + [sep]
         segment_ids = [0 for _ in range(len(tokens))]
         if feature[1]:
-            tokens += feature[1] + ['[SEP]']
+            if self.starting_sep_token:
+                tokens += [sep] + feature[1] + [sep]
+            else:
+                tokens += feature[1] + [sep]
             segment_ids += [1 for _ in range(len(feature[1]) + 1)]
 
         padding = [0 for _ in range(self.max_sequence_length - len(tokens))]

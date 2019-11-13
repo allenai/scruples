@@ -4,6 +4,7 @@ from . import (
     bert,
     labels,
     linear,
+    roberta,
     style)
 
 
@@ -50,6 +51,12 @@ FINE_TUNE_LM_BASELINES = {
         bert.BERT_RANKER_CONFIG,
         bert.BERT_RANKER_HYPER_PARAM_SPACE,
         bert.BERT_RANKER_TRANSFORM
+    ),
+    'roberta': (
+        roberta.RoBERTaRanker,
+        roberta.ROBERTA_RANKER_CONFIG,
+        roberta.ROBERTA_RANKER_HYPER_PARAM_SPACE,
+        roberta.ROBERTA_RANKER_TRANSFORM
     )
 }
 """Fine-tuned language model baselines for the scruples resource."""
