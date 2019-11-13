@@ -53,8 +53,8 @@ setup(
         'tensorboardX >= 1.6',
         'tensorflow >= 1.13.1',
         'tensorflow-estimator >= 1.13.0',
-        'torch >= 1.0.1.post2',
-        'torchvision >= 0.2.2.post3',
+        'torch >= 1.3.1',
+        'torchvision >= 0.4.2',
         'transformers >= 2.1.1',
         'xgboost >= 0.82'
     ],
