@@ -48,7 +48,7 @@ setup(
         'scikit-optimize >= 0.5.2',
         'scipy >= 1.2.1, < 1.3',
         'seaborn >= 0.9.0',
-        'spacy >= 2.1.3',
+        'spacy >= 2.1.3, < 2.2.0',
         'tensorboard >= 1.13.1',
         'tensorboardX >= 1.6',
         'tensorflow >= 1.13.1',
