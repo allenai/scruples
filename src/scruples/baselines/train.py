@@ -97,12 +97,6 @@ def train_lm(
             f' "xentropy-hard", "xentropy-soft", "xentropy-full" or'
             f' "dirichlet-multinomial".')
 
-    if opt_level == 'O1':
-        raise ValueError(
-            'opt_level of O1 is not supported because it triggers a bug in'
-            ' NVIDIA apex. Use O2 instead. For more information, see'
-            ' https://github.com/NVIDIA/apex/issues/505.')
-
     # Step 1: Manage and construct paths.
 
     if logger is not None:
@@ -274,8 +268,22 @@ def train_lm(
     ]
     optimizer = AdamW(parameter_groups, lr=hyper_params['lr'])
 
+    if loss_type == 'xentropy-hard':
+        loss = torch.nn.CrossEntropyLoss()
+    elif loss_type == 'xentropy-soft':
+        loss = SoftCrossEntropyLoss()
+    elif loss_type == 'xentropy-full':
+        loss = SoftCrossEntropyLoss()
+    elif loss_type == 'dirichlet-multinomial':
+        loss = DirichletMultinomialLoss()
+
+    xentropy = SoftCrossEntropyLoss()
+
     # add fp16 support
-    model, optimizer = amp.initialize(model, optimizer, opt_level=opt_level)
+    [model, loss, xentropy], optimizer = amp.initialize(
+        [model, loss, xentropy],
+        optimizer,
+        opt_level=opt_level)
 
     scheduler = WarmupLinearSchedule(
         optimizer=optimizer,
@@ -287,17 +295,6 @@ def train_lm(
 
     # add data parallelism support
     model = torch.nn.DataParallel(model)
-
-    if loss_type == 'xentropy-hard':
-        loss = torch.nn.CrossEntropyLoss()
-    elif loss_type == 'xentropy-soft':
-        loss = SoftCrossEntropyLoss()
-    elif loss_type == 'xentropy-full':
-        loss = SoftCrossEntropyLoss()
-    elif loss_type == 'dirichlet-multinomial':
-        loss = DirichletMultinomialLoss()
-
-    xentropy = SoftCrossEntropyLoss()
 
     # Step 8: Run training.
 

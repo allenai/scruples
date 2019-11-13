@@ -1,11 +1,13 @@
 """Custom losses for baselines."""
 
+from apex import amp
 import torch as th
 from torch.nn import functional as F
 
 
 class SoftCrossEntropyLoss(th.nn.Module):
     """Cross-entropy with soft reference labels."""
+
     # N.B. This loss can be used in two ways. First, labels can be
     # averaged and then passed in as the targets, and second, the raw
     # counts of each label can be passed in as the target. The first
@@ -13,7 +15,7 @@ class SoftCrossEntropyLoss(th.nn.Module):
     # of one instances labeling versus another. The second approach
     # leverages all of the annotation information available. Both are
     # equivalent if each instance has the same number of labels.
-
+    @amp.half_function
     def forward(self, input, target):
         return - th.mean(
             th.sum(target * F.log_softmax(input, dim=-1), dim=-1))
@@ -27,6 +29,7 @@ class DirichletMultinomialLoss(th.nn.Module):
     # statistic derived from them (i.e., the counts of each label). We
     # only need the sufficient statistic however to compute this
     # likelihood, and both lead to the same MLE.
+    @amp.half_function
     def forward(self, inputs, targets):
         inputs = th.exp(inputs)
         return - th.mean(
