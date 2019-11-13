@@ -102,7 +102,7 @@ METRICS = {
         lambda y_true, y_pred: metrics.log_loss(
             y_true=y_true,
             y_pred=y_pred,
-            eps=0.0),
+            eps=1e-9),
         {
             'greater_is_better': False,
             'needs_proba': True
