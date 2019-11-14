@@ -64,8 +64,7 @@ MIN_AGREEMENT = 5
 """The minimum number of gold annotators required to agree.
 
 The minimum number of gold annotators required to agree for the instance
-to be considered non-controversial (and thus be included in the final
-dataset.
+to be considered non-controversial.
 """
 
 N_ANNOTATORS_FOR_HUMAN_PERFORMANCE = 5
