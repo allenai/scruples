@@ -1,5 +1,6 @@
 """Fine-tune pre-trained LMs on the scruples datasets."""
 
+import gc
 import json
 import logging
 import math
@@ -89,6 +90,11 @@ def train_lm(
     bool
         ``True`` if the training loss diverged, ``False`` otherwise.
     """
+    gc.collect()
+    # collect any garbage to make sure old torch objects are cleaned up (and
+    # their memory is freed from the GPU). Otherwise, old tensors can hang
+    # around on the GPU, causing CUDA out-of-memory errors.
+
     if loss_type not in settings.LOSS_TYPES:
         raise ValueError(
             f'Unrecognized loss type: {loss_type}. Please use one of'
