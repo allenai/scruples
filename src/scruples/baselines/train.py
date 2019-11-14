@@ -11,7 +11,6 @@ from typing import (
     List,
     Optional)
 
-from apex import amp
 import numpy as np
 from transformers import (
     AdamW,
@@ -42,7 +41,6 @@ def train_lm(
         loss_type: str,
         compute_train_batch_size: int,
         predict_batch_size: int,
-        opt_level: str,
         gpu_ids: Optional[List[int]],
         logger: Optional[logging.Logger] = None
 ) -> None:
@@ -140,7 +138,6 @@ def train_lm(
             'loss_type': loss_type,
             'compute_train_batch_size': compute_train_batch_size,
             'predict_batch_size': predict_batch_size,
-            'opt_level': opt_level,
             'gpu_ids': gpu_ids
         }, config_file)
 
@@ -279,12 +276,6 @@ def train_lm(
 
     xentropy = SoftCrossEntropyLoss()
 
-    # add fp16 support
-    [model, loss, xentropy], optimizer = amp.initialize(
-        [model, loss, xentropy],
-        optimizer,
-        opt_level=opt_level)
-
     scheduler = WarmupLinearSchedule(
         optimizer=optimizer,
         warmup_steps=int(
@@ -352,8 +343,7 @@ def train_lm(
             ) / (i + 1)
 
             # update the network
-            with amp.scale_loss(batch_loss, optimizer) as scaled_loss:
-                scaled_loss.backward()
+            batch_loss.backward()
 
             if (i + 1) % n_gradient_accumulation == 0:
                 optimizer.step()

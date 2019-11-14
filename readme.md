@@ -25,23 +25,15 @@ This project requires Python 3.7. To setup the project:
          sudo apt-get install libmysqlclient-dev
 
   2. Install [PyTorch][pytorch] using the directions on their site.
-  3. Install [apex][apex]:
-
-         pip install \
-           --no-cache-dir \
-           --global-option="--cpp_ext" \
-           --global-option="--cuda_ext" \
-           git+git://github.com/nvidia/apex.git@606c3dcccd6ca70f4b506714d38a193e0845ee7f
-
-  4. Install this repository:
+  3. Install this repository:
 
          pip install --editable .
 
-  5. Download the english model for spacy:
+  4. Download the english model for spacy:
 
          python -m spacy download en
 
-  6. (optional) Run the tests to make sure that everything is
+  5. (optional) Run the tests to make sure that everything is
      working. They'll take about 5 minutes to complete:
 
          pip install pytest
@@ -95,7 +87,6 @@ product or service should carefully consider, investigate, and evaluate
 which norms are correct for their particular application.
 
 
-[apex]: https://github.com/nvidia/apex
 [pytorch]: https://pytorch.org/
 [reddit-comments]: http://files.pushshift.io/reddit/comments/
 [reddit-posts]: http://files.pushshift.io/reddit/submissions/
