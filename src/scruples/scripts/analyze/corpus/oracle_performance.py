@@ -9,9 +9,9 @@ from scipy import stats
 from sklearn import metrics
 import tqdm
 
-from ... import utils, settings
-from ...data.labels import Label
-from ...baselines.metrics import METRICS
+from .... import utils, settings
+from ....data.labels import Label
+from ....baselines.metrics import METRICS
 
 
 logger = logging.getLogger(__name__)

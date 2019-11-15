@@ -1,12 +1,10 @@
-"""Scripts for performing analyses."""
+"""Scripts for analyzing the scruples resource."""
 
 import logging
 
 import click
 
-from . import (
-    corpus,
-    resource)
+from . import latent_traits
 
 
 logger = logging.getLogger(__name__)
@@ -15,17 +13,16 @@ logger = logging.getLogger(__name__)
 # main function
 
 @click.group()
-def analyze():
-    """Run an analysis."""
+def resource():
+    """Analyze the scruples resource."""
     pass
 
 
 # register subcommands to the command group
 
 subcommands = [
-    corpus.corpus,
-    resource.resource
+    latent_traits.latent_traits
 ]
 
 for subcommand in subcommands:
-    analyze.add_command(subcommand)
+    resource.add_command(subcommand)

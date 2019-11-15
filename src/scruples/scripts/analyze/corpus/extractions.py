@@ -10,14 +10,14 @@ import click
 from sklearn import metrics
 import tqdm
 
-from ... import (
+from .... import (
     settings,
     utils)
-from ...data.comment import Comment
-from ...data.post import Post
-from ...data.utils import instantiate_attrs_with_extra_kwargs
-from ...data.labels import Label
-from ...data.post_types import PostType
+from ....data.comment import Comment
+from ....data.post import Post
+from ....data.utils import instantiate_attrs_with_extra_kwargs
+from ....data.labels import Label
+from ....data.post_types import PostType
 
 
 logger = logging.getLogger(__name__)

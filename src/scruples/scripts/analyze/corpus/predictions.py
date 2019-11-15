@@ -6,9 +6,9 @@ import logging
 import click
 from sklearn import metrics
 
-from ... import utils
-from ...data.labels import Label
-from ...baselines.metrics import METRICS
+from .... import utils
+from ....data.labels import Label
+from ....baselines.metrics import METRICS
 
 
 logger = logging.getLogger(__name__)

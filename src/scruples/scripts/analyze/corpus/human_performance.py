@@ -8,12 +8,12 @@ import random
 import click
 import tqdm
 
-from ... import settings
-from ...baselines.metrics import METRICS
-from ...data.comment import Comment
-from ...data.post import Post
-from ...data.labels import Label
-from ...data.utils import instantiate_attrs_with_extra_kwargs
+from .... import settings
+from ....baselines.metrics import METRICS
+from ....data.comment import Comment
+from ....data.post import Post
+from ....data.labels import Label
+from ....data.utils import instantiate_attrs_with_extra_kwargs
 
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 @click.argument(
     'output_path',
     type=click.Path(exists=False, file_okay=True, dir_okay=False))
-def corpus_human_performance(
+def human_performance(
         comments_path: str,
         posts_path: str,
         split_path: str,

@@ -10,7 +10,7 @@ import numpy as np
 import seaborn as sns
 import torch as th
 
-from ...analysis import traits
+from ....analysis import traits
 
 
 logger = logging.getLogger(__name__)

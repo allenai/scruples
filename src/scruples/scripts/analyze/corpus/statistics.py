@@ -14,7 +14,7 @@ import numpy as np
 import seaborn as sns
 import spacy
 
-from ... import settings
+from .... import settings
 
 
 logger = logging.getLogger(__name__)
@@ -266,7 +266,7 @@ def _write_statistics(
 @click.argument(
     'output_dir',
     type=click.Path(exists=False, file_okay=False, dir_okay=True))
-def corpus(
+def statistics(
         corpus_dir: str,
         output_dir: str
 ) -> None:
