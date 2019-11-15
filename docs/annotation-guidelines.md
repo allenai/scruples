@@ -67,8 +67,9 @@ some phrase corresponding to the initialism, then use that label for the
 comment. Similarly, mark the comment with `implied` as `false` and
 `spam` as `false`.
 
-If the comment expresses multiple labels or is otherwise ambiguous, mark
-`label` as `null`, `implied` as `null`, and `spam` as `true`.
+If the comment expresses multiple labels with no clear winner or is
+otherwise ambiguous, mark `label` as `null`, `implied` as `null`, and
+`spam` as `true`.
 
 If the comment expresses no labels explicitly but still has a viewpoint
 that clearly expresses one of the labels, then use that label for the
