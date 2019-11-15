@@ -4,7 +4,11 @@ import logging
 
 import click
 
-from . import latent_traits
+from . import (
+    human_performance,
+    latent_traits,
+    oracle_performance,
+    predictions)
 
 
 logger = logging.getLogger(__name__)
@@ -21,7 +25,10 @@ def resource():
 # register subcommands to the command group
 
 subcommands = [
-    latent_traits.latent_traits
+    human_performance.human_performance,
+    latent_traits.latent_traits,
+    oracle_performance.oracle_performance,
+    predictions.predictions
 ]
 
 for subcommand in subcommands:

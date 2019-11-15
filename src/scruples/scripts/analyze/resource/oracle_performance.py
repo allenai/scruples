@@ -1,4 +1,4 @@
-"""Estimate the oracle performance on the scruples corpus."""
+"""Estimate the oracle performance on the scruples resource."""
 
 import json
 import logging
@@ -9,7 +9,6 @@ from scipy import stats
 import tqdm
 
 from .... import utils, settings
-from ....data.labels import Label
 from ....baselines.metrics import METRICS
 
 
@@ -19,9 +18,9 @@ logger = logging.getLogger(__name__)
 # constants
 
 REPORT_TEMPLATE =\
-"""Scruples Corpus Oracle Performance
-==================================
-Oracle performance on the scruples corpus.
+"""Scruples Resource Oracle Performance
+====================================
+Oracle performance on the scruples resource.
 
 
 Oracle Metrics
@@ -58,29 +57,32 @@ def oracle_performance(
     Read in the dataset from DATASET_PATH, estimate the oracle
     performance and write the results to OUTPUT_PATH.
     """
-    label_name_to_idx = {
-        label.name: label.index
-        for label in Label
-    }
     # Step 1: Read in the dataset.
     with click.open_file(dataset_path, 'r') as dataset_file:
         labels = []
         label_scores = []
+        label_annotations_all = []
         for ln in dataset_file:
             row = json.loads(ln)
 
-            labels.append(label_name_to_idx[row['label']])
+            labels.append(row['gold_label'])
+            label_scores.append(row['gold_annotations'])
+            label_annotations_all.append(
+                [
+                    i + j
+                    for i, j in zip(
+                            row['gold_annotations'],
+                            row['human_perf_annotations']
+                    )
+                ])
 
-            scores = [0 for _ in Label]
-            for label_name, score in row['label_scores'].items():
-                scores[label_name_to_idx[label_name]] = score
-            label_scores.append(scores)
     labels = np.array(labels)
     label_scores = np.array(label_scores)
+    label_annotations_all = np.array(label_annotations_all)
 
     # Step 2: Estimate the dirichlet-multinomial parameters.
     params = utils.estimate_dirichlet_multinomial_parameters(
-        label_scores)
+        label_annotations_all)
 
     # Step 3: Estimate the expected performance.
     metric_name_to_value = {}

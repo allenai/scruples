@@ -1,4 +1,4 @@
-"""Analyze predictions on scruples."""
+"""Analyze predictions on the scruples resource."""
 
 import json
 import logging
@@ -7,7 +7,6 @@ import click
 from sklearn import metrics
 
 from .... import utils
-from ....data.labels import Label
 from ....baselines.metrics import METRICS
 
 
@@ -17,9 +16,9 @@ logger = logging.getLogger(__name__)
 # constants
 
 REPORT_TEMPLATE =\
-"""Scruples Corpus Predictions Performance Report
-==============================================
-Analysis of predictions on the scruples corpus.
+"""Scruples Resource Predictions Performance Report
+================================================
+Analysis of predictions on the scruples resource.
 
 
 Main Metrics
@@ -81,8 +80,8 @@ def predictions(
         for ln in dataset_file:
             row = json.loads(ln)
             id_to_dataset_label_and_label_scores[row['id']] = (
-                row['label'],
-                row['label_scores']
+                row['gold_label'],
+                row['gold_annotations']
             )
 
     # Step 2: Read in the predictions.
@@ -157,7 +156,7 @@ def predictions(
             for name, value in metric_name_to_value.items())
 
         # create the classification report
-        label_names = [label.name for label in Label]
+        label_names = [0, 1]
 
         classification_report = metrics.classification_report(
             y_true=dataset_labels,
