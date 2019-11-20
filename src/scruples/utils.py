@@ -439,7 +439,7 @@ def calibration_factor(
     logits : np.ndarray, required
         The logits from the model to calibrate.
     targets : np.ndarray, required
-        The targets on which to calibrate.
+        The targets on which to calibrate. The targets should be probabilities.
 
     Returns
     -------

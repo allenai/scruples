@@ -4,6 +4,7 @@ import json
 import logging
 
 import click
+import numpy as np
 from sklearn import metrics
 
 from .... import utils
@@ -60,11 +61,17 @@ Confusion Matrix
     help='Compute metrics which require predictions of label'
          ' probabilities, and include them in the report. Predictions'
          ' must have "label_scores" keys to use this option.')
+@click.option(
+    '--calibration-factor', type=float, default=None,
+    help='The calibration factor to use for computing the calibrated'
+         ' xentropy. If no calibration factor is provided, then it will be'
+         ' calculated from the data.')
 def predictions(
         dataset_path: str,
         predictions_path: str,
         output_path: str,
-        label_scores: bool
+        label_scores: bool,
+        calibration_factor: float
 ) -> None:
     """Analyze classification performance and write a report.
 
@@ -148,6 +155,27 @@ def predictions(
             metric_name_to_value['xentropy'] = utils.xentropy(
                 y_true=dataset_label_scores,
                 y_pred=predicted_label_scores)
+
+            if 'calibrated_xentropy' in metric_name_to_value:
+                raise ValueError(
+                    'METRICS should not have a key named'
+                    ' "calibrated_xentropy". This issue is a bug in the'
+                    ' library, please notify the maintainers.')
+
+            logits = np.log(predicted_label_scores)
+            temperature = (
+                calibration_factor
+                if calibration_factor is not None else
+                utils.calibration_factor(
+                    logits=logits,
+                    targets=dataset_label_scores)
+            )
+
+            logger.info(f'Calibrating temperature: {temperature}')
+
+            metric_name_to_value['calibrated_xentropy'] = utils.xentropy(
+                y_true=dataset_label_scores,
+                y_pred=softmax(logits / temperature, axis=-1))
 
         metric_name_width = 1 + max(
             len(name)

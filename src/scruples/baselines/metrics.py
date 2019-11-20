@@ -116,10 +116,11 @@ METRICS = {
             'needs_proba': False
         }
     )
-    # N.B., do not include a key for "xentropy" in this dictionary.
-    # "xentropy" is reserved for the cross-entropy between the predicted
-    # probabilities and the dataset's label scores, which is computed in
-    # the bin/analyze-predictions.py script.
+    # N.B., do not include a key for "xentropy" or "calibrated_xentropy"
+    # in this dictionary. Those keys are reserved for the cross-entropy
+    # between the predicted probabilities and the dataset's label
+    # scores, which is computed in the scruples.scripts.analyze.*.predictions
+    # scripts.
 }
 """A dictionary defining the important metrics to assess baselines.
 
