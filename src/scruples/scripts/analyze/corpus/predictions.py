@@ -30,7 +30,7 @@ Note that the xentropy score, if present, is computed with respect to
 the estimated true label distribution rather than the hard labels. All
 other scores are standard and computed against the most frequent label.
 
-{metrics_report}
+{metrics_report}{calibration_factor_report}
 
 
 Classification Report
@@ -185,6 +185,13 @@ def predictions(
             f'{name: <{metric_name_width}}: {value:.4f}'
             for name, value in metric_name_to_value.items())
 
+        if label_scores:
+            calibration_factor_report = (
+                f'\n\nCalibration Factor: {temperature}\n'
+            )
+        else:
+            calibration_factor_report = ''
+
         # create the classification report
         label_names = [label.name for label in Label]
 
@@ -202,5 +209,6 @@ def predictions(
         output_file.write(
             REPORT_TEMPLATE.format(
                 metrics_report=metrics_report,
+                calibration_factor_report=calibration_factor_report,
                 classification_report=classification_report,
                 confusion_matrix=confusion_matrix))
