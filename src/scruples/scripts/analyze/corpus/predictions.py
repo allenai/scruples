@@ -5,6 +5,7 @@ import logging
 
 import click
 import numpy as np
+from scipy.special import softmax
 from sklearn import metrics
 
 from .... import utils

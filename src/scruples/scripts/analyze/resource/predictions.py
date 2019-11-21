@@ -5,6 +5,7 @@ import logging
 
 import click
 import numpy as np
+from scipy.special import softmax
 from sklearn import metrics
 
 from .... import utils
@@ -123,11 +124,11 @@ def predictions(
     ]
     if label_scores:
         dataset_label_scores = [
-            [count / sum(scores.values()) for count in scores.values()]
+            [count / sum(scores) for count in scores]
             for _, scores in dataset_labels_and_label_scores
         ]
         predicted_label_scores = [
-            [count / sum(scores.values()) for count in scores.values()]
+            [count / sum(scores) for count in scores]
             for _, scores in predicted_labels_and_label_scores
         ]
 
@@ -184,17 +185,17 @@ def predictions(
             for name, value in metric_name_to_value.items())
 
         # create the classification report
-        label_names = [0, 1]
+        label_names = ['0', '1']
 
         classification_report = metrics.classification_report(
-            y_true=dataset_labels,
-            y_pred=predicted_labels,
+            y_true=[str(label) for label in dataset_labels],
+            y_pred=[str(label) for label in predicted_labels],
             labels=label_names)
 
         # create the confusion matrix
         confusion_matrix = utils.make_confusion_matrix_str(
-            y_true=dataset_labels,
-            y_pred=predicted_labels,
+            y_true=[str(label) for label in dataset_labels],
+            y_pred=[str(label) for label in predicted_labels],
             labels=label_names)
 
         output_file.write(
