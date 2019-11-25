@@ -6,6 +6,7 @@ import click
 
 from . import (
     corpus,
+    oracle_estimator,
     resource)
 
 
@@ -24,6 +25,7 @@ def analyze():
 
 subcommands = [
     corpus.corpus,
+    oracle_estimator.oracle_estimator,
     resource.resource
 ]
 
