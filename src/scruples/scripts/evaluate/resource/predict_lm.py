@@ -14,8 +14,8 @@ import tqdm
 
 from .... import settings, baselines
 from ....baselines.metrics import METRICS
-from ....baselines.utils import dirichlet_multinomial
 from ....dataset.readers import ScruplesResourceDataset
+from ....baselines.utils import dirichlet_multinomial
 
 
 logger = logging.getLogger(__name__)

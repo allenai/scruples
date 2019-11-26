@@ -16,6 +16,7 @@ from .... import settings, baselines
 from ....baselines.metrics import METRICS
 from ....data.labels import Label
 from ....dataset.readers import ScruplesCorpusDataset
+from ....baselines.utils import dirichlet_multinomial
 
 
 logger = logging.getLogger(__name__)
