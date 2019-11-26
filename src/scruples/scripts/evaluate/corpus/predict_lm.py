@@ -158,7 +158,7 @@ def predict_lm(
                 mb_labels = mb_labels.to(device)
 
                 # make predictions
-                mb_logits = model(**mb_features)
+                mb_logits = model(**mb_features)[0]
                 _, mb_predictions = torch.max(mb_logits, 1)
 
                 ids.extend(mb_ids)
