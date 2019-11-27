@@ -22,19 +22,18 @@ METRICS = [
     (
         'accuracy',
         metrics.accuracy_score,
-        {},
         lambda pss: np.argmax(pss, axis=-1)
     ),
     (
         'f1 (macro)',
-        metrics.f1_score,
-        {'average': 'macro'},
+        lambda y_pred, y_true: metrics.f1_score(
+            y_pred=y_pred, y_true=y_true,
+            average='macro'),
         lambda pss: np.argmax(pss, axis=-1)
     ),
     (
         'xentropy',
         utils.xentropy,
-        {},
         lambda pss: pss
     )
 ]
@@ -42,7 +41,7 @@ METRICS = [
 
 Each tuple contains:
 
-    (name, metric_func, kwargs, make_predictions)
+    (name, metric, make_predictions)
 
 """
 
@@ -127,30 +126,23 @@ def oracle_estimator(
         ys = scenario['ys']
 
         results[name]['oracle'] = {
-            metric_name: metric_func(
+            metric_name: metric(
                 y_pred=make_predictions(pss),
                 y_true=make_predictions(
-                    ys / np.expand_dims(np.sum(ys, axis=-1), axis=-1)),
-                **kwargs)
-            for metric_name, metric_func, kwargs, make_predictions in METRICS
+                    ys / np.expand_dims(np.sum(ys, axis=-1), axis=-1)))
+            for metric_name, metric, make_predictions in METRICS
         }
 
         # estimate oracle performance
         estimated_alphas = utils.estimate_dirichlet_multinomial_parameters(ys)
 
         results[name]['estimate'] = {
-            metric_name: np.mean([
-                metric_func(
-                    y_pred=make_predictions([
-                        stats.dirichlet.rvs(alpha=estimated_alphas + y, size=1)[0]
-                        for y in ys
-                    ]),
-                    y_true=make_predictions(
-                        ys / np.expand_dims(np.sum(ys, axis=-1), axis=-1)),
-                    **kwargs)
-                for _ in tqdm.tqdm(range(10000), **settings.TQDM_KWARGS)
-            ])
-            for metric_name, metric_func, kwargs, make_predictions in tqdm.tqdm(
+            metric_name: utils.oracle_performance(
+                ys=ys,
+                metric=metric,
+                make_predictions=make_predictions,
+                n_samples=10000)[0]
+            for metric_name, metric, make_predictions in tqdm.tqdm(
                     METRICS, **settings.TQDM_KWARGS)
         }
 

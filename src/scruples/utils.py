@@ -6,6 +6,7 @@ import os
 import random
 import string
 from typing import (
+    Callable,
     List,
     Optional,
     Tuple)
@@ -454,3 +455,66 @@ def calibration_factor(
         fun=loss,
         bounds=(1e-10, 1e10),
     ).x
+
+
+def oracle_performance(
+        ys: np.ndarray,
+        metric: Callable,
+        make_predictions: Optional[Callable] = None,
+        n_samples: int = 625
+) -> float:
+    """Estimate the oracle performance.
+
+    Estimate the oracle performance for ``metric_func`` on a dataset
+    with labels given by ``ys``.
+
+    Parameters
+    ----------
+    ys : np.ndarray, required
+        An N x K array where N is the number of data points, K is the
+        number of classes, and the ij'th entry gives the number of
+        annotators that said example i is from class j.
+    metric : Callable, required
+        A function taking in ``y_pred`` and ``y_true`` arguments and
+        returning a float representing the performance.
+    make_predictions : Optional[Callable], optional (default=None)
+        An optional function to apply to the predictions and true labels
+        (i.e. class probabilities) before passing them to
+        ``metric``. Typically, this transformation would be an
+        argmax. If ``None``, then the identity transformation is used.
+    n_samples : int, optional (default=625)
+        The number of samples to use for Monte-carlo integration.
+
+    Returns
+    -------
+    float
+        An estimate of the oracle performance.
+    float
+        An estimate of the sampling error. The estimator uses a Monte-carlo
+        integration step, so this value represents the standard error of that
+        integration.
+    """
+    y_true = (
+        ys / np.expand_dims(np.sum(ys, axis=-1), axis=-1)
+    )
+    if make_predictions:
+        y_true = make_predictions(y_true)
+
+    estimated_alphas = estimate_dirichlet_multinomial_parameters(ys)
+    posterior = estimated_alphas + ys
+
+    scores = []
+    for _ in range(n_samples):
+        # efficiently sample from dirichlet distributions in a vectorized way
+        # using the fact that the dirichlet distribution is equivalent to a
+        # normalized vector of independent gamma distributed random variables.
+        y_pred = np.random.gamma(posterior)
+        y_pred = (
+            y_pred / np.expand_dims(np.sum(y_pred, axis=-1), axis=-1)
+        )
+        if make_predictions:
+            y_pred = make_predictions(y_pred)
+
+        scores.append(metric(y_pred=y_pred, y_true=y_true))
+
+    return np.mean(scores), np.std(scores) / n_samples**0.5
