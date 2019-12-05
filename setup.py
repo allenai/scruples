@@ -33,6 +33,7 @@ setup(
     scripts=['bin/scruples'],
     install_requires=[
         'Click >= 7.0',
+        'Flask >= 1.1.1',
         'Pattern >= 3.6',
         'attrs >= 19.1.0',
         'autograd >= 1.2',
