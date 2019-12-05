@@ -6,6 +6,7 @@ import click
 
 from . import (
     analyze,
+    demo,
     evaluate,
     make)
 from .. import utils
@@ -30,6 +31,7 @@ def scruples(verbose: bool) -> None:
 
 subcommands = [
     analyze.analyze,
+    demo.demo,
     evaluate.evaluate,
     make.make
 ]

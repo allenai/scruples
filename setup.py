@@ -39,6 +39,7 @@ setup(
         'autograd >= 1.2',
         'dill >= 0.2.9',
         'ftfy >= 5.5.1',
+        'gevent >= 1.4.0',
         'matplotlib >= 3.0.3',
         'networkx >= 2.3',
         'numpy >= 1.16.2',
