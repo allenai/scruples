@@ -57,12 +57,27 @@ all the commands necessary to build and analyze `scruples`:
 
     Commands:
       analyze   Run an analysis.
+      demo      Run a demo's server.
       evaluate  Evaluate models on scruples.
       make      Make different components of scruples.
 
 To build the dataset, you'll need to download the reddit
 [posts][reddit-posts] and [comments][reddit-comments]. The initial
 version of `scruples` used November 2018 through April 2019.
+
+Also, `scruples` comes with demos that you can run and view locally in the
+browser:
+
+    $ scruples demo --help
+    Usage: scruples demo [OPTIONS] COMMAND [ARGS]...
+
+      Run a demo's server.
+
+    Options:
+      --help  Show this message and exit.
+
+    Commands:
+      scoracle  Serve the scoracle demo.
 
 
 Disclaimer
