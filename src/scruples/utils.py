@@ -122,7 +122,8 @@ def xentropy(
     np.float64
         The xentropy of ``y_pred` with respect to ``y_true``.
     """
-    return np.mean(- np.sum(y_true * np.log(y_pred), axis=1))
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    return np.mean(- np.sum(np.log(y_pred ** y_true), axis=1))
 
 
 def make_id() -> str:

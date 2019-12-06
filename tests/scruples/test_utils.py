@@ -199,6 +199,15 @@ class XentropyTestCase(unittest.TestCase):
                 utils.xentropy(y_true=y_true, y_pred=y_pred),
                 self._slow_xentropy(y_true=y_true, y_pred=y_pred))
 
+    def test_xentropy_when_its_zero(self):
+        # make sure that the xentropy properly returns 0 and not NaN when the
+        # cross-entropy of the distributions is zero.
+        ps = np.array([[0, 1]])
+        self.assertEqual(utils.xentropy(y_true=ps, y_pred=ps), 0)
+
+        ps = np.array([[0, 1], [1, 0]])
+        self.assertEqual(utils.xentropy(y_true=ps, y_pred=ps), 0)
+
 
 class MakeIdTestCase(unittest.TestCase):
     """Test scruples.utils.make_id."""
