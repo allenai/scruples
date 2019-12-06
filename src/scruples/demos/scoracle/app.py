@@ -28,7 +28,7 @@ SUPPORTED_METRICS = {
         {'average': 'macro'},
         lambda ys: np.argmax(ys, axis=-1)
     ),
-    'cross-entropy (soft labels)': (
+    'cross entropy (soft labels)': (
         xentropy,
         {},
         None
