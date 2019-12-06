@@ -114,12 +114,18 @@
             performance. There's no point studying a solved problem!
           </p>
           <p>
-            We can formalize &ldquo;best possible&rdquo; with an oracle that
-            knows exactly how people annotate the examples on average. This
-            demo estimates that oracle's score on your data.
+            If every label were correct (the one chosen most often) then models
+            could score perfectly. In practice, a handful of annotators decide
+            each gold label, getting some wrong by pure chance. So, even the
+            perfect model won't get the perfect score.
           </p>
           <p>
-            Submit a dataset below to get back the oracle's performance!
+            We can formalize &ldquo;the perfect model&rdquo; as an oracle
+            that knows how people annotate each example on average. This demo
+            estimates the oracle's score on your data.
+          </p>
+          <p>
+            Submit your dataset and discover the best possible performance!
             You can also check out
             the <a href="https://github.com/allenai/scruples">code</a> or read
             some <a href="#background">background</a> on how we compute the
