@@ -1,5 +1,7 @@
 """The Flask app implementing the scoracle demo."""
 
+import math
+
 import flask
 import numpy as np
 from sklearn import metrics
@@ -197,6 +199,16 @@ def score():
                     y_true=y_true, y_pred=y_pred, **kwargs),
                 make_predictions=make_predictions,
                 n_samples=10000)
+
+        # JSON doesn't support NaN, Infinite, or -Infinite, so we have to
+        # encode these values as strings.
+        if math.isnan(score):
+            score = 'NaN'
+        elif math.isinf(score) and score > 0:
+            score = 'Infinite'
+        elif math.isinf(score) and score < 0:
+            score = '-Infinite'
+
         response.append({
             'metric': metric_name,
             'score':  score

@@ -813,7 +813,14 @@ Server: Werkzeug/0.15.4 Python/3.7.0
           xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && xhr.status == 200) {
               var responseData;
-              responseData = JSON.parse(xhr.responseText);
+              responseData = JSON.parse(
+                xhr.responseText,
+                function(key, value) {
+                  if (key === 'score' && value === 'NaN') { return NaN; }
+                  if (key === 'score' && value === 'Infinite') { return Infinite; }
+                  if (key === 'score' && value === '-Infinite') { return -Infinite; }
+                  return value
+              });
               for (var i = 0; i < responseData.length; i++) {
                 document
                   .getElementById('demo-display')
