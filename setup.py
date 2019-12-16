@@ -28,7 +28,27 @@ setup(
         'Topic :: Scientific/Engineering :: Artificial Intelligence'
     ],
     license='Apache',
-    packages=['scruples'],
+    packages=[
+        'scruples',
+        'scruples.analysis',
+        'scruples.baselines',
+        'scruples.data',
+        'scruples.dataset',
+        'scruples.demos',
+        'scruples.demos.scoracle',
+        'scruples.extraction',
+        'scruples.scripts',
+        'scruples.scripts.analyze',
+        'scruples.scripts.analyze.corpus',
+        'scruples.scripts.analyze.resource',
+        'scruples.scripts.demo',
+        'scruples.scripts.evaluate',
+        'scruples.scripts.evaluate.corpus',
+        'scruples.scripts.evaluate.resource',
+        'scruples.scripts.make',
+        'scruples.scripts.make.resource',
+        'scruples.vendor'
+    ],
     package_dir={'': 'src'},
     scripts=['bin/scruples'],
     install_requires=[
