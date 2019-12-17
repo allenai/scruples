@@ -37,9 +37,13 @@
 !src/scruples/demos/norms/__init__.py
 !src/scruples/demos/norms/app.py
 !src/scruples/demos/norms/utils.py
+!src/scruples/demos/norms/static/favicon.ico
+!src/scruples/demos/norms/static/logo-ai2-white-withText-micro.svg
 !src/scruples/demos/norms/templates/index.html
 !src/scruples/demos/scoracle/__init__.py
 !src/scruples/demos/scoracle/app.py
+!src/scruples/demos/scoracle/static/favicon.ico
+!src/scruples/demos/scoracle/static/logo-ai2-white-withText-micro.svg
 !src/scruples/demos/scoracle/templates/index.html
 !src/scruples/extraction/__init__.py
 !src/scruples/extraction/base.py

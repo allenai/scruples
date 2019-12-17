@@ -8,6 +8,12 @@
 
     <title>Scoracle: Estimate Oracle Scores</title>
 
+    <!-- favicon -->
+    <link
+       rel="shortcut icon"
+       type="image/x-icon"
+       href="{{ url_for('static', filename='favicon.ico') }}">
+
     <!-- bootstrap -->
     <link
        rel="stylesheet"
@@ -54,6 +60,16 @@
      data-target="#navbar"
      data-offset="0"
      style="position: relative;">
+    <header
+       style="background: #223367;">
+      <a href="https://allenai.org/">
+        <img
+           class="img-fluid"
+           style="height: 1rem; margin: 0.5rem 1.5rem"
+           src="{{ url_for('static', filename='logo-ai2-white-withText-micro.svg') }}"
+           alt="Allen Institute for AI">
+      </a>
+    </header>
     <nav
        id="navbar"
        class="navbar sticky-top navbar-light navbar-expand-sm bg-light shadow-sm">
