@@ -678,17 +678,17 @@ Server: Werkzeug/0.15.4 Python/3.7.0
         errors.forEach(function(error) {
           document.getElementById(error['element']).insertAdjacentHTML(
             'beforeend',
-             `<div\
-                 class="alert alert-danger alert-dismissable fade show"\
-                 role="alert">\
-                <strong>${error['error']}:</strong> ${error['message']}\
-                <button\
-                   class="close"\
-                   type="button"\
-                   data-dismiss="alert"\
-                   aria-label="Close">\
-                  <span aria-hidden="true">&times;</span>\
-                </button>\
+             `<div
+                 class="alert alert-danger alert-dismissable fade show"
+                 role="alert">
+                <strong>${error['error']}:</strong> ${error['message']}
+                <button
+                   class="close"
+                   type="button"
+                   data-dismiss="alert"
+                   aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
               </div>`
           );
         });
@@ -753,17 +753,17 @@ Server: Werkzeug/0.15.4 Python/3.7.0
           .getElementById('demo-display-table')
           .insertAdjacentHTML(
             'beforebegin',
-            `<div\
-                id="submission-progress"\
-                class="progress">\
-              <div\
-                 class="progress-bar progress-bar-striped progress-bar-animated"\
-                 role="progressbar"\
-                 aria-valuenow="100"\
-                 aria-valuemin="100"\
-                 aria-valuemax="100"\
-                 style="width: 100%">\
-              </div>\
+            `<div
+                id="submission-progress"
+                class="progress">
+              <div
+                 class="progress-bar progress-bar-striped progress-bar-animated"
+                 role="progressbar"
+                 aria-valuenow="100"
+                 aria-valuemin="100"
+                 aria-valuemax="100"
+                 style="width: 100%">
+              </div>
              </div>`
           );
       }
@@ -848,10 +848,10 @@ Server: Werkzeug/0.15.4 Python/3.7.0
                   .getElementById('demo-display')
                   .insertAdjacentHTML(
                     'afterbegin',
-                    `<tr>\
-                       <td>${datasetName}</td>\
-                       <td>${responseData[i]['metric']}</td>\
-                       <td>${responseData[i]['score']}</td>\
+                    `<tr>
+                       <td>${datasetName}</td>
+                       <td>${responseData[i]['metric']}</td>
+                       <td>${responseData[i]['score'].toFixed(3)}</td>
                      </tr>`
                   );
               }
