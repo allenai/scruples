@@ -79,7 +79,7 @@ def score():
     # ``errors`` collects error messages to return to the client. It has
     # the following shape:
     #
-    #   [(error_string, help_message), ...]
+    #   [{"error": $error_string, "message": $help_message}, ...]
     #
 
     # validate that the request has JSON

@@ -77,6 +77,7 @@ browser:
       --help  Show this message and exit.
 
     Commands:
+      norms     Serve the norms demo.
       scoracle  Serve the scoracle demo.
 
 

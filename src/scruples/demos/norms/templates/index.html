@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta
+       name="viewport"
+       content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Norms: Can Machines Understand Human Values?</title>
+
+    <!-- bootstrap -->
+    <link
+       rel="stylesheet"
+       href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+       integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+       crossorigin="anonymous">
+
+    <!-- Code Highlighting -->
+    <link
+       rel="stylesheet"
+       href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/styles/monokai-sublime.min.css"
+       integrity="sha384-jO9iEb/dRjGM8YVa0IZ5vaWgp05Cnhp/QVnbq4B5frdQvrpDlxVB5odH9Gne1o3+"
+       crossorigin="anonymous">
+    <script
+       async
+       src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/highlight.min.js"
+       integrity="sha384-sBdaRRScDKKRhhw8Fmr+XBy1lvOM3188vYhxIBoiQ6RYxijav6vM7yOnyXRR369O"
+       crossorigin="anonymous"
+       onload="hljs.initHighlightingOnLoad();">
+    </script>
+
+    <!-- KaTeX (math type setting) -->
+    <link
+       rel="stylesheet"
+       href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css"
+       integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq"
+       crossorigin="anonymous">
+    <script
+       defer
+       src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"
+       integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz"
+       crossorigin="anonymous">
+    </script>
+    <script
+       defer
+       src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"
+       integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI"
+       crossorigin="anonymous"
+       onload="renderMathInElement(document.body);">
+    </script>
+  </head>
+  <body
+     data-spy="scroll"
+     data-target="#navbar"
+     data-offset="0"
+     style="position: relative;">
+    <nav
+       id="navbar"
+       class="navbar sticky-top navbar-light navbar-expand-sm bg-light shadow-sm">
+      <div class="container">
+        <a class="navbar-brand" href="#">&#x2696; Norms</a>
+        <button
+           class="navbar-toggler"
+           type="button"
+           data-toggle="collapse"
+           data-target="#navbar-links"
+           aria-controls="navbar-links"
+           aria-expanded="false"
+           aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div
+           id="navbar-links"
+           class="collapse navbar-collapse">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="#about">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#demo">Demo</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#api">API</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#background">Background</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="jumbotron jumbotron-fluid">
+      <div class="container">
+        <h1 class="display-2">Norms &#x2696;</h1>
+        <p class="lead">
+          Can machines understand human values? &#x1F916;
+        </p>
+      </div>
+    </div>
+
+    <div
+       id="about"
+       class="container pt-5">
+      <div class="row">
+        <div class="col-12">
+          <h2 class="display-4">About</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <p>
+            Everday, AI plays a bigger role in making decisions that
+            impact us; however, most AIs have little or no understanding
+            of our values.
+          </p>
+          <p>
+            Norms are complex. We shouldn't expect to solve fundamental
+            problems in ethics tomorrow; however, today we already have AI
+            agents that miss basic, uncontroversial norms. We don't need to
+            solve <a href="https://en.wikipedia.org/wiki/Trolley_problem">the
+            Trolley problem</a> to stop AIs from becoming cyber bullies, or
+            treating people unfairly.
+          </p>
+          <p>
+            As a next step towards <strong>norm understanding</strong>, we propose
+            training models to <em>reproduce</em> the kinds of normative
+            judgments people make about anecdotes.
+          </p>
+          <p>
+            Feel free to play around with the models we've developed in this
+            demo! You can also check out
+            the <a href="https://github.com/allenai/scruples">code</a> or read
+            some <a href="#background">background</a> to dig deeper into how we
+            built them.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+       id="demo"
+       class="container pt-5">
+      <div class="row">
+        <div class="col-12">
+          <h2 class="display-4">Demo</h2>
+          <p>
+            Below, we demo two models. One compares two actions, predicting
+            which is less ethical according to the average user on Mechanical
+            Turk. The other reads an anecdote and predicts which participants
+            were in the wrong, according to members of
+            the <a href="https://www.reddit.com/r/AmItheAsshole/">AITA
+            subreddit</a>.
+          </p>
+        </div>
+      </div>
+      <ul
+         id="demo-form-tabs"
+         class="nav nav-tabs"
+         role="tablist">
+        <li class="nav-item">
+          <a
+             id="demo-form-actions-tab"
+             class="nav-link active"
+             data-toggle="tab"
+             href="#actions"
+             role="tab"
+             aria-controls="actions"
+             aria-selected="true">
+            Compare Actions
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+             id="demo-form-corpus-tab"
+             class="nav-link"
+             data-toggle="tab"
+             href="#corpus"
+             role="tab"
+             aria-controls="corpus"
+             aria-selected="false">
+            Analyze an Anecdote
+          </a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div
+           id="actions"
+           class="tab-pane fade show active"
+           role="tabpanel"
+           aria-labelledby="demo-form-actions-tab">
+          <div class="row py-2">
+            <div class="col-12">
+              <h3>Upload Data</h3>
+            </div>
+          </div>
+          <div class="row py-2">
+            <div class="col-12">
+              <form id="demo-form-actions">
+                <div class="form-group">
+                  <label for="demo-form-action1">Enter Action 1.</label>
+                  <input
+                     id="demo-form-action1"
+                     class="form-control"
+                     type="text"
+                     placeholder="Volunteering at my school.">
+                  <div id="demo-form-action1-errors"></div>
+                </div>
+                <div class="form-group">
+                  <label for="demo-form-action2">Enter Action 2.</label>
+                  <input
+                     id="demo-form-action2"
+                     class="form-control"
+                     type="text"
+                     placeholder="Fighting with my sibling.">
+                  <div id="demo-form-action2-errors"></div>
+                </div>
+                <button
+                   class="btn btn-primary"
+                   type="submit">
+                  Submit
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="row pt-4 pb-2">
+            <div class="col-12">
+              <h3>View Results</h3>
+            </div>
+            <div class="col-12">
+              <figure class="figure w-100">
+                <figcaption class="figure-caption text-center mb-2">
+                  Model predictions.
+                </figcaption>
+                <ul
+                   id="demo-actions-display"
+                   class="list-group list-group-flush">
+                </ul>
+              </figure>
+            </div>
+          </div>
+        </div>
+        <div
+           id="corpus"
+           class="tab-pane fade"
+           role="tabpanel"
+           aria-labelledby="demo-form-corpus-tab">
+          <div class="row py-2">
+            <div class="col-12">
+              <h3>Upload Data</h3>
+            </div>
+          </div>
+          <div class="row py-2">
+            <div class="col-12">
+              <form id="demo-form-corpus">
+                <div class="form-group">
+                  <label for="demo-form-title">Write the title.</label>
+                  <input
+                     id="demo-form-title"
+                     class="form-control"
+                     type="text"
+                     placeholder="Helping my friend get revenge.">
+                  <div id="demo-form-title-errors"></div>
+                </div>
+                <div class="form-group">
+                  <label for="demo-form-text">Write the text.</label>
+                  <textarea
+                     id="demo-form-text"
+                     class="form-control"
+                     rows="4"
+                     placeholder="My friend and I..."></textarea>
+                  <div id="demo-form-text-errors"></div>
+                </div>
+                <button
+                   class="btn btn-primary"
+                   type="submit">
+                  Submit
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="row pt-4 pb-2">
+            <div class="col-12">
+              <h3>View Results</h3>
+            </div>
+            <div class="col-12">
+              <figure class="figure w-100">
+                <figcaption class="figure-caption text-center mb-2">
+                  Model predictions.
+                </figcaption>
+                <ul
+                   id="demo-corpus-display"
+                   class="list-group list-group-flush">
+                </ul>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+       id="api"
+       class="container pt-5">
+      <div class="row">
+        <div class="col-12">
+          <h2 class="display-4">API</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <p>
+            This demo provides ReST API endpoints
+            at <code>/api/actions/predict</code>
+            and <code>/api/corpus/predict</code>.
+          </p>
+          <h3><code class="text-body">/api/actions/predict</code></h3>
+          <p>This endpoint compares two actions, returning the model's predictions.</p>
+          <h4>Usage</h4>
+          <p>
+            <code>POST</code> a JSON array of objects. Each object should have the following keys:
+          </p>
+          <dl class="row">
+            <dt class="col-sm-3 col-md-2">action1</dt>
+            <dd class="col-sm-9 col-md-10">A description of the first action to compare.</dd>
+            <dt class="col-sm-3 col-md-2">action2</dt>
+            <dd class="col-sm-9 col-md-10">A description of the second action to compare.</dd>
+          </dl>
+          <p>
+            Optionally, you can specify the query
+            parameter: <code>?plot=true</code> to also compute a base64 encoded
+            PNG plot depicting the predicted distribution.
+          </p>
+          <h4>Examples</h4>
+          <p>
+            Using <a href="https://curl.haxx.se/">cURL</a>, you could hit
+            the API as follows:
+          </p>
+          <pre><code class="bash rounded">
+$ curl \
+>   --request POST \
+>   --header "Content-Type: application/json" \
+>   --data '[{"action1": "Volunteering at my school.", "action2": "Fighting with my sibling."}]' \
+>   $DOMAIN/api/actions/predict
+[
+  {
+    "action1": 0.5804435014724731,
+    "action2": 12.396906852722168
+  }
+]
+          </code></pre>
+          <p>Or using <a href="https://httpie.org/">HTTPie</a>:</p>
+          <pre><code class="bash rounded">
+$ echo '[{"action1": "Volunteering at my school.", "action2": "Fighting with my sibling."}]' \
+>    | http post $DOMAIN/api/actions/predict
+HTTP/1.0 200 OK
+Content-Length: 82
+Content-Type: application/json
+Date: Thu, 12 Dec 2019 22:43:35 GMT
+Server: Werkzeug/0.15.4 Python/3.7.0
+
+[
+    {
+        "action1": 0.5804435014724731,
+        "action2": 12.396906852722168
+    }
+]
+          </code></pre>
+          <p>To receive the distribution plot, include <code>?plot=true</code>:</p>
+          <pre><code>
+$ curl \
+>   --request POST \
+>   --header "Content-Type: application/json" \
+>   --data '[{"action1": "Volunteering at my school.", "action2": "Fighting with my sibling."}]' \
+>   $DOMAIN/api/actions/predict?plot=true
+[
+  {
+    "action1": 0.5804435014724731,
+    "action2": 12.396906852722168,
+    "plot": "iV...mCC"
+  }
+]
+          </code></pre>
+          <h3><code class="text-body">/api/corpus/predict</code></h3>
+          <p>This endpoint predicts which participants in an anecdote were in the wrong.</p>
+          <h4>Usage</h4>
+          <p>
+            <code>POST</code> a JSON array of objects. Each object should have
+            the following keys:
+          </p>
+          <dl class="row">
+            <dt class="col-sm-3 col-md-2">title</dt>
+            <dd class="col-sm-9 col-md-10">The title of the anecdote.</dd>
+            <dt class="col-sm-3 col-md-2">text</dt>
+            <dd class="col-sm-9 col-md-10">The text of the anecdote.</dd>
+          </dl>
+          <p>
+            Optionally, you can specify the query
+            parameter: <code>?plot=true</code> to also compute base64 encoded
+            PNG plots depicting the distribution of probabilities that the
+            author is in the wrong (<span class="text-monospace font-weight-bold">AUTHOR</span>
+            or <span class="text-monospace font-weight-bold">EVERYBODY</span>
+            labels) and that the other is in the wrong
+            (<span class="text-monospace font-weight-bold">OTHER</span>
+            or <span class="text-monospace font-weight-bold">EVERYBODY</span>
+            labels).
+          </p>
+          <h4>Examples</h4>
+          <p>
+            Using <a href="https://curl.haxx.se/">cURL</a>, you could hit
+            the API as follows:
+          </p>
+          <pre><code class="bash rounded">
+$ curl \
+>   --request POST \
+>   --header "Content-Type: application/json" \
+>   --data '[{"title": "Never texting back", "text": "I never text my friends back. I always forget."}]' \
+>   $DOMAIN/api/corpus/predict
+[
+  {
+    "AUTHOR": 1.1538619995117188,
+    "EVERYBODY": 0.06874721497297287,
+    "INFO": 0.23060794174671173,
+    "NOBODY": 0.5397516489028931,
+    "OTHER": 0.9151269793510437
+  }
+]
+          </code></pre>
+          <p>Or using <a href="https://httpie.org/">HTTPie</a>:</p>
+          <pre><code class="bash rounded">
+$ echo \
+>   '[{"title": "Never texting back", "text": "I never text my friends back. I always forget."}]' \
+>   | http post $DOMAIN/api/corpus/predict
+HTTP/1.0 200 OK
+Content-Length: 187
+Content-Type: application/json
+Date: Thu, 12 Dec 2019 22:53:27 GMT
+Server: Werkzeug/0.15.4 Python/3.7.0
+
+[
+    {
+        "AUTHOR": 1.1538619995117188,
+        "EVERYBODY": 0.06874721497297287,
+        "INFO": 0.23060794174671173,
+        "NOBODY": 0.5397516489028931,
+        "OTHER": 0.9151269793510437
+    }
+]
+          </code></pre>
+          <p>To receive the distribution plots, include <code>?plot=true</code>:</p>
+          <pre><code>
+$ curl \
+>   --request POST \
+>   --header "Content-Type: application/json" \
+>   --data '[{"title": "Never texting back", "text": "I never text my friends back. I always forget."}]' \
+>   $DOMAIN/api/corpus/predict?plot=true
+[
+  {
+    "AUTHOR": 1.1538619995117188,
+    "EVERYBODY": 0.06874721497297287,
+    "INFO": 0.23060794174671173,
+    "NOBODY": 0.5397516489028931,
+    "OTHER": 0.9151269793510437,
+    "plot_author": "iV...=",
+    "plot_other": "iV...="
+  }
+]
+          </code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div
+       id="background"
+       class="container pt-5">
+      <div class="row">
+        <div class="col-12">
+          <h2 class="display-4">Background</h2>
+        </div>
+      </div>
+      <div class="row py-2">
+        <div class="col-12">
+          <h3>Norm Understanding</h3>
+        </div>
+        <div class="col-12">
+          <p>
+            Today, most AI programs have little or no understanding of human
+            values. As AI agents become increasingly autonomous, it's
+            increasingly important that they apply the norms of the communities
+            in which they operate. This work seeks to develop such
+            <strong>norm understanding</strong> by reproducing the normative
+            judgments people make.
+          </p>
+        </div>
+        <div class="col-12">
+          <h3>Modeling Subjectivity</h3>
+        </div>
+        <div class="col-12">
+          <p>
+            Reasonable people can disagree about normative decisions. Norms are
+            inherently <em>subjective</em>. Predicting only the most probable
+            judgment throws away critical information. Is the norm
+            controversial or widely agreed upon? How likely is a person to
+            view this action negatively?
+          </p>
+          <p>
+            Common deep learning approaches conflate the label's subjectivity
+            with the model's uncertainty. If the model predicts the label
+            <span class="text-monospace font-weight-bold">AUTHOR</span> with
+            \(0.72\) probability, we don't know whether the model claims that
+            \(72\%\) of people believe the author was wrong, or that the model
+            is only \(72\%\) sure that <em>everyone</em> agrees the author was
+            wrong.
+          </p>
+          <p>
+            To address this short-coming, we augment the last layer to predict
+            the parameters of a
+            <a href="https://en.wikipedia.org/wiki/Dirichlet_distribution">Dirichlet distribution</a>.
+            This requires training the model using a
+            <a href="https://en.wikipedia.org/wiki/Dirichlet-multinomial_distribution">Dirichlet-multinomial</a>
+            likelihood rather than the more common
+            <a href="https://en.wikipedia.org/wiki/Softmax_function">softmax</a>.
+            The effect is that the model outputs a set of alphas, one for each
+            class (\(\alpha_j\)), which are the parameters to a Dirichlet
+            distribution. Classes with higher \(\alpha\) values are more
+            likely, and the higher the sum of the \(\alpha\) values, the more
+            certain the model is.
+          </p>
+        </div>
+        <div class="col-12">
+          <h3>Further Reading</h3>
+          <p>
+            Feel free to check
+            out <a href="https://github.com/allenai/scruples">the code</a> for
+            more details!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="w-100 text-center py-5">
+      <small>
+        &copy; <a href="https://allenai.org">
+          The Allen Institute for Artificial Intelligence
+        </a> - All Rights Reserved
+        | <a href="https://allenai.org/privacy-policy.html">Privacy Policy</a>
+        | <a href="https://allenai.org/terms.html">Terms of Use</a>
+      </small>
+    </footer>
+
+    <!-- Bootstrap JS and it's dependencies -->
+    <script
+       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+       integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+       crossorigin="anonymous">
+    </script>
+    <script
+       src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+       integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+       crossorigin="anonymous">
+    </script>
+    <script
+       src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+       integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+       crossorigin="anonymous">
+    </script>
+
+    <!-- Custom JavaScript -->
+    <script>
+      // Helper Functions
+
+      /**
+       * Format the number to a fixed-length string.
+       *
+       * @param {Number} n - The number to format.
+       * @param {Number} placesBefore - The places to include before the
+       *   decimal point.
+       * @param {Number} decimalPlaces - The places to include after the
+       *   decimal place.
+       *
+       * @returns {String} The number formated to a fixed length string. Places
+       *   before the decimal are filled with non-breaking space characters
+       *   ("&nbsp;") while places after the decimal are filled with zeros.
+       */
+      function fixedLengthNumber(n, placesBefore, decimalPlaces) {
+        n = n.toFixed(decimalPlaces)
+
+        return (
+          '&nbsp;'
+            .repeat(placesBefore + 1 + decimalPlaces - n.length)
+            + n
+        );
+      }
+
+      /**
+       * Clear form inputs.
+       *
+       * @param {String} dataset - The dataset ("actions" or "corpus") for
+       *   which to clear the form.
+       */
+      function clearForm(dataset) {
+        if (dataset === 'actions') {
+          // clear the actions form
+          document
+            .getElementById('demo-form-action1')
+            .value = '';
+          document
+            .getElementById('demo-form-action2')
+            .value = '';
+        } else if (dataset === 'corpus') {
+          // clear the corpus form
+          document
+            .getElementById('demo-form-title')
+            .value = '';
+          document
+            .getElementById('demo-form-text')
+            .value = '';
+        }
+      }
+
+      /**
+       * Display errors to the user.
+       *
+       * @param {Array} errors - The error messages to display.
+       */
+      function displayErrors(errors) {
+        errors.forEach(function(error) {
+          document
+            .getElementById(error['element'])
+            .insertAdjacentHTML(
+              'beforeend',
+               `<div
+                   class="alert alert-danger alert-dismissable fade show"
+                   role="alert">
+                  <strong>${error['error']}:</strong> ${error['message']}
+                  <button
+                     class="close"
+                     type="button"
+                     data-dismiss="alert"
+                     aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>`
+            );
+        });
+      }
+
+      /**
+       * Clear error messages.
+       *
+       * @param {String} dataset - The dataset ("actions" or "corpus") for
+       *   which to clear the errors.
+       */
+      function clearErrors(dataset) {
+        if (dataset === 'actions') {
+          // clear the actions form errors
+          document
+            .getElementById('demo-form-action1-errors')
+            .innerHTML = '';
+          document
+            .getElementById('demo-form-action2-errors')
+            .innerHTML = '';
+        } else if (dataset === 'corpus') {
+          // clear the corpus form errors
+          document
+            .getElementById('demo-form-title-errors')
+            .innerHTML = '';
+          document
+            .getElementById('demo-form-text-errors')
+            .innerHTML = '';
+        }
+      }
+
+      /**
+       * The number of submissions in progress (by dataset).
+       */
+      var nSubmissionsInProgress = {actions: 0, corpus: 0};
+
+      /**
+       * Add the progress bar in the display.
+       *
+       * Increment the number of submissions in progress and add the progress
+       * bar to the UI if it's not present.
+       *
+       * @param {String} dataset - The dataset ("actions" or "corpus") for
+       *   which add the progress bar.
+       */
+      function addProgress(dataset) {
+        var progressBar;
+
+        // signal that an additional submission is in progress.
+        nSubmissionsInProgress[dataset]++;
+
+        // if the progress bar exists, there's nothing to do.
+        progressBar = document
+          .getElementById(`${dataset}-submission-progress`);
+        if (progressBar !== null) { return; }
+
+        document
+          .getElementById(`demo-${dataset}-display`)
+          .insertAdjacentHTML(
+            'beforebegin',
+            `<div
+                id="${dataset}-submission-progress"
+                class="progress">
+              <div
+                 class="progress-bar progress-bar-striped progress-bar-animated"
+                 role="progressbar"
+                 aria-valuenow="100"
+                 aria-valuemin="100"
+                 aria-valuemax="100"
+                 style="width: 100%">
+              </div>
+             </div>`
+          );
+      }
+
+      /**
+       * Remove the progress bar from the display.
+       *
+       * Decrement the number of submissions in progress and remove the
+       * progress bar from the UI if no submissions are left in progress.
+       *
+       * @param {String} dataset - The dataset ("actions" or "corpus") for
+       *   which to remove the progress bar.
+       */
+      function removeProgress(dataset) {
+        var progressBar;
+
+        nSubmissionsInProgress[dataset] = Math.max(
+          nSubmissionsInProgress[dataset] - 1,
+          0
+        );
+
+        // if there are still submissions in progress, there's nothing to do.
+        if (nSubmissionsInProgress[dataset] > 0) { return; }
+
+        // if the progress bar doesn't exist, there's nothing to do.
+        progressBar = document
+          .getElementById(`${dataset}-submission-progress`)
+        if (progressBar === null) { return; }
+
+        progressBar.remove();
+      }
+
+
+      // Actions Form
+
+      /**
+       * Validate and return an action.
+       *
+       * @param {Number} idx - The index of the action to retrieve.
+       * @param {Array} errors - An array for accumulating error messages.
+       *
+       * @returns {String} The action.
+       */
+      function validateAction(idx, errors) {
+        var action;
+
+        // fetch the action
+        action = document
+          .getElementById(`demo-form-action${idx}`)
+          .value;
+
+        // validate the action
+        if (action === '') {
+          errors.push({
+            element: `demo-form-action${idx}-errors`,
+            error: 'No action provided',
+            message: 'Please provide a non-empty action.'
+          });
+        }
+
+        return action;
+      }
+
+      /**
+       * Add an actions result to the display.
+       *
+       * @param {Object} request - The request object sent to the API. It
+       *   should have "action1" and "action2" keys.
+       * @param {Object} response - The response object returned by the API,
+       *   it should have "action1", "action2", and "plot" keys.
+       */
+      function addActionsResult(request, response) {
+        var action1Prob, action2Prob;
+
+        action1Prob = (
+          response['action1']
+          / (response['action1'] + response['action2'])
+        );
+        action2Prob = (
+          response['action2']
+          / (response['action1'] + response['action2'])
+        );
+
+        document
+          .getElementById('demo-actions-display')
+          .insertAdjacentHTML(
+            'afterbegin',
+            `<li class="list-group-item">
+               <div class="row">
+                 <div class="col-12 col-md-6">
+                   <h4 class="mt-4 mb-3">Actions</h4>
+                   <dl>
+                     <dt>
+                       Action 1
+                       <span
+                          class="badge badge-secondary badge-pill text-monospace float-right">
+                         alpha: ${fixedLengthNumber(response['action1'], 2, 2)}
+                       </span>
+                     </dt>
+                     <dd>${request['action1']}</dd>
+                     <dt>
+                       Action 2
+                       <span
+                          class="badge badge-secondary badge-pill text-monospace float-right">
+                         alpha: ${fixedLengthNumber(response['action2'], 2, 2)}
+                       </span>
+                     </dt>
+                     <dd>${request['action2']}</dd>
+                   </dl>
+                   <h4 class="mt-4 mb-3">Mean Prediction</h4>
+                   <p>Which action would a person consider less ethical?</p>
+                   <div
+                      class="progress text-monospace"
+                      style="height: 1.25rem;">
+                     <div
+                        class="progress-bar bg-info"
+                        style="width: ${100 * action1Prob.toFixed(2)}%;">
+                       <span style="z-index: 100;">${action1Prob.toFixed(2)}</span>
+                     </div>
+                     <div
+                        class="progress-bar bg-dark"
+                        style="width: ${100 * action2Prob.toFixed(2)}%;">
+                       <span style="z-index: 100; direction: rtl;">${action2Prob.toFixed(2)}</span>
+                     </div>
+                   </div>
+                   <small class="float-left">action 1</small>
+                   <small class="float-right">action 2</small>
+                 </div>
+                 <div class="col-12 col-md-6">
+                   <h4 class="mt-4">Uncertainty</h4>
+                   <img
+                      class="img-fluid"
+                      src="data:image/png;base64,${response['plot']}">
+                 </div>
+               </div>
+             </li>`
+          );
+      }
+
+
+      // Corpus Form
+
+      /**
+       * Validate and return the title.
+       *
+       * @param {Array} errors - An array for accumulating error messages.
+       *
+       * @returns {String} The title.
+       */
+      function validateTitle(errors) {
+        var title;
+
+        // fetch the title
+        title = document
+          .getElementById('demo-form-title')
+          .value;
+
+        // validate the title
+        if (title === '') {
+          errors.push({
+            element: 'demo-form-title-errors',
+            error: 'No title provided',
+            message: 'Please provide a non-empty title.'
+          });
+        }
+
+        return title;
+      }
+
+      /**
+       * Validate and return the text.
+       *
+       * @param {Array} errors - An array for accumulating error messages.
+       *
+       * @returns {String} The text.
+       */
+      function validateText(errors) {
+        var text;
+
+        // fetch the text
+        text = document
+          .getElementById('demo-form-text')
+          .value;
+
+        // validate the text
+        // (nothing to do)
+
+        return text;
+      }
+
+      /**
+       * Add a corpus result to the display.
+       *
+       * @param {Object} request - The request object sent to the API. It
+       *   should have "title" and "text" keys.
+       * @param {Object} response - The response object returned by the API,
+       *   it should have "title", "text", "plot_author", and "plot_other" keys.
+       */
+      function addCorpusResult(request, response) {
+        var alphaSum,
+            labels,
+            probAuthor,
+            probOther,
+            probEverybody,
+            probNobody,
+            probInfo;
+
+        labels = ['AUTHOR', 'OTHER', 'EVERYBODY', 'NOBODY', 'INFO'];
+
+        alphaSum = labels.reduce(
+          function (acc, v) { return acc + response[v]; },
+          0
+        );
+
+        probAuthor = response['AUTHOR'] / alphaSum;
+        probOther = response['OTHER'] / alphaSum;
+        probEverybody = response['EVERYBODY'] / alphaSum;
+        probNobody = response['NOBODY'] / alphaSum;
+        probInfo = response['INFO'] / alphaSum;
+
+        document
+          .getElementById('demo-corpus-display')
+          .insertAdjacentHTML(
+            'afterbegin',
+            `<li class="list-group-item">
+               <div class="row">
+                 <div class="col-12">
+                   <h4 class="mt-4 mb-3">Anecdote</h4>
+                   <dl>
+                     <dt>Title</dt>
+                     <dd>${request['title']}</dd>
+                     <dt>Text</dt>
+                     <dd style="white-space: pre-line;">${request['text']}</dd>
+                   </dl>
+                 </div>
+                 <div class="col-12 col-lg-6">
+                   <h4 class="mt-4 mb-3">Label Scores</h4>
+                   <dl>
+                     <dt class="text-monospace">
+                       AUTHOR
+                       <span
+                          class="badge badge-primary badge-pill text-monospace float-right">
+                         alpha: ${fixedLengthNumber(response['AUTHOR'], 2, 2)}
+                       </span>
+                     </dt>
+                     <dd>The author was in the wrong.</dd>
+                     <dt class="text-monospace">
+                       OTHER
+                       <span
+                          class="badge badge-warning badge-pill text-monospace float-right">
+                         alpha: ${fixedLengthNumber(response['OTHER'], 2, 2)}
+                       </span>
+                     </dt>
+                     <dd>The other person was in the wrong.</dd>
+                     <dt class="text-monospace">
+                       EVERYBODY
+                       <span
+                          class="badge badge-info badge-pill text-monospace float-right">
+                         alpha: ${fixedLengthNumber(response['EVERYBODY'], 2, 2)}
+                       </span>
+                     </dt>
+                     <dd>Everyone was in the wrong.</dd>
+                     <dt class="text-monospace">
+                       NOBODY
+                       <span
+                          class="badge badge-danger badge-pill text-monospace float-right">
+                         alpha: ${fixedLengthNumber(response['NOBODY'], 2, 2)}
+                       </span>
+                     </dt>
+                     <dd>Nobody was in the wrong.</dd>
+                     <dt class="text-monospace">
+                       INFO
+                       <span
+                          class="badge badge-success badge-pill text-monospace float-right">
+                         alpha: ${fixedLengthNumber(response['INFO'], 2, 2)}
+                       </span>
+                     </dt>
+                     <dd>More information is needed.</dd>
+                   </dl>
+                 </div>
+                 <div class="col-12 col-lg-6">
+                   <h4 class="mt-4 mb-3">Mean Prediction</h4>
+                   <p>Who would someone think was in the wrong?</p>
+                   <div
+                      class="progress text-monospace"
+                      style="height: 1.25rem;">
+                     <div
+                        class="progress-bar bg-primary"
+                        style="width: ${100 * probAuthor}%;">
+                     </div>
+                     <div
+                        class="progress-bar bg-warning"
+                        style="width: ${100 * probOther}%;">
+                     </div>
+                     <div
+                        class="progress-bar bg-info"
+                        style="width: ${100 * probEverybody}%;">
+                     </div>
+                     <div
+                        class="progress-bar bg-danger"
+                        style="width: ${100 * probNobody}%;">
+                     </div>
+                     <div
+                        class="progress-bar bg-success"
+                        style="width: ${100 * probInfo}%;">
+                     </div>
+                   </div>
+                   <table class="table table-responsive my-5">
+                     <caption class="text-center">The mean predicted class probabilities.</caption>
+                     <thead>
+                       <tr>
+                         <th scope="col">AUTHOR</th>
+                         <th scope="col">OTHER</th>
+                         <th scope="col">EVERYBODY</th>
+                         <th scope="col">NOBODY</th>
+                         <th scope="col">INFO</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       <tr>
+                         <td>${probAuthor.toFixed(2)}</td>
+                         <td>${probOther.toFixed(2)}</td>
+                         <td>${probEverybody.toFixed(2)}</td>
+                         <td>${probNobody.toFixed(2)}</td>
+                         <td>${probInfo.toFixed(2)}</td>
+                     </tbody>
+                   </table>
+                 </div>
+                 <div class="col-12">
+                   <h4 class="mt-4">Uncertainty</h4>
+                   <div class="row">
+                     <div class="col-12 col-md-6">
+                       <img
+                          class="img-fluid"
+                          src="data:image/png;base64,${response['plot_author']}">
+                     </div>
+                     <div class="col-12 col-md-6">
+                       <img
+                          class="img-fluid"
+                          src="data:image/png;base64,${response['plot_other']}">
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </li>`
+          );
+      }
+
+      // Set the Form Handlers
+
+      var actionsForm = document.getElementById('demo-form-actions');
+      actionsForm.onsubmit = function(e) {
+        e.preventDefault();
+
+        var action1,
+            action2,
+            errors,
+            request,
+            xhr;
+
+        // add the progress bar
+        addProgress('actions');
+
+        // set up error handling
+        clearErrors('actions');
+
+        // collect errors for later display to the user
+        errors = [];
+
+        // validate and fetch the data
+        action1 = validateAction(1, errors);
+        action2 = validateAction(2, errors);
+
+        // check for errors
+        if (errors.length > 0) {
+          displayErrors(errors);
+          removeProgress('actions');
+          return;
+        }
+
+        // clear the form
+        clearForm('actions');
+
+        // construct the request object
+        request = {action1: action1, action2: action2};
+
+        // submit the form
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/actions/predict?plot=true', true);
+        xhr.setRequestHeader('Content-type', 'application/json');
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            var response;
+
+            response = JSON.parse(xhr.responseText)[0];
+            addActionsResult(request, response);
+
+            removeProgress('actions');
+          }
+        }
+        xhr.send(JSON.stringify([request]));
+
+        return false;
+      }
+
+      var corpusForm = document.getElementById('demo-form-corpus');
+      corpusForm.onsubmit = function(e) {
+        e.preventDefault();
+
+        var title,
+            text,
+            errors,
+            request,
+            xhr;
+
+        // add the progress bar
+        addProgress('corpus');
+
+        // set up error handling
+        clearErrors('corpus');
+
+        // collect errors for later display to the user
+        errors = [];
+
+        // validate and fetch the data
+        title = validateTitle(errors);
+        text = validateText(errors);
+
+        // check for errors
+        if (errors.length > 0) {
+          displayErrors(errors);
+          removeProgress('corpus');
+          return;
+        }
+
+        // clear the form
+        clearForm('corpus');
+
+        // construct the request object
+        request = {title: title, text: text};
+
+        // submit the form
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/corpus/predict?plot=true', true);
+        xhr.setRequestHeader('Content-type', 'application/json');
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            var response;
+
+            response = JSON.parse(xhr.responseText)[0];
+            addCorpusResult(request, response);
+
+            removeProgress('corpus');
+          }
+        }
+        xhr.send(JSON.stringify([request]));
+
+        return false;
+      }
+    </script>
+  </body>
+</html>

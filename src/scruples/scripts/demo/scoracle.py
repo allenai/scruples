@@ -18,7 +18,10 @@ logger = logging.getLogger(__name__)
 @click.option(
     '--port', type=int, default=5000,
     help='The port on which to serve the demo. Defaults to 5000.')
-def scoracle(expose, port):
+def scoracle(
+        expose: bool,
+        port: int
+) -> None:
     """Serve the scoracle demo."""
     ip = '0.0.0.0' if expose else '127.0.0.1'
 

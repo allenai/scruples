@@ -1,3 +1,5 @@
 """Demos for scruples."""
 
-from . import scoracle
+from . import (
+    norms,
+    scoracle)

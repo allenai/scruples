@@ -1,4 +1,5 @@
 include readme.md
 include docs/*.md
+include src/scruples/demos/norms/templates/*
 include src/scruples/demos/scoracle/templates/*
 include tests/fixtures/*

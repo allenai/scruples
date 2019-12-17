@@ -35,6 +35,7 @@ setup(
         'scruples.data',
         'scruples.dataset',
         'scruples.demos',
+        'scruples.demos.norms',
         'scruples.demos.scoracle',
         'scruples.extraction',
         'scruples.scripts',

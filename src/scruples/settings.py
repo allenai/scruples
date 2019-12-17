@@ -1,5 +1,7 @@
 """Constants and settings."""
 
+import os
+
 
 # subreddit related constants
 
@@ -100,6 +102,49 @@ of annotations.
 ``"dirichlet-multinomial"`` uses a dirichlet-multinomial likelihood
 where the model is predicting the parameters for the dirichlet
 distribution as part of the hierarchical model.
+"""
+
+
+# demos
+
+def _coerce_if_not_none(value, type_):
+    if value is None:
+        return None
+
+    return type_(value)
+
+
+NORMS_ACTIONS_MODEL = _coerce_if_not_none(
+    os.environ.get('SCRUPLES_NORMS_ACTIONS_MODEL'),
+    str)
+"""The path to the model directory to use for predicting the actions.
+
+The path to the fine-tuned Dirichlet-multinomial likelihood model to use when
+predicting the actions in the ``norms`` demo.
+"""
+
+NORMS_CORPUS_MODEL = _coerce_if_not_none(
+    os.environ.get('SCRUPLES_NORMS_CORPUS_MODEL'),
+    str)
+"""The path to the model directory to use for predicting the corpus.
+
+The path to the fine-tuned Dirichlet-multinomial likelihood model to use when
+predicting the corpus in the ``norms`` demo.
+"""
+
+NORMS_PREDICT_BATCH_SIZE = _coerce_if_not_none(
+    os.environ.get('SCRUPLES_NORMS_PREDICT_BATCH_SIZE'),
+    int)
+"""The batch size to use for predictions in the ``norms`` demo."""
+
+NORMS_GPU_IDS = _coerce_if_not_none(
+    os.environ.get('SCRUPLES_NORMS_GPU_IDS'),
+    str)
+"""The GPU IDs to use for making predictions.
+
+The GPU IDs to use when making predictions in the ``norms`` demo. In the
+environment variable specifying this configuration, the GPU IDs should be
+separated by commas (i.e., ``"0,1,2"``).
 """
 
 

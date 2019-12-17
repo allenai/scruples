@@ -34,6 +34,10 @@
 !src/scruples/dataset/readers.py
 !src/scruples/dataset/transforms.py
 !src/scruples/demos/__init__.py
+!src/scruples/demos/norms/__init__.py
+!src/scruples/demos/norms/app.py
+!src/scruples/demos/norms/utils.py
+!src/scruples/demos/norms/templates/index.html
 !src/scruples/demos/scoracle/__init__.py
 !src/scruples/demos/scoracle/app.py
 !src/scruples/demos/scoracle/templates/index.html
@@ -57,6 +61,7 @@
 !src/scruples/scripts/analyze/resource/oracle_performance.py
 !src/scruples/scripts/analyze/resource/predictions.py
 !src/scruples/scripts/demo/__init__.py
+!src/scruples/scripts/demo/norms.py
 !src/scruples/scripts/demo/scoracle.py
 !src/scruples/scripts/evaluate/__init__.py
 !src/scruples/scripts/evaluate/corpus/__init__.py
@@ -112,6 +117,9 @@
 !tests/scruples/dataset/test_readers.py
 !tests/scruples/dataset/test_transforms.py
 !tests/scruples/demos/__init__.py
+!tests/scruples/demos/norms/__init__.py
+!tests/scruples/demos/norms/test_app.py
+!tests/scruples/demos/norms/test_utils.py
 !tests/scruples/demos/scoracle/__init__.py
 !tests/scruples/demos/scoracle/test_app.py
 !tests/scruples/extraction/__init__.py

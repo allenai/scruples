@@ -4,7 +4,9 @@ import logging
 
 import click
 
-from . import scoracle
+from . import (
+    norms,
+    scoracle)
 
 
 logger = logging.getLogger(__name__)
@@ -21,7 +23,8 @@ def demo():
 # register subcommands to the command group
 
 subcommands = [
-    scoracle.scoracle
+    norms.norms,
+    scoracle.scoracle,
 ]
 
 for subcommand in subcommands:
