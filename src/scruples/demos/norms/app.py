@@ -106,9 +106,29 @@ def load_model(
         raise ValueError(f'Unrecognized dataset: {dataset}.')
 
     # load the model
-    model = torch.nn.DataParallel(Model(**baseline_config['model']))
-    model.load_state_dict(torch.load(checkpoint_file_path)['model'])
-    model.to(get_device())
+    device = get_device()
+
+    if device.type == 'cuda':
+        model = torch.nn.DataParallel(Model(**baseline_config['model']))
+        model.load_state_dict(
+            torch.load(
+                checkpoint_file_path,
+                map_location=device
+            )['model'])
+    else:
+        # DataParallel has to run on a CUDA device, so omit it
+        model = Model(**baseline_config['model'])
+        model.load_state_dict({
+            # in order to load the weights into the non-DataParallel-wrapped
+            # model, we have to remove the 'module.' prefix from the key names.
+            k[len('module.'):]: v
+            for k, v in torch.load(
+                    checkpoint_file_path,
+                    map_location=device
+            )['model'].items()
+        })
+
+    model.to(device)
     model.eval()
 
     # create the transforms
