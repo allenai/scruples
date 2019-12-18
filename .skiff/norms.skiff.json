@@ -2,7 +2,7 @@
     "appName": "norms",
     "contact": "nicholasl",
     "team": "mosaic",
-    "args": [ "bin/scruples", "demo", "norms", "--port", "8000", "--expose" ],
+    "args": [ "demo", "norms", "--port", "8000", "--expose" ],
     "resources": {
         "requests": {
             "cpu": "3.5",

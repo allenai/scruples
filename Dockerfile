@@ -121,6 +121,6 @@ RUN pip install .
 
 # Define the entrypoint and default command.
 
-ENTRYPOINT [ "python" ]
+ENTRYPOINT [ "scruples" ]
 
-CMD [ "bin/scruples", "demo", "norms", "--port", "8000", "--expose" ]
+CMD [ "demo", "norms", "--port", "8000", "--expose" ]

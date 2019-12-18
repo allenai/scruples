@@ -2,7 +2,7 @@
     "appName": "scoracle",
     "contact": "nicholasl",
     "team": "mosaic",
-    "args": [ "bin/scruples", "demo", "scoracle", "--port", "8000", "--expose" ],
+    "args": [ "demo", "scoracle", "--port", "8000", "--expose" ],
     "resources": {
         "requests": {
             "cpu": "1.0",
