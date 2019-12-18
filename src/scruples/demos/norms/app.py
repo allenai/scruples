@@ -3,7 +3,6 @@
 import base64
 import functools
 import io
-import json
 import os
 from typing import (
     Callable,
@@ -25,12 +24,17 @@ app = flask.Flask(__name__)
 
 Requires the following environment variables:
 
-- ``SCRUPLES_NORMS_ACTIONS_MODEL``: The path to the Dirichlet-multinomial model
-  trained on the resource (actions).
-- ``SCRUPLES_NORMS_CORPUS_MODEL``: The path to the Dirichlet-multinomial model
-  trained on the corpus.
-- ``SCRUPLES_NORMS_PREDICT_BATCH_SIZE``: The batch size to use for predictions.
-- ``SCRUPLES_NORMS_GPU_IDS``: The GPU IDs to use for making predictions.
+- ``SCRUPLES_NORMS_ACTIONS_BASELINE``   : The baseline to use for the resource
+  (actions).
+- ``SCRUPLES_NORMS_ACTIONS_MODEL``      : The path to the Dirichlet-multinomial
+  model trained on the resource (actions).
+- ``SCRUPLES_NORMS_CORPUS_BASELINE``    : The baseline to use for the corpus.
+- ``SCRUPLES_NORMS_CORPUS_MODEL``       : The path to the Dirichlet-multinomial
+  model trained on the corpus.
+- ``SCRUPLES_NORMS_PREDICT_BATCH_SIZE`` : The batch size to use for
+  predictions.
+- ``SCRUPLES_NORMS_GPU_IDS``            : The GPU IDs to use for making
+  predictions.
 
 """
 
@@ -62,18 +66,15 @@ def get_device() -> torch.device:
 
 @functools.lru_cache()
 def load_model(
-        dataset: str,
-        model_dir: str
+        dataset: str
 ) -> Tuple[torch.nn.Module, Callable, Callable]:
-    """Return the model loaded from ``model_dir``.
+    """Return the model components for ``dataset``.
 
     Parameters
     ----------
     dataset: str, required
-        The model's corresponding dataset. Must be either ``'resource'`` or
-        ``'corpus'``.
-    model_dir : str, required
-        The path to the model's experiment directory.
+        The dataset for which to load a model. Must be either
+        ``'resource'`` or ``'corpus'``.
 
     Returns
     -------
@@ -86,22 +87,21 @@ def load_model(
         The function for converting predicted indices back into the
         original labels.
     """
-    # construct the paths
-    config_file_path = os.path.join(model_dir, 'config.json')
-    checkpoint_file_path = os.path.join(
-        model_dir, 'checkpoints', 'best.checkpoint.pkl')
-
-    # read the config
-    with open(config_file_path, 'r') as config_file:
-        config = json.load(config_file)
-
     # fetch the baseline
     if dataset == 'resource':
         Model, baseline_config, _, make_transform =\
-            baselines.resource.FINE_TUNE_LM_BASELINES[config['baseline']]
+            baselines.resource.FINE_TUNE_LM_BASELINES[
+                settings.NORMS_ACTIONS_BASELINE
+            ]
+        baseline_config['model']['pretrained_model_name_or_path'] =\
+            settings.NORMS_ACTIONS_MODEL
     elif dataset == 'corpus':
         Model, baseline_config, _, make_transform =\
-            baselines.corpus.FINE_TUNE_LM_BASELINES[config['baseline']]
+            baselines.corpus.FINE_TUNE_LM_BASELINES[
+                settings.NORMS_CORPUS_BASELINE
+            ]
+        baseline_config['model']['pretrained_model_name_or_path'] =\
+            settings.NORMS_CORPUS_MODEL
     else:
         raise ValueError(f'Unrecognized dataset: {dataset}.')
 
@@ -110,23 +110,9 @@ def load_model(
 
     if device.type == 'cuda':
         model = torch.nn.DataParallel(Model(**baseline_config['model']))
-        model.load_state_dict(
-            torch.load(
-                checkpoint_file_path,
-                map_location=device
-            )['model'])
     else:
         # DataParallel has to run on a CUDA device, so omit it
         model = Model(**baseline_config['model'])
-        model.load_state_dict({
-            # in order to load the weights into the non-DataParallel-wrapped
-            # model, we have to remove the 'module.' prefix from the key names.
-            k[len('module.'):]: v
-            for k, v in torch.load(
-                    checkpoint_file_path,
-                    map_location=device
-            )['model'].items()
-        })
 
     model.to(device)
     model.eval()
@@ -244,9 +230,7 @@ def predict_actions():
     # make the predictions
     device = get_device()
 
-    model, featurize, _ = load_model(
-        dataset='resource',
-        model_dir=settings.NORMS_ACTIONS_MODEL)
+    model, featurize, _ = load_model(dataset='resource')
 
     dataset = utils.PredictionDataset(
         features=[
@@ -416,9 +400,7 @@ def predict_corpus():
     # make predictions
     device = get_device()
 
-    model, featurize, delabelize = load_model(
-        dataset='corpus',
-        model_dir=settings.NORMS_CORPUS_MODEL)
+    model, featurize, delabelize = load_model(dataset='corpus')
 
     dataset = utils.PredictionDataset(
         features=[

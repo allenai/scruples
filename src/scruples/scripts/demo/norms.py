@@ -31,10 +31,13 @@ def norms(
     In order to run this server, you must set the following environment
     variables:
 
-      SCRUPLES_NORMS_ACTIONS_MODEL      : The path to the model directory to
-        use for predicting the actions.
-      SCRUPLES_NORMS_CORPUS_MODEL       : The path to the model directory to
-        use for predicting the corpus.
+      SCRUPLES_NORMS_ACTIONS_BASELINE   : The baseline to use for the resource
+        (actions).
+      SCRUPLES_NORMS_ACTIONS_MODEL      : The path to the saved pretrained
+        model to use for predicting the actions.
+      SCRUPLES_NORMS_CORPUS_BASELINE    : The baseline to use for the corpus.
+      SCRUPLES_NORMS_CORPUS_MODEL       : The path to the saved pretrained
+        model to use for predicting the corpus.
       SCRUPLES_NORMS_PREDICT_BATCH_SIZE : The batch size to use for
         prediction.
       SCRUPLES_NORMS_GPU_IDS            : A comma separated list of GPU IDs to
@@ -46,14 +49,10 @@ def norms(
     get_device()
 
     logger.info('Loading the Actions model.')
-    load_model(
-        dataset='resource',
-        model_dir=settings.NORMS_ACTIONS_MODEL)
+    load_model(dataset='resource',)
 
     logger.info('Loading the Corpus model.')
-    load_model(
-        dataset='corpus',
-        model_dir=settings.NORMS_CORPUS_MODEL)
+    load_model(dataset='corpus')
 
     # start the server
 

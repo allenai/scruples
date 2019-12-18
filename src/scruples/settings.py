@@ -114,13 +114,37 @@ def _coerce_if_not_none(value, type_):
     return type_(value)
 
 
+NORMS_ACTIONS_BASELINE = _coerce_if_not_none(
+    os.environ.get('SCRUPLES_NORMS_ACTIONS_BASELINE'),
+    str)
+"""The baseline to use for predicting the actions in the norms demo.
+
+This constant should be one of the keys from
+``scruples.baselines.resource.FINE_TUNE_LM_BASELINES`` and should correspond to
+the ``NORMS_ACTIONS_MODEL`` setting.
+"""
+
 NORMS_ACTIONS_MODEL = _coerce_if_not_none(
     os.environ.get('SCRUPLES_NORMS_ACTIONS_MODEL'),
     str)
 """The path to the model directory to use for predicting the actions.
 
 The path to the fine-tuned Dirichlet-multinomial likelihood model to use when
-predicting the actions in the ``norms`` demo.
+predicting the actions in the ``norms`` demo. The chosen directory should be
+the result of calling ``.save_pretrained`` on the model instance. See the
+transformers_ library for more details.
+
+.. _transformers: https://github.com/huggingface/transformers
+"""
+
+NORMS_CORPUS_BASELINE = _coerce_if_not_none(
+    os.environ.get('SCRUPLES_NORMS_CORPUS_BASELINE'),
+    str)
+"""The baseline to use for predicting the corpus in the norms demo.
+
+This constant should be one of the keys from
+``scruples.baselines.corpus.FINE_TUNE_LM_BASELINES`` and should correspond to
+the ``NORMS_CORPUS_MODEL`` setting.
 """
 
 NORMS_CORPUS_MODEL = _coerce_if_not_none(
@@ -129,7 +153,9 @@ NORMS_CORPUS_MODEL = _coerce_if_not_none(
 """The path to the model directory to use for predicting the corpus.
 
 The path to the fine-tuned Dirichlet-multinomial likelihood model to use when
-predicting the corpus in the ``norms`` demo.
+predicting the corpus in the ``norms`` demo. The chosen directory should be the
+result of calling ``.save_pretrained`` on the model instance. See the
+transformers_ library for more details.
 """
 
 NORMS_PREDICT_BATCH_SIZE = _coerce_if_not_none(

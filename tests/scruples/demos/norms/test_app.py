@@ -267,7 +267,8 @@ class AppTestCase(unittest.TestCase):
 
     @pytest.mark.slow
     @pytest.mark.skipif(
-        settings.NORMS_ACTIONS_MODEL is None
+        settings.NORMS_ACTIONS_BASELINE is None
+        or settings.NORMS_ACTIONS_MODEL is None
         or settings.NORMS_PREDICT_BATCH_SIZE is None,
         reason='requires the norms demo environment variables.')
     def test_predict_actions_computes_action_prediction(self):
@@ -284,7 +285,8 @@ class AppTestCase(unittest.TestCase):
 
     @pytest.mark.slow
     @pytest.mark.skipif(
-        settings.NORMS_ACTIONS_MODEL is None
+        settings.NORMS_ACTIONS_BASELINE is None
+        or settings.NORMS_ACTIONS_MODEL is None
         or settings.NORMS_PREDICT_BATCH_SIZE is None,
         reason='requires the norms demo environment variables.')
     def test_predict_actions_computes_plots(self):
@@ -547,7 +549,8 @@ class AppTestCase(unittest.TestCase):
 
     @pytest.mark.slow
     @pytest.mark.skipif(
-        settings.NORMS_CORPUS_MODEL is None
+        settings.NORMS_CORPUS_BASELINE is None
+        or settings.NORMS_CORPUS_MODEL is None
         or settings.NORMS_PREDICT_BATCH_SIZE is None,
         reason='requires the norms demo environment variables.')
     def test_predict_corpus_computes_corpus_prediction(self):
@@ -573,7 +576,8 @@ class AppTestCase(unittest.TestCase):
 
     @pytest.mark.slow
     @pytest.mark.skipif(
-        settings.NORMS_CORPUS_MODEL is None
+        settings.NORMS_CORPUS_BASELINE is None
+        or settings.NORMS_CORPUS_MODEL is None
         or settings.NORMS_PREDICT_BATCH_SIZE is None,
         reason='requires the norms demo environment variables.')
     def test_predict_corpus_computes_plots(self):
