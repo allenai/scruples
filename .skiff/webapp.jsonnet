@@ -8,12 +8,19 @@
 
 // This file is generated once at template creation time and unlikely to change
 // from that point forward.
-local config = import 'skiff.json';
+local normsConfig = import 'norms.skiff.json';
+local scoracleConfig = import 'scoracle.skiff.json';
 
 function(
-    image, cause, sha, env='staging', branch='', repo='',
+    app, image, cause, sha, env='staging', branch='', repo='',
     buildId=''
 )
+    local config =
+        if app == 'norms' then
+            normsConfig
+        else
+            scoracleConfig;
+
     // We only allow registration of hostnames attached to '*.apps.allenai.org'
     // at this point. If you need a custom domain, contact us: reviz@allenai.org.
     local topLevelDomain = '.apps.allenai.org';
@@ -151,14 +158,10 @@ function(
                         {
                             name: fullyQualifiedName,
                             image: image,
+                            args: config.args,
                             readinessProbe: healthCheck,
                             livenessProbe: healthCheck,
-                            resources: {
-                                requests: {
-                                    cpu: '1.0',
-                                    memory: '2Gi'
-                                }
-                            }
+                            resources: config.resources
                         }
                     ]
                 }
