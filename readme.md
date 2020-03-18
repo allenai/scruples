@@ -34,7 +34,8 @@ This project requires Python 3.7. To setup the project:
          python -m spacy download en
 
   5. (optional) Run the tests to make sure that everything is
-     working. They'll take about 5 minutes to complete:
+     working. They'll take about 5 minutes to complete, or you can pass the
+     `--skip-slow` (`-s`) option to run a smaller, faster test suite:
 
          pip install pytest
          pytest
@@ -79,6 +80,15 @@ browser:
     Commands:
       norms     Serve the norms demo.
       scoracle  Serve the scoracle demo.
+
+
+Contact
+-------
+For public, non-sensitive questions and concerns, please file an issue
+on this repository.
+
+For private or sensitive inquiries email mosaic on the allenai.org
+website.
 
 
 Disclaimer
