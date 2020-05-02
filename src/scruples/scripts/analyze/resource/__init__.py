@@ -9,6 +9,7 @@ from . import (
     latent_traits,
     oracle_performance,
     predictions,
+    topics,
     verbs)
 
 
@@ -30,6 +31,7 @@ subcommands = [
     latent_traits.latent_traits,
     oracle_performance.oracle_performance,
     predictions.predictions,
+    topics.topics,
     verbs.verbs
 ]
 
