@@ -8,7 +8,8 @@ from . import (
     human_performance,
     latent_traits,
     oracle_performance,
-    predictions)
+    predictions,
+    verbs)
 
 
 logger = logging.getLogger(__name__)
@@ -28,7 +29,8 @@ subcommands = [
     human_performance.human_performance,
     latent_traits.latent_traits,
     oracle_performance.oracle_performance,
-    predictions.predictions
+    predictions.predictions,
+    verbs.verbs
 ]
 
 for subcommand in subcommands:
