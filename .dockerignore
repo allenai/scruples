@@ -1,4 +1,6 @@
 **
+!Dockerfile
+!LICENSE
 !MANIFEST.in
 !bin/scruples
 !readme.md
@@ -36,10 +38,10 @@
 !src/scruples/demos/__init__.py
 !src/scruples/demos/norms/__init__.py
 !src/scruples/demos/norms/app.py
-!src/scruples/demos/norms/utils.py
 !src/scruples/demos/norms/static/favicon.ico
 !src/scruples/demos/norms/static/logo-ai2-white-withText-micro.svg
 !src/scruples/demos/norms/templates/index.html
+!src/scruples/demos/norms/utils.py
 !src/scruples/demos/scoracle/__init__.py
 !src/scruples/demos/scoracle/app.py
 !src/scruples/demos/scoracle/static/favicon.ico
@@ -64,6 +66,8 @@
 !src/scruples/scripts/analyze/resource/latent_traits.py
 !src/scruples/scripts/analyze/resource/oracle_performance.py
 !src/scruples/scripts/analyze/resource/predictions.py
+!src/scruples/scripts/analyze/resource/topics.py
+!src/scruples/scripts/analyze/resource/verbs.py
 !src/scruples/scripts/demo/__init__.py
 !src/scruples/scripts/demo/norms.py
 !src/scruples/scripts/demo/scoracle.py
