@@ -160,8 +160,22 @@
           <p>
             To compute the oracle score, you'll need a classification dataset
             with a fixed set of classes and multiple annotators per
-            question. We'll estimate the score from the label counts.
+            question. We'll estimate the score from the label counts. To try it
+            out, you can select a preset example below.
           </p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="form-group">
+            <label for="demo-preset-example">(Optional) Preset Examples</label>
+            <select id="demo-preset-example" class="form-control">
+              <option value="none">(none)</option>
+              <option value="anecdotes">Scruples Anecdotes</option>
+              <option value="dilemmas">Scruples Dilemmas</option>
+              <option value="snli">Stanford Natural Language Inference (SNLI)</option>
+            </select>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -478,9 +492,18 @@ Server: Werkzeug/0.15.4 Python/3.7.0
        crossorigin="anonymous">
     </script>
 
+    <!-- Custom Data -->
+    <script id="anecdotes-dev-label-counts" type="application/json">{% include 'dev.scruples-anecdotes_label-counts.json' %}</script>
+
+    <script id="dilemmas-dev-label-counts" type="application/json">{% include 'dev.scruples-dilemmas_label-counts.json' %}</script>
+
+    <script id="snli-dev-label-counts" type="application/json">{% include 'dev.snli_label-counts.json' %}</script>
+
     <!-- Custom JavaScript -->
     <script>
       // helper functions
+
+      /** Form validation and submission. */
 
       /**
        * Validate and return the dataset's name.
@@ -787,7 +810,70 @@ Server: Werkzeug/0.15.4 Python/3.7.0
         progressBar.remove();
       }
 
-      // set a handler for form submission
+      /** The preset examples. */
+
+      var presetExamples = {
+        none: {
+          name: '',
+          metrics: [],
+          text: '',
+        },
+        anecdotes: {
+          name: 'Scruples Anecdotes (dev)',
+          metrics: ['f1 (macro)', 'cross entropy (soft labels)'],
+          text: document.getElementById('anecdotes-dev-label-counts').innerHTML,
+        },
+        dilemmas: {
+          name: 'Scruples Dilemmas (dev)',
+          metrics: ['f1 (macro)', 'cross entropy (soft labels)'],
+          text: document.getElementById('dilemmas-dev-label-counts').innerHTML,
+        },
+        snli: {
+          name: 'SNLI (dev)',
+          metrics: ['accuracy'],
+          text: document.getElementById('snli-dev-label-counts').innerHTML,
+        },
+      };
+
+      /**
+       * Set the form to a preset example.
+       *
+       * @param {string} example - The preset example with which to populate the form.
+       */
+      function setExample(exampleName) {
+        var example, metrics;
+
+        // set the demo form's tab to text
+        $('#demo-form-text-tab').tab('show');
+
+        example = presetExamples[exampleName];
+
+        // set the form elements
+        document.getElementById('demo-form-name').value = example.name;
+        metrics = document.getElementsByClassName('demo-form-metric');
+        for (var i = 0; i < metrics.length; i++) {
+          var includeMetric;
+
+          includeMetric = example.metrics.indexOf(metrics[i].value) !== -1;
+          metrics[i].checked = includeMetric;
+        }
+        document.getElementById('demo-form-text').value = example.text;
+
+        // clear form validation errors since they're no longer applicable
+        clearErrors();
+      }
+
+      // event handlers
+
+      /** The preset example selection handler. */
+      var exampleSelector = document.getElementById('demo-preset-example');
+      exampleSelector.onchange = function(e) {
+        var selectElement;
+        selectElement = e.target;
+        setExample(selectElement.value);
+      }
+
+      /** The form submission handler. */
       var form = document.getElementById('demo-form');
       form.onsubmit = function(e) {
         e.preventDefault();
@@ -823,6 +909,8 @@ Server: Werkzeug/0.15.4 Python/3.7.0
             return;
           }
 
+          // set the preset example to none
+          document.getElementById('demo-preset-example').value = 'none';
           // clear the form
           clearForm();
 
