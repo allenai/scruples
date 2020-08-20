@@ -110,7 +110,7 @@
       <div class="container">
         <h1 class="display-2">Scoracle</h1>
         <p class="lead">
-          What's the best performance on your data? &#x1F916;
+          What's the BEST performance on your data? &#x1F916;
         </p>
       </div>
     </div>
@@ -138,10 +138,11 @@
           <p>
             We can formalize &ldquo;the perfect model&rdquo; as an oracle
             that knows how people annotate each example on average. This demo
-            estimates the oracle's score on your data.
+            reports an estimate of that oracle's score on your data, which we
+            call the BEST (Bayesian Estimated Score Terminus) performance.
           </p>
           <p>
-            Submit your dataset and discover the best possible performance!
+            Submit your dataset and discover the BEST performance!
             You can also check out
             the <a href="https://github.com/allenai/scruples">code</a> or read
             some <a href="#background">background</a> on how we compute the
@@ -450,8 +451,8 @@ Server: Werkzeug/0.15.4 Python/3.7.0
             the <a href="https://en.wikipedia.org/wiki/Empirical_Bayes_method">empirical
             Bayesian</a> approach, we fit the prior (\(\alpha\))
             via <a href="https://en.wikipedia.org/wiki/Maximum_likelihood_estimation">maximum
-            likelihood</a> to obtain \(\hat{\alpha}\). Our estimate is then
-            the oracle's expected loss over the posterior:
+            likelihood</a> to obtain \(\hat{\alpha}\). Our estimate, the BEST
+            performance, is then the oracle's expected loss over the posterior:
 
             \[ s \coloneqq \mathbb{E}_{p \mid Y, \hat{\alpha}}[\ell(p, Y)] \]
 
