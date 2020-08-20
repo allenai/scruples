@@ -49,7 +49,7 @@
 !src/scruples/demos/scoracle/templates/index.html
 !src/scruples/demos/scoracle/templates/dev.scruples-anecdotes_label-counts.json
 !src/scruples/demos/scoracle/templates/dev.scruples-dilemmas_label-counts.json
-!src/scruples/demos/scoracle/templates/dev.scruples-snli_label-counts.json
+!src/scruples/demos/scoracle/templates/dev.snli_label-counts.json
 !src/scruples/extraction/__init__.py
 !src/scruples/extraction/base.py
 !src/scruples/extraction/filters.py
