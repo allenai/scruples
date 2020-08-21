@@ -2,11 +2,13 @@ Scruples
 ========
 A corpus and code for understanding norms and subjectivity.
 
-This repository is for the paper: [&ldquo;Scruples: A Corpus of Community
-Ethical Judgments on 32,000 Real-life Anecdotes&rdquo;][paper]. In particular,
-`scruples` is a collection of datasets for studying _norm understanding_ in
-anecdotes. This repo contains code for building and analyzing `scruples`,
-running the baselines, and demoing the models and BEST estimator.
+This repository is for the paper: [Scruples: A Corpus of Community Ethical
+Judgments on 32,000 Real-life Anecdotes][paper]. In particular, `scruples` is a
+collection of datasets for studying _norm understanding_ in anecdotes. This
+repo contains code for building and analyzing `scruples`, running the
+baselines, and demoing the models and BEST estimator.
+
+To download the data, see [Data](#data).
 
 To rebuild the dataset or re-run the analyses, see [Setup](#setup) and
 then [Quickstart](#quickstart). For documentation on how we validated
@@ -18,6 +20,30 @@ To cite the paper, jump to [Citation](#citation).
 NOT intended for use in production environments, and there is no
 intention for ongoing maintainence. See the [Disclaimer](#disclaimer)
 for more information.
+
+
+Data
+----
+`scruples` has two primary datasets: the Anecdotes and the Dilemmas.
+
+### Anecdotes
+
+The Anecdotes provide 32,000 anecdotes of real-life situations with
+ethical judgments collected from community members about who was in the
+wrong. See [Scruples: A Corpus of Community Ethical Judgments on
+32,000 Real-life Anecdotes][paper] for more information.
+
+You can download the Anecdotes [here][anecdotes].
+
+### Dilemmas
+
+The Scruples Dilemmas provide 10,000 ethical dilemmas in the form of
+paired actions, where the model must identify which one was considered
+less ethical by crowd workers on Mechanical Turk. See [Scruples: A
+Corpus of Community Ethical Judgments on 32,000 Real-life
+Anecdotes][paper] for more information.
+
+You can download the Dilemmas [here][dilemmas].
 
 
 Setup
@@ -132,6 +158,8 @@ product or service should carefully consider, investigate, and evaluate
 which norms are correct for their particular application.
 
 
+[anecdotes]: https://storage.googleapis.com/ai2-mosaic-public/projects/scruples/v1.0/data/anecdotes.tar.gz
+[dilemmas]: https://storage.googleapis.com/ai2-mosaic-public/projects/scruples/v1.0/data/dilemmas.tar.gz
 [paper]: https://arxiv.org/abs/2008.09094
 [pytorch]: https://pytorch.org/
 [reddit-comments]: http://files.pushshift.io/reddit/comments/
