@@ -8,7 +8,8 @@ collection of datasets for studying _norm understanding_ in anecdotes. This
 repo contains code for building and analyzing Scruples, running the
 baselines, and demoing the models and BEST estimator.
 
-To download the data, see [Data](#data).
+To download the data, see [Data](#data). To demo the BEST estimator or the
+model trained to predict people's ethical judgments, go to [Demo](#demos).
 
 To rebuild the dataset or re-run the analyses, see [Setup](#setup) and
 then [Quickstart](#quickstart). For documentation on how we validated
@@ -44,6 +45,36 @@ Corpus of Community Ethical Judgments on 32,000 Real-life
 Anecdotes][paper] for more information.
 
 You can download the Dilemmas [here][dilemmas].
+
+
+Demos
+-----
+Scruples has two demos associated with it.
+
+### Scoracle
+
+Visit [scoracle][scoracle] to compute the BEST (Bayesian Estimated Score
+Terminus) performance for a classification dataset. BEST uses the annotations
+to estimate the upper bound for how well models can possibly do on a dataset
+under various metrics (accuracy, cross entropy, etc.). See [the paper][paper]
+for details.
+
+![Scoracle Demo Results Screenshot](./docs/assets/demo-screenshots/scoracle-results.png?raw=true "Scoracle Demo Results")
+
+### Norms
+
+The [norms][norms] demo shows how current neural models can learn to predict
+basic ethical judgments using the Scruples data. It let's you run anecdotes and
+dilemmas through a model to view its predictions. In addition, it visualizes
+how Dirichlet-multinomial layers allow models to separate intrinsic from model
+uncertainty. [The paper][paper] elaborates on these techniques.
+
+![Norms Demo Results Screenshot](./docs/assets/demo-screenshots/norms-results.png?raw=true "Norms Demo Results")
+
+### Running the Demos
+
+Running the demos yourself is quite easy! If you want to run these demos on
+your own hardware, check out the [demo documentation](./docs/demos.md).
 
 
 Setup
@@ -160,7 +191,9 @@ which norms are correct for their particular application.
 
 [anecdotes]: https://storage.googleapis.com/ai2-mosaic-public/projects/scruples/v1.0/data/anecdotes.tar.gz
 [dilemmas]: https://storage.googleapis.com/ai2-mosaic-public/projects/scruples/v1.0/data/dilemmas.tar.gz
+[norms]: https://norms.apps.allenai.org/
 [paper]: https://arxiv.org/abs/2008.09094
 [pytorch]: https://pytorch.org/
 [reddit-comments]: http://files.pushshift.io/reddit/comments/
 [reddit-posts]: http://files.pushshift.io/reddit/submissions/
+[scoracle]: https://scoracle.apps.allenai.org/

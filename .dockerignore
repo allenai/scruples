@@ -7,6 +7,12 @@
 !requirements.txt
 !setup.cfg
 !setup.py
+!docs/annotation-guidelines.md
+!docs/demos.md
+!docs/assets/demo-screenshots/norms-about.png
+!docs/assets/demo-screenshots/norms-results.png
+!docs/assets/demo-screenshots/scoracle-about.png
+!docs/assets/demo-screenshots/scoracle-results.png
 !src/scruples/__init__.py
 !src/scruples/analysis/__init__.py
 !src/scruples/analysis/traits.py
