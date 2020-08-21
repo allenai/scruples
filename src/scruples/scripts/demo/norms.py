@@ -31,6 +31,7 @@ def norms(
     In order to run this server, you must set the following environment
     variables:
 
+      \b
       SCRUPLES_NORMS_ACTIONS_BASELINE   : The baseline to use for the resource
         (actions).
       SCRUPLES_NORMS_ACTIONS_MODEL      : The path to the saved pretrained
