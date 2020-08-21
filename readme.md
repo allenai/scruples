@@ -3,19 +3,30 @@ Scruples
 A corpus and code for understanding norms and subjectivity.
 
 This repository is for the paper: [Scruples: A Corpus of Community Ethical
-Judgments on 32,000 Real-life Anecdotes][paper]. In particular, Scruples is a
-collection of datasets for studying _norm understanding_ in anecdotes. This
-repo contains code for building and analyzing Scruples, running the
-baselines, and demoing the models and BEST estimator.
+Judgments on 32,000 Real-life Anecdotes][paper]. Scruples provides datasets for
+studying _norm understanding_ in anecdotes and language. This repo contains
+code for building and analyzing the Scruples datasets, running the baselines,
+demoing the models and the BEST estimator, and using the BEST estimator
+directly to estimate the best possible performance on classification datasets.
 
-To download the data, see [Data](#data). To demo the BEST estimator or the
-model trained to predict people's ethical judgments, go to [Demo](#demos).
+Jump to a section of this readme to accomplish different goals:
 
-To rebuild the dataset or re-run the analyses, see [Setup](#setup) and
-then [Quickstart](#quickstart). For documentation on how we validated
-the extractions, see the [Annotation Guidelines](./docs/annotation-guidelines.md).
+  - [Data](#data): Download the Scruples data.
+  - [Demos](#demos): View or run demos for the BEST estimator or the model
+    trained to predict people's ethical judgments on anecdotes and moral
+    dilemmas.
+  - [Setup](#setup): Install the code in this repository.
+  - [Quickstart](#quickstart): Get started running the code in this repo.
+  - [Citation](#citation): Cite the Scruples project.
+  - [Contact](#contact): Reach out with questions or comments.
+  - [Disclaimer](#disclaimer): Understand the intended purpose of this work as
+    well as it's limitations.
 
-To cite the paper, jump to [Citation](#citation).
+In addition, the following documents dive deep into particular topics:
+
+  - [Annotation Guidelines](./docs/annotation-guidelines.md): Learn how we
+    annotated data for Scruples to validate the extraction performance.
+  - [Demos](./docs/demos.md): Set up and run the demos on your own machine.
 
 **Note: This repository is intended for research purpooses only.** It is
 NOT intended for use in production environments, and there is no
@@ -59,8 +70,6 @@ to estimate the upper bound for how well models can possibly do on a dataset
 under various metrics (accuracy, cross entropy, etc.). See [the paper][paper]
 for details.
 
-![Scoracle Demo Results Screenshot](./docs/assets/demo-screenshots/scoracle-results.png?raw=true "Scoracle Demo Results")
-
 ### Norms
 
 The [norms][norms] demo shows how current neural models can learn to predict
@@ -68,8 +77,6 @@ basic ethical judgments using the Scruples data. It let's you run anecdotes and
 dilemmas through a model to view its predictions. In addition, it visualizes
 how Dirichlet-multinomial layers allow models to separate intrinsic from model
 uncertainty. [The paper][paper] elaborates on these techniques.
-
-![Norms Demo Results Screenshot](./docs/assets/demo-screenshots/norms-results.png?raw=true "Norms Demo Results")
 
 ### Running the Demos
 

@@ -35,6 +35,9 @@ When you visit the site, you should see something like this:
 
 ![Scoracle Demo About Screenshot](./assets/demo-screenshots/scoracle-about.png?raw=true "Scoracle Demo About")
 
+After submitting a dataset and requesting the BEST performance for some
+metrics, you'll see something like this:
+
 ![Scoracle Demo Results Screenshot](./assets/demo-screenshots/scoracle-results.png?raw=true "Scoracle Demo Results")
 
 
@@ -100,6 +103,8 @@ So, to run norms on localhost at port 5050, execute:
 When you visit the site, you should see something like this:
 
 ![Norms Demo About Screenshot](./assets/demo-screenshots/norms-about.png?raw=true "Norms Demo About")
+
+And after submitting a dilemma to the model, you should see results like this:
 
 ![Norms Demo Results Screenshot](./assets/demo-screenshots/norms-results.png?raw=true "Norms Demo Results")
 
