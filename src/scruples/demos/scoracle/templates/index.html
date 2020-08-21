@@ -146,10 +146,10 @@
             performance. There's no point studying a solved problem!
           </p>
           <p>
-            If every label were correct (the one chosen most often) then models
-            could score perfectly. In practice, a handful of annotators decide
-            each gold label, getting some wrong by pure chance. So, even the
-            perfect model won't get the perfect score.
+            If a group of annotators always labeled examples the same way, then
+            models could score perfectly. In practice, only a handful of
+            annotators decide each label, introducing some randomness in the
+            process. So, even the perfect model can't get the perfect score.
           </p>
           <p>
             We can formalize &ldquo;the perfect model&rdquo; as an oracle
@@ -158,11 +158,11 @@
             call the BEST (Bayesian Estimated Score Terminus) performance.
           </p>
           <p>
-            Submit your dataset and discover the BEST performance!
-            You can also check out
-            the <a href="https://github.com/allenai/scruples">code</a> or read
-            some <a href="#background">background</a> on how we compute the
-            estimate.
+            Submit your dataset and discover the BEST performance! You can also
+            check out the <a href="https://github.com/allenai/scruples">code</a>,
+            read the <a href="https://arxiv.org/abs/2008.09094">paper</a>, or
+            learn some <a href="#background">background</a> on how we compute
+            the estimate.
           </p>
         </div>
       </div>
@@ -422,11 +422,19 @@ Server: Werkzeug/0.15.4 Python/3.7.0
       <div class="row">
         <div class="col-12">
           <h2 class="display-4">Background</h2>
+          <p>
+            This section provides some quick background on how we define and
+            estimate the BEST performance for a dataset. For an implementation,
+            see the
+            <a href="https://github.com/allenai/scruples/blob/da41cf8976e96ceb05fdeca887b460ea1baf5629/src/scruples/utils.py#L460">code</a>.
+            For more information, checkout
+            the <a href="https://arxiv.org/abs/2008.09094">paper</a>.
+          </p>
         </div>
       </div>
       <div class="row py-2">
         <div class="col-12">
-          <h3>Defining Oracle Score</h3>
+          <h3>Defining the Oracle</h3>
         </div>
         <div class="col-12">
           <p>
@@ -450,7 +458,7 @@ Server: Werkzeug/0.15.4 Python/3.7.0
           </p>
         </div>
         <div class="col-12">
-          <h3>Estimating Oracle Score</h3>
+          <h3>The BEST Performance: Estimating the Oracle's Score</h3>
         </div>
         <div class="col-12">
           <p>
@@ -474,7 +482,8 @@ Server: Werkzeug/0.15.4 Python/3.7.0
 
           </p>
           <p>
-            For the mathematical details, check out the
+            For the mathematical details, check out
+            the <a href="https://arxiv.org/abs/2008.09094">paper</a> or the
             <a href="https://github.com/allenai/scruples/blob/da41cf8976e96ceb05fdeca887b460ea1baf5629/src/scruples/utils.py#L460">code</a>
             for computing the oracle score.
           </p>
