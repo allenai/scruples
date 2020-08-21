@@ -1,14 +1,18 @@
-scruples
+Scruples
 ========
 A corpus and code for understanding norms and subjectivity.
 
-This repository contains the code for building and analyzing the
-`scruples` corpus. `scruples` is a corpus for studying _norm
-understanding_ in anecdotes.
+This repository is for the paper: [&ldquo;Scruples: A Corpus of Community
+Ethical Judgments on 32,000 Real-life Anecdotes&rdquo;][paper]. In particular,
+`scruples` is a collection of datasets for studying _norm understanding_ in
+anecdotes. This repo contains code for building and analyzing `scruples`,
+running the baselines, and demoing the models and BEST estimator.
 
 To rebuild the dataset or re-run the analyses, see [Setup](#setup) and
 then [Quickstart](#quickstart). For documentation on how we validated
 the extractions, see the [Annotation Guidelines](./docs/annotation-guidelines.md).
+
+To cite the paper, jump to [Citation](#citation).
 
 **Note: This repository is intended for research purpooses only.** It is
 NOT intended for use in production environments, and there is no
@@ -82,6 +86,21 @@ browser:
       scoracle  Serve the scoracle demo.
 
 
+Citation
+--------
+If you build off of this code, data, or work, please cite [the paper][paper] as
+follows:
+
+    @article{Lourie2020Scruples,
+        author = {Nicholas Lourie and Ronan Le Bras and Yejin Choi},
+        title = {Scruples: A Corpus of Community Ethical Judgments on 32,000 Real-Life Anecdotes},
+        journal = {arXiv e-prints},
+        year = {2020},
+        archivePrefix = {arXiv},
+        eprint = {2008.09094},
+    }
+
+
 Contact
 -------
 For public, non-sensitive questions and concerns, please file an issue
@@ -113,6 +132,7 @@ product or service should carefully consider, investigate, and evaluate
 which norms are correct for their particular application.
 
 
+[paper]: https://arxiv.org/abs/2008.09094
 [pytorch]: https://pytorch.org/
 [reddit-comments]: http://files.pushshift.io/reddit/comments/
 [reddit-posts]: http://files.pushshift.io/reddit/submissions/
