@@ -3,9 +3,9 @@ Scruples
 A corpus and code for understanding norms and subjectivity.
 
 This repository is for the paper: [Scruples: A Corpus of Community Ethical
-Judgments on 32,000 Real-life Anecdotes][paper]. In particular, `scruples` is a
+Judgments on 32,000 Real-life Anecdotes][paper]. In particular, Scruples is a
 collection of datasets for studying _norm understanding_ in anecdotes. This
-repo contains code for building and analyzing `scruples`, running the
+repo contains code for building and analyzing Scruples, running the
 baselines, and demoing the models and BEST estimator.
 
 To download the data, see [Data](#data).
@@ -24,7 +24,7 @@ for more information.
 
 Data
 ----
-`scruples` has two primary datasets: the Anecdotes and the Dilemmas.
+Scruples has two primary datasets: the Anecdotes and the Dilemmas.
 
 ### Anecdotes
 
@@ -73,9 +73,9 @@ This project requires Python 3.7. To setup the project:
 
 Quickstart
 ----------
-Once you've [installed the package](#setup), you'll have the `scruples`
+Once you've [installed the package](#setup), you'll have the Scruples
 CLI available. It's a hierarchical, self-documenting CLI that contains
-all the commands necessary to build and analyze `scruples`:
+all the commands necessary to build and analyze Scruples:
 
     $ scruples --help
     Usage: scruples [OPTIONS] COMMAND [ARGS]...
@@ -94,9 +94,9 @@ all the commands necessary to build and analyze `scruples`:
 
 To build the dataset, you'll need to download the reddit
 [posts][reddit-posts] and [comments][reddit-comments]. The initial
-version of `scruples` used November 2018 through April 2019.
+version of Scruples used November 2018 through April 2019.
 
-Also, `scruples` comes with demos that you can run and view locally in the
+Also, Scruples comes with demos that you can run and view locally in the
 browser:
 
     $ scruples demo --help
@@ -146,7 +146,7 @@ understanding_ is to reproduce normative judgments drawn from various
 communities. This skill would enable computers to anticipate people's
 reactions and understand deeper situational context.
 
-`scruples` encourages progress on this research problem by providing a
+Scruples encourages progress on this research problem by providing a
 corpus of real-world ethical situations with community sourced normative
 judgments. The norms expressed by this corpus represent those of the
 community from which they're drawn&mdash;and thus they are not
