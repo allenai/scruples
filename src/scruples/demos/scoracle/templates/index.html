@@ -6,7 +6,7 @@
        name="viewport"
        content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Scoracle: Estimate Oracle Scores</title>
+    <title>Scoracle: Estimate BEST performance</title>
 
     <!-- favicon -->
     <link
@@ -179,8 +179,8 @@
         <div class="col-12">
           <h2 class="display-4">Demo</h2>
           <p>
-            To compute the oracle score, you'll need a classification dataset
-            with a fixed set of classes and multiple annotators per
+            To compute the BEST performance, you'll need a classification
+            dataset with a fixed set of classes and multiple annotators per
             question. We'll estimate the score from the label counts. To try it
             out, you can select a preset example below.
           </p>
@@ -317,7 +317,7 @@
         <div class="col-12">
           <figure class="figure w-100">
             <figcaption class="figure-caption text-center mb-2">
-              Estimated oracle scores.
+              BEST performance estimates
             </figcaption>
             <table
                id="demo-display-table"
@@ -489,7 +489,7 @@ Server: Werkzeug/0.15.4 Python/3.7.0
             For the mathematical details, check out
             the <a href="https://arxiv.org/abs/2008.09094">paper</a> or the
             <a href="https://github.com/allenai/scruples/blob/da41cf8976e96ceb05fdeca887b460ea1baf5629/src/scruples/utils.py#L460">code</a>
-            for computing the oracle score.
+            for computing the BEST performance.
           </p>
         </div>
       </div>
