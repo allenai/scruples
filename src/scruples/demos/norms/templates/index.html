@@ -223,7 +223,30 @@
            class="tab-pane fade show active"
            role="tabpanel"
            aria-labelledby="demo-form-actions-tab">
-          <div class="row py-2">
+          <div class="row py-4">
+            <div class="col-12">
+              <div class="form-group">
+                <label for="demo-actions-preset-example">
+                  (Optional) Preset Examples
+                </label>
+                <select id="demo-actions-preset-example" class="form-control">
+                  <option value="none">
+                    (none)
+                  </option>
+                  <option value="pizza">
+                    ordering pizza in a snowstorm...
+                  </option>
+                  <option value="blender">
+                    using a blender early in the morning...
+                  </option>
+                  <option value="siding">
+                    siding with my sister over my mom...
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
             <div class="col-12">
               <h3>Upload Data</h3>
             </div>
@@ -277,7 +300,27 @@
            class="tab-pane fade"
            role="tabpanel"
            aria-labelledby="demo-form-corpus-tab">
-          <div class="row py-2">
+          <div class="row py-4">
+            <div class="col-12">
+              <div class="form-group">
+                <label for="demo-corpus-preset-example">
+                  (Optional) Preset Examples
+                </label>
+                <select id="demo-corpus-preset-example" class="form-control">
+                  <option value="none">
+                    (none)
+                  </option>
+                  <option value="salesperson">
+                    AITA For closing the door in a salespersons face?
+                  </option>
+                  <option value="elevator">
+                    AITA for getting upset at people taking the elevator
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
             <div class="col-12">
               <h3>Upload Data</h3>
             </div>
@@ -626,7 +669,9 @@ $ curl \
 
     <!-- Custom JavaScript -->
     <script>
-      // Helper Functions
+      // helper functions
+
+      /** Form validation and submission. */
 
       /**
        * Format the number to a fixed-length string.
@@ -1118,8 +1163,99 @@ $ curl \
           );
       }
 
-      // Set the Form Handlers
+      /** The preset examples. */
 
+      var actionsPresetExamples = {
+        none: {
+          action1: '',
+          action2: '',
+        },
+        pizza: {
+          action1: 'ordering pizza in a snowstorm',
+          action2: 'cutting communications with my ex',
+        },
+        blender: {
+          action1: 'stopping a friend from talking to an ex',
+          action2: 'using a blender early in the morning',
+        },
+        siding: {
+          action1: 'siding with my sister over my mom',
+          action2: 'wanting to be number one for a change',
+        },
+      };
+
+      /**
+      * Set the actions preset example.
+      *
+      * @param {string} exampleName - The preset example with which to populate
+      *   the actions form.
+      */
+      function setActionsExample(exampleName) {
+        var example;
+
+        example = actionsPresetExamples[exampleName];
+
+        // set the form elements
+        document.getElementById('demo-form-action1').value = example.action1;
+        document.getElementById('demo-form-action2').value = example.action2;
+
+        // clear form validation errors since they're no longer applicable
+        clearErrors('actions');
+      }
+
+      var corpusPresetExamples = {
+        none: {
+          title: '',
+          text: '',
+        },
+        salesperson: {
+          title: 'AITA For closing the door in a salespersons face?',
+          text: "The other day a salespersons knocked on our door and it was obvious he was about to sell something (insurance company uniform with flyers). I already have insurance that I'm happy with so I already knew I would've said no to any deals (although I would probably say no to any door to door salesperson)\n\nI opened the door and before he could get a word out I just said \"Sorry, not interested\" and closed the door and went about my day. \n\nMy friend thinks that I was rude and should've let him at least introduce himself, whereas I  feel like I saved us both time - he doesn't waste time trying to push a sale he won't get and I don't waste time listening to the pitch just to say \"no thanks\".\n\nSo, AITA?",
+        },
+        elevator: {
+          title: 'AITA for getting upset at people taking the elevator',
+          text: "I live in a dorm in college. It is 11 stories and I live on floor 9, so I take the elevator because walking up 9 stories would take a while. However, I get really irritated when people get in the elevator to go to floor 4 or below. It ends up wasting my time. I am also not talking about people who cannot do stairs. These are people who walk all around campus all day everyday. Obviously, if someone was in a wheel chair or had a physical reason to need the elevator, I would understand but this is not true for the majority of college students. I never say anything but I do get very frustrated and upset. So, AITA?",
+        },
+      };
+
+      /**
+      * Set the corpus preset example.
+      *
+      * @param {string} exampleName - The preset example with which to populate
+      *   the corpus form.
+      */
+      function setCorpusExample(exampleName) {
+        var example;
+
+        example = corpusPresetExamples[exampleName];
+
+        // set the form elements
+        document.getElementById('demo-form-title').value = example.title;
+        document.getElementById('demo-form-text').value = example.text;
+
+        // clear form validation errors since they're no longer applicable
+        clearErrors('corpus');
+      }
+
+      // event handlers
+
+      /** The preset actions example selection handler. */
+      var actionsExampleSelector = document.getElementById('demo-actions-preset-example');
+      actionsExampleSelector.onchange = function(e) {
+        var selectElement;
+        selectElement = e.target;
+        setActionsExample(selectElement.value);
+      }
+
+      /** The preset corpus example selection handler. */
+      var corpusExampleSelector = document.getElementById('demo-corpus-preset-example');
+      corpusExampleSelector.onchange = function(e) {
+        var selectElement;
+        selectElement = e.target;
+        setCorpusExample(selectElement.value);
+      }
+
+      /** The actions form submission handler. */
       var actionsForm = document.getElementById('demo-form-actions');
       actionsForm.onsubmit = function(e) {
         e.preventDefault();
@@ -1150,6 +1286,8 @@ $ curl \
           return;
         }
 
+        // set the preset example to none
+        document.getElementById('demo-actions-preset-example').value = 'none';
         // clear the form
         clearForm('actions');
 
@@ -1175,6 +1313,7 @@ $ curl \
         return false;
       }
 
+      /** The corpus form submission handler. */
       var corpusForm = document.getElementById('demo-form-corpus');
       corpusForm.onsubmit = function(e) {
         e.preventDefault();
@@ -1205,6 +1344,8 @@ $ curl \
           return;
         }
 
+        // set the preset example to none
+        document.getElementById('demo-corpus-preset-example').value = 'none';
         // clear the form
         clearForm('corpus');
 
