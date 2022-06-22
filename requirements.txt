@@ -9,7 +9,7 @@ gevent>=20.9
 greenlet>=0.4.17
 matplotlib==3.0.3
 networkx==2.3
-numpy==1.16.2
+numpy==1.22.0
 pandas==0.24.2
 pytest==4.4.1
 python-dateutil<2.8.1,>=2.1
