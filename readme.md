@@ -187,9 +187,9 @@ reactions and understand deeper situational context.
 Scruples encourages progress on this research problem by providing a
 corpus of real-world ethical situations with community sourced normative
 judgments. The norms expressed by this corpus represent those of the
-community from which they're drawn&mdash;and thus they are not
-necessarily the right norms to use in any particular application
-scenario.
+community from which they're drawn&mdash;and thus they are neither
+representative of other communities nor necessarily the right norms to use in
+any particular application scenario.
 
 Any organization looking to incorporate normative understanding into a
 product or service should carefully consider, investigate, and evaluate
