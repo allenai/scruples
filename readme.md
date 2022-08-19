@@ -2,8 +2,8 @@ Scruples
 ========
 A corpus and code for understanding norms and subjectivity.
 
-This repository is for the paper: [Scruples: A Corpus of Community Ethical
-Judgments on 32,000 Real-life Anecdotes][paper]. Scruples provides datasets for
+This repository is for the paper: [*Scruples: A Corpus of Community Ethical
+Judgments on 32,000 Real-life Anecdotes*][paper]. Scruples provides datasets for
 studying _norm understanding_ in anecdotes and language. This repo contains
 code for building and analyzing the Scruples datasets, running the baselines,
 demoing the models and the BEST estimator, and using the BEST estimator
@@ -28,9 +28,9 @@ In addition, the following documents dive deep into particular topics:
     annotated data for Scruples to validate the extraction performance.
   - [Demos](./docs/demos.md): Set up and run the demos on your own machine.
 
-**Note: This repository is intended for research purpooses only.** It is
+**Note: This repository is intended for research purposes only.** It is
 NOT intended for use in production environments, and there is no
-intention for ongoing maintainence. See the [Disclaimer](#disclaimer)
+intention for ongoing maintenance. See the [Disclaimer](#disclaimer)
 for more information.
 
 
