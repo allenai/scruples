@@ -62,7 +62,7 @@ The possible labels are:
   </dd>
 </dl>
 
-If the comment explicitly expresses a label either by it's initialism or
+If the comment explicitly expresses a label either by its initialism or
 some phrase corresponding to the initialism, then use that label for the
 comment. Similarly, mark the comment with `implied` as `false` and
 `spam` as `false`.
