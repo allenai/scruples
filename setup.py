@@ -61,6 +61,9 @@ setup(
         'dill >= 0.2.9',
         'ftfy >= 5.5.1',
         'gevent >= 1.4.0',
+        'itsdangerous < 2.0.0',
+        'Jinja2 < 3.0.0',
+        'MarkupSafe < 2.0.0',
         'matplotlib >= 3.0.3',
         'networkx >= 2.3',
         'numpy >= 1.16.2',
@@ -78,6 +81,7 @@ setup(
         'torch >= 1.3.1',
         'torchvision >= 0.4.2',
         'transformers >= 2.1.1',
+        'Werkzeug < 2.0.0',
         'xgboost >= 0.82'
     ],
     setup_requires=[

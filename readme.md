@@ -86,22 +86,31 @@ your own hardware, check out the [demo documentation](./docs/demos.md).
 
 Setup
 -----
-This project requires Python 3.7. To setup the project:
+This project requires Python 3.7, and was tested with Python 3.7.6
+specifically. To setup the project:
 
   1. Make sure you have the MySQL client (on ubuntu):
 
          sudo apt-get install libmysqlclient-dev
 
-  2. Install [PyTorch][pytorch] using the directions on their site.
-  3. Install this repository:
+  2. Upgrade pip:
+
+         pip install --upgrade pip
+
+  3. Install [PyTorch][pytorch] using the directions on their site.
+  4. Install the package requirements:
+
+         pip install -r requirements.txt
+
+  5. Install this repository:
 
          pip install --editable .
 
-  4. Download the english model for spacy:
+  6. Download the english model for spacy:
 
          python -m spacy download en
 
-  5. (optional) Run the tests to make sure that everything is
+  7. (optional) Run the tests to make sure that everything is
      working. They'll take about 5 minutes to complete, or you can pass the
      `--skip-slow` (`-s`) option to run a smaller, faster test suite:
 
