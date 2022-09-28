@@ -60,7 +60,7 @@ more-itertools==8.14.0
 murmurhash==1.0.8
 mysqlclient==2.1.1
 networkx==2.3
-nltk==3.6.3
+nltk==3.6.6
 numpy==1.21.6
 oauthlib==3.2.1
 opt-einsum==3.3.0
