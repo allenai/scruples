@@ -1,6 +1,6 @@
 {
     "appName": "norms",
-    "contact": "nicholasl",
+    "contact": "chandrab",
     "team": "mosaic",
     "args": [ "demo", "norms", "--port", "8000", "--expose" ],
     "resources": {
