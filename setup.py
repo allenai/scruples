@@ -81,7 +81,7 @@ setup(
         'torch >= 1.3.1',
         'torchvision >= 0.4.2',
         'transformers >= 2.1.1',
-        'Werkzeug < 2.0.0',
+        'Werkzeug < 3.0.0',
         'xgboost >= 0.82'
     ],
     setup_requires=[
