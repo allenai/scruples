@@ -120,7 +120,7 @@ typing_extensions==4.3.0
 urllib3==1.26.12
 wasabi==0.10.1
 wcwidth==0.2.5
-Werkzeug==1.0.1
+Werkzeug==2.2.3
 wrapt==1.14.1
 xgboost==0.90
 zc.lockfile==2.0
