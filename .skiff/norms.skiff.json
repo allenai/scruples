@@ -5,7 +5,7 @@
     "args": [ "demo", "norms", "--port", "8000", "--expose" ],
     "resources": {
         "requests": {
-            "cpu": "3.5",
+            "cpu": "1",
             "memory": "16Gi"
         }
     }
