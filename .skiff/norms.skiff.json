@@ -1,7 +1,7 @@
 {
     "appName": "norms",
-    "contact": "chandrab",
-    "team": "mosaic",
+    "contact": "ronanlb",
+    "team": "aristo",
     "args": [ "demo", "norms", "--port", "8000", "--expose" ],
     "resources": {
         "requests": {
