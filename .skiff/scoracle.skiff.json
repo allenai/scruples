@@ -1,7 +1,7 @@
 {
     "appName": "scoracle",
-    "contact": "chandrab",
-    "team": "mosaic",
+    "contact": "ronanlb",
+    "team": "aristo",
     "args": [ "demo", "scoracle", "--port", "8000", "--expose" ],
     "resources": {
         "requests": {
