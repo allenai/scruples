@@ -93,7 +93,7 @@ s3transfer==0.6.0
 sacremoses==0.0.53
 scikit-learn==0.20.3
 scikit-optimize==0.5.2
-scipy==1.2.1
+scipy==1.10.0
 seaborn==0.9.0
 sentencepiece==0.1.97
 sgmllib3k==1.0.0

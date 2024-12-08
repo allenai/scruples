@@ -71,7 +71,7 @@ setup(
         'regex >= 2018.1.10',
         'scikit-learn >= 0.20.3, < 0.21',
         'scikit-optimize >= 0.5.2',
-        'scipy >= 1.2.1, < 1.3',
+        'scipy >= 1.2.1, < 1.11',
         'seaborn >= 0.9.0',
         'spacy >= 2.1.3, < 2.2.0',
         'tensorboard >= 1.15.0',
