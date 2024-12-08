@@ -22,7 +22,7 @@ cymem==2.0.6
 decorator==5.1.1
 dill==0.2.9
 feedparser==6.0.10
-Flask==1.1.1
+Flask==2.3.2
 flatbuffers==22.9.24
 ftfy==5.5.1
 future==0.18.2
